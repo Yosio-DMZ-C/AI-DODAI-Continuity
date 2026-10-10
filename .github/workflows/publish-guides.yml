@@ -1,0 +1,56 @@
+name: Publish AgentOS-C downloadable guides
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/AgentOS-C_設計・構築運用指示書_一般配布版.md'
+      - 'docs/AgentOS-C_設計・構築運用指示書_AI無課金ユーザー版.md'
+      - '.github/workflows/publish-guides.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: agentos-c-guide-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Prepare Markdown downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp 'docs/AgentOS-C_設計・構築運用指示書_一般配布版.md' 'dist/AgentOS-C_Guide.md'
+          cp 'docs/AgentOS-C_設計・構築運用指示書_AI無課金ユーザー版.md' 'dist/AgentOS-C_Free_Guide.md'
+          test -s 'dist/AgentOS-C_Guide.md'
+          test -s 'dist/AgentOS-C_Free_Guide.md'
+          grep -q '^# AgentOS-C' 'dist/AgentOS-C_Guide.md'
+          grep -q '^# AgentOS-C' 'dist/AgentOS-C_Free_Guide.md'
+
+      - name: Publish or update stable download release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag='guides-current'
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/AgentOS-C_Guide.md dist/AgentOS-C_Free_Guide.md --clobber
+          else
+            gh release create "$tag" dist/AgentOS-C_Guide.md dist/AgentOS-C_Free_Guide.md \
+              --title 'AgentOS-C 設計・構築運用指示書（最新版）' \
+              --notes '一般配布版とAI無課金ユーザー版のMarkdown配布リンクです。文書の変更時に同じファイル名で差し替えます。' \
+              --target main
+          fi
