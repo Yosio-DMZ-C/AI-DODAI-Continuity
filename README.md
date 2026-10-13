@@ -18,6 +18,12 @@ AgentOS-Cは新しいLLMや新しいアルゴリズムではありません。Me
 
 短い手順だけ見たい場合は [QUICKSTART.md](QUICKSTART.md) を参照してください。
 
+## はじめての方向けガイド（レビュー中）
+
+**[AgentOS-Cの全体像と導入ガイド](docs/wiki/Home.md)** — 初めて試す手順、Claude・Gemini・Grokの限定的な[実動作検証](docs/wiki/Verified-Results.md)、将来の[組織標準KB・インストーラKB等の構想](docs/wiki/Future-Vision.md)をまとめています。
+
+「実際に確認できたこと」「検証中」「構想」は区別して紹介しています。個人KBを公開GitHubへ置く必要はありません。
+
 ## どの設計書を使うか
 
 判断基準は**料金プランではなく、そのAIが保存先へ直接読み書きできるか**です。
