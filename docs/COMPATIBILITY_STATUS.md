@@ -12,6 +12,20 @@
 
 初期構築、受渡し、外部保存、新規チャット再開、内容更新、AI間移植は**別々の品質ゲート**で評価する。ZIPのファイル名が `.zip` でも、バイナリの読戻し・構文検査までは成功扱いにしない。修正版で `node-source-001` 等に名称を揃えても、`node-start-001` 等の固定的名称のままでは新規固有NodeIDの発行を保証しない。
 
+## 2026-10-13 外部成果物の再検査
+
+以下は新たにファイル実体を再読込した**追加事実**と、なお未実証の事項を区別した記録。
+
+| 対象 | 独立検査結果 | 限界 |
+|---|---|---|
+| Claude Free | Drive直下に13フォルダ、Context配下4サブフォルダ、入口2ファイル（MIME `text/markdown`）、system配下のregistry（`application/json`）・品質ゲート・索引、reviews配下の報告を確認。registryの`file_id:null`は2件 | 新規Claudeチャットでの再開成功は前段の試験記録に基づく。同一fileId本文更新は当該環境でFAIL |
+| Gemini Free | Driveルートに2ファイルのみ。名前は`.md`だがMIMEは`application/vnd.google-apps.document`。両文書に同じサンプルUUID `a1b2c3d4-e5f6-7890-abcd-ef1234567890` | 初期構築FAIL。実データの修復・再開は実施していない |
+| Grok初回ZIP | 11,343 bytes、7ファイル、8ディレクトリエントリ。CRC正常、registry JSON正常。registryの7相対パスはすべて存在、IDの重複なし。ただし1件のNodeIDヘッダー不一致 | 組織的な新規NodeIDの発行は未達。元設計書は全文ではなく抜粋。レビュー文書のQG-07はPASSとする一方「ZIP読戻し確認予定」と記録 |
+| Grok修正版ZIP | 11,836 bytes、同じ7相対パス。CRC正常、registry JSON正常。7件すべて`node-`で始まり、registryとMarkdownヘッダーは一致 | `node-start-001`等の固定番号が残るため新規固有性は未証明。QG-07の「確認予定」表記も残存 |
+| DriveへのGrok初回ZIP保存 | DriveでZIP実体を読戻し、作成時のSHA-256と一致。初回ZIPと修正版ZIPは別ハッシュ | Driveへ置かれたのは**初回ZIP**のみ。修正版を外部保存済みと混同しない |
+
+CRC/JSON/相対パスの一致、識別子の新規性、レビュー完了、再開・更新能力は別々の判定項目とする。新規Grokチャットでの再開・差分更新は`NOT_RUN`。
+
 ---
 
 # 過去の記録：2026-10-09時点
