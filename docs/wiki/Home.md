@@ -10,7 +10,7 @@ AgentOS-Cは、利用者の知識・判断・手順・作業状態をAIサービ
 - [何が実際に確認されたか](Verified-Results.md)
 - [開発中の構想と将来用途](Future-Vision.md)
 
-**初回の最小目標は「KBを生成し、検査可能な形式で受け取り、自分の保存先へバックアップする」こと**です。すべてのAIで自動更新やAI間移植ができるとは約束しません。
+まずは、KBを生成し、受け取り、自分の保存先へバックアップできるところまでを小さく確認します。更新やAI間での引き継ぎについては、順次検証を進めています。
 
 ## 基本の使い方
 
@@ -21,16 +21,16 @@ AgentOS-Cは、利用者の知識・判断・手順・作業状態をAIサービ
 
 [公式QUICKSTART](https://github.com/Yosio-DMZ-C/AgentOS-C/blob/main/QUICKSTART.md) / [一般配布版の設計書](https://github.com/Yosio-DMZ-C/AgentOS-C/blob/main/docs/AgentOS-C_設計・構築運用指示書_一般配布版.md) / [AI無課金ユーザー版](https://github.com/Yosio-DMZ-C/AgentOS-C/blob/main/docs/AgentOS-C_設計・構築運用指示書_AI無課金ユーザー版.md)
 
-## 実装と構想を混同しない
+## 現在できることと、これから広げること
 
 | 区分 | 内容 |
 |---|---|
-| **限定的に実証** | 一部環境で初期KB生成、ZIP受渡し、外部保存、別チャット読戻し |
-| **検証中** | IDと参照の完全性、安全な更新、競合復旧、他AI間移植 |
-| **構想** | 組織標準KB、対話型インストーラKB、共有知の拡充、Core Life Skills |
+| **現在確認できていること** | 一部環境で初期KBの生成、ZIPでの受渡し、外部保存、別チャットからの読戻し |
+| **次に検証すること** | IDと参照の完全性、安全な更新、競合からの復旧、他AIへの移植 |
+| **今後の展開** | 組織標準KB、対話型インストーラKB、共有知の拡充、Core Life Skills |
 
-環境・契約・ツールによって可否は異なります。**AIの自己申告と外部成果物の独立検査を分けます。** [試験結果と限界](Verified-Results.md)を参照してください。
+利用するAIや環境によって使える機能は異なります。実際に確認できた内容は、[実動作の検証結果](Verified-Results.md)で順次公開しています。
 
-## このページについて
+## さらに詳しく
 
-この一連のページはPR用の説明案です。詳しい技術仕様の正本は[リポジトリの設計書](https://github.com/Yosio-DMZ-C/AgentOS-C/tree/main/docs)にあります。内容を確認せず、個人KBや内部文書を公開リポジトリへ移さないでください。
+より詳しい仕組みや設計については、[AgentOS-Cの設計書](https://github.com/Yosio-DMZ-C/AgentOS-C/tree/main/docs)をご覧ください。
