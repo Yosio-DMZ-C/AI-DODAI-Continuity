@@ -69,12 +69,8 @@ AgentOS-Cでは、主に次のようなファイルを使います。
 - [Core Life Skillsのロードマップ](docs/CORE_LIFE_SKILLS.md)
 - [紹介スライド v1.3](https://docs.google.com/presentation/d/1oOroO3_Ry_AyJMZlITOoG5Lpg6AH83t8/edit?usp=sharing)
 
-## 公開資料と個人データ
-
-このリポジトリには、一般公開用の設計書・説明・テンプレートを置いています。**実際の個人KB、会話履歴、購入・健康・業務情報、認証情報は公開リポジトリへ置かず、非公開の保存先で管理してください。**
-
-AgentOS-C本体のライセンスは[MIT License](LICENSE)です。共有知の独自の文章等は[別リポジトリ](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge)のライセンスをご確認ください。
-
 ---
 
 AgentOS-Cは、実際に使える仕組みから試しながら開発しています。[まずは導入手順を見る](QUICKSTART.md)。
+
+本体は[MIT License](LICENSE)で公開しています。共有知は[別リポジトリ](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge)をご覧ください。
