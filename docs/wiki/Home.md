@@ -6,7 +6,7 @@
 
 DODAIは日本語の「土台」に由来します。TRPGのGMがルールブックや冒険記録を引き継ぐように、各AIが共通の知識と作業状態を使うことを目指す仕組みです。GMの裁量に相当するAIの推論能力は生かしつつ、重要なデータと品質条件は保持します。これは比喩であり、異なるAI間の自動的な引継ぎは未実証です。
 
-**名称移行準備中：** GitHubリポジトリの現行名と固定ダウンロード用の旧ファイル名は維持しています。[移行計画・検査状況](../ADNC_NAME_MIGRATION_PLAN.md)も参照してください。
+**名称変更済み（2026-10-14）：** 本体GitHubリポジトリ名は `AI-DODAI-Continuity` に変更しました。固定ダウンロード用の従来の資産名は維持しています。旧URLからの実ダウンロードは未検証です。[移行計画・検査状況](../ADNC_NAME_MIGRATION_PLAN.md)も参照してください。
 
 目標は単なるバックアップではありません。医師や研究者などの専門家も、ITの導入や連携に時間を取られず、本来の課題に集中できるようにすること。そして将来は、共有できる専門知と本人の状況に合う選択肢をつなぎ、人生のより良い判断を支えることです。**これは開発目標で、現在の機能や効果を保証するものではありません。**
 
@@ -46,4 +46,4 @@ DODAIは日本語の「土台」に由来します。TRPGのGMがルールブッ
 
 ---
 
-[AD&C（現行リポジトリ名：AgentOS-C）のGitHub](https://github.com/Yosio-DMZ-C/AgentOS-C) ／ [設計書・技術資料](https://github.com/Yosio-DMZ-C/AgentOS-C/tree/main/docs)
+[AD&CのGitHub（旧名称：AgentOS-C）](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity) ／ [設計書・技術資料](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/tree/main/docs)

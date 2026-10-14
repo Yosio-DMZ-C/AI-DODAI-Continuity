@@ -1,8 +1,8 @@
-# AgentOS-Cを試してみる
+# AD&Cを試してみる（旧名称：AgentOS-C）
 
 [概要](Home.md) ／ [実動作の検証結果](Verified-Results.md)
 
-AgentOS-Cを始めるときに必要なのは、利用するAIと、知識ベースを保存する場所です。
+AD&Cを始めるときに必要なのは、利用するAIと、知識ベースを保存する場所です。
 
 ## 1. 設計書を選ぶ
 
@@ -54,6 +54,6 @@ AIが作成したフォルダと主要ファイルが、指定した保存先に
 
 ## 参考資料
 
-[実動作の試験結果](Verified-Results.md) ／ [公式Quick Start](../../QUICKSTART.md) ／ [GitHubリポジトリ](https://github.com/Yosio-DMZ-C/AgentOS-C)
+[実動作の試験結果](Verified-Results.md) ／ [公式Quick Start](../../QUICKSTART.md) ／ [GitHubリポジトリ](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity)
 
 個人の会話履歴や業務資料を使う場合は、公開GitHubではなく自分が管理する非公開の保存先を利用してください。

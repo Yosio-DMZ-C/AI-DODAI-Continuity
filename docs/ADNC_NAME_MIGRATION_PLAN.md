@@ -1,5 +1,17 @@
 # AD&C（AI-DODAI & Continuity）名称移行計画 — 審査用
 
+## 追記：本体リポジトリ改名の実施結果（2026-10-14）
+
+**現在の本体正本：** [Yosio-DMZ-C/AI-DODAI-Continuity](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity)。旧名称は `Yosio-DMZ-C/AgentOS-C`。利用者の明示承認により、GitHubの同一リポジトリを改名済み（repo ID `1409572106`）。PR #9はmainへマージ済み（`5cdd1056c9d74ae3dfcdd8403e6b71abd9d1eb64`）。
+
+- **PASS：** 新URLのリポジトリAPI取得、同一固定ID、旧URLからのAPIリポジトリ参照（新名称へ解決）、main、PR #9と過去コミット、`guides-current` のRelease・従来資産2件の登録メタデータ、既存ワークフロー／過去manifest／配布設計書のblob SHA維持。
+- **NOT_RUN：** 旧URL・新URLからのRelease資産の実ダウンロード／独立SHA照合、ブラウザでのHTTP転送検査、改名後の配布ワークフロー実行、Claude/Geminiのアクセス改善確認。GitHub接続経由での配布ファイル直取得は404となり、利用者環境での成否とは区別する。
+- **継続方針：** 配布タグ `guides-current` と資産名 `AgentOS-C_Guide.md` / `AgentOS-C_Free_Guide.md`、設計書の旧ファイルパス、NodeID、個人KB固定ID、過去のmanifest・ハッシュを保持。共有知リポジトリの改名は別判断とする。今回の表示・URL訂正PRでもこれらには触れない。
+
+**以下は改名前に作成した計画・承認条件・当時の検査結果をそのまま残した歴史的記録です。** 以下の「未承認」「未実施」「候補URLは有効でない」といった文言は記述当時の状態であり、現況は本追記を優先してください。
+
+---
+
 - 作成日：2026-10-14
 - 状態：**名称移行計画／PR #9のマージ承認を受領（2026-10-14）**。**本体リポジトリの改名は未承認・未実施**。個人KB・旧リリース・外部サービスも変更しない。
 - 改名前の正本：`Yosio-DMZ-C/AgentOS-C`（調査時の main: `34eeed2cf260185e7959424eb3085d4f4eb4c201`）
