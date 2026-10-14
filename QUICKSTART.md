@@ -2,7 +2,7 @@
 
 **AD&C — AI-DODAI & Continuity**：AIの外に、自分の知識や作業履歴を残すための導入手順です。DODAIは日本語の「土台」に由来します。
 
-**名称移行準備中：** リポジトリ名・既存配布ガイド名・`AgentOS-C_initial.zip` という初期出力名は当面変更しません。[移行計画](docs/ADNC_NAME_MIGRATION_PLAN.md)を参照してください。
+**名称変更済み（2026-10-14）：** 本体リポジトリ名は `AI-DODAI-Continuity` になりました。既存配布ガイドのファイル名と、初期出力名 `AgentOS-C_initial.zip` は互換性のため変更していません。[移行計画](docs/ADNC_NAME_MIGRATION_PLAN.md)を参照してください。
 
 ## 1. 自分の環境に合う設計書を選ぶ
 
