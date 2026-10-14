@@ -35,7 +35,7 @@ jobs:
           cp 'docs/AgentOS-C_設計・構築運用指示書_AI無課金ユーザー版.md' 'dist/AgentOS-C_Free_Guide.md'
           test -s 'dist/AgentOS-C_Guide.md'
           test -s 'dist/AgentOS-C_Free_Guide.md'
-          grep -q '^# AgentOS-C' 'dist/AgentOS-C_Guide.md'
+          grep -q '^# AD&C' 'dist/AgentOS-C_Guide.md'
           grep -q '^# AgentOS-C' 'dist/AgentOS-C_Free_Guide.md'
 
       - name: Publish or update stable download release
