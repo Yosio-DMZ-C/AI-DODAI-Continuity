@@ -85,6 +85,7 @@ AD&Cでは、主に次のようなファイルを使います。
 - [導入ガイド](docs/wiki/Getting-Started.md)
 - [対応状況・技術的な検証記録](docs/COMPATIBILITY_STATUS.md)
 - [開発・調査支援の共通標準](docs/PROJECT_EXECUTION_STANDARD.md)
+- [APIキーの保存方式・初回登録・自動再利用ガイド](docs/API_SECRET_HANDLING.md)
 - [先行開発調査Skill（Draft）](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)
 - [共有知プロジェクト](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge)
 - [Core Life Skillsのロードマップ](docs/CORE_LIFE_SKILLS.md)
