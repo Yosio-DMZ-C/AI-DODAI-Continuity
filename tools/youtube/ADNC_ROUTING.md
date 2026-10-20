@@ -84,15 +84,14 @@
 - OAuthやMCP用秘密情報をGitHub、ブラウザlocalStorage、AD&C共有KBに保存しない。
 - 利用者がOAuthクライアントJSONをダウンロードした際は「大丈夫です」等の曖昧な表現ではなく、**セキュリティ上チャットへの添付・貼付は禁止**と明言し、ダウンロード完了だけを確認する。画面のトークンやシークレットもマスクしてから共有してもらう。
 
-## Windowsデスクトップ版 ChatGPT 設定への正しい案内（2026-10-20 実画面）
+## Windowsデスクトップ版 ChatGPTのMCPサーバー管理（2026-10-20実機確認）
 
-1. **画面左下の自分のアイコン**をクリック。
-2. 表示されたメニューの **「設定」** をクリック。
-3. 設定画面の**左メニューを下へスクロール**。
-4. **「コーディング」→「接続」** をクリック。
-5. 「接続」の次画面を確認し、MCPサーバー管理が利用できるか、`cloudflare-api` の登録／要認証状態があるかを確かめる。**現段階ではメニュー自体のMCP対応は未検証**。
+1. **左下の本人アイコン→「設定」** を開く。**「MCP サーバー」** 管理画面からMCPタブを開き、「＋ サーバーを追加する」を選択する。具体的なメニュー階層は画面更新で変わるため、存在しないパスを断定しない。
+2. Cloudflare公式MCP: 名前 `cloudflare-api`、種類「ストリーミング可能なHTTP」、URL `https://mcp.cloudflare.com/mcp`。OAuthなのでBearer token / header手入力なし。
+3. 保存後「認証する」→ Cloudflare OAuthで `Read only`（初期選択のFull accessのまま進めない）→ 必要な範囲を本人確認してAuthorize。
+4. Codexの新規チャットからMCP `search` / `execute` を使用してGETのみでWorker・KV・Binding・Variableを点検。**実機で全項目PASS・GET HTTP200**（2026-10-20、Codexの結果に基づく）。`execute`の承認は「一度だけ許可」、書込み・削除・デプロイは未試験。
 
-- 旧案内「Settings → MCP servers → Add server」はユーザーの環境で目視未確認だったため**標準操作名として使わない**。ユーザー提供のSSを根拠とする。公式MCPの説明は https://developers.openai.com/plugins/concepts/mcp-server
-- **MCPはAIと外部ツール／データをつなぐ共通規格**。MCPサーバーがツール/API実行窓口。SkillはAIへの手順、プラグインは両者をまとめる配布形式。Skill読込≠MCP接続成功。
-- サーバーの追加・OAuth同意等は本人が許可する。まず読み取りのみ。既存設定・Secrets・Workerは無断変更しない。
+**誤案内の訂正**：「コーディング→接続」はリモートPC・SSHの接続設定であり、**MCPサーバー設定ではない**。「接続を許可」をONにしない。プラグインのSkillが読めても、そのプラグインのMCPが自動登録されるとは限らない。Cloudflare MCPは今回はアプリ設定から個別登録した。
+
+- API認証情報・OAuthコード・Secret値をチャットに送らない。初期権限はRead only。Full accessや「常に許可」は標準にしない。
 
