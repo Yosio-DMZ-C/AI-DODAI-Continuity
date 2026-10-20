@@ -150,3 +150,10 @@
 - **今回の個別KV ID** はスクリーンショットのブラウザURLで取得可能だったが、一般配布版のサンプル設定には利用者固有IDを埋め込まず `REPLACE_WITH_CLOUDFLARE_KV_NAMESPACE_ID` を維持。Workerの紐付け先が別アカウントになることを防ぐ。
 - 今回はDashboardで既にWorkerとKVを作成済みなので、本人PCへのWrangler導入・Cloudflare認証を増やしてまで途中で操作経路を切替えない。**次回の初期構築ではコード管理を第一候補**として工数比較。
 
+
+## 2026-10-20 実機確認：KV binding登録完了
+
+- ユーザー提供のCloudflare Worker `adnc-youtube-private` > Settings > Bindings（Production）の実画面に `KV namespace | UPLOADS_KV | adnc-youtube-uploads` が表示された。**バインディングの登録・読戻し PASS（スクリーンショット確認）**。Google OAuth接続や実動画アップロードは未実行。
+- 黄色の「Update your Wrangler configuration with these changes to keep deployments in sync」は**将来のWranglerデプロイで設定を維持するための注意**。現在のバインディングが失敗した意味ではない。
+- 次工程は **Worker側 Settings > Variables and Secrets > Add** で平文変数 `EXPECTED_CHANNEL_ID = UCrLzqKRdeNsCpSrHPQy8Ifg` を設定。YouTubeチャンネルIDは公開識別子なのでSecretではなくTextでよい。Worker実画面で当該セクションの位置を確認する。公式: https://developers.cloudflare.com/workers/configuration/environment-variables/ （2026-08-21更新）。
+- 以後 `GOOGLE_CLIENT_SECRET` / `GOOGLE_REFRESH_TOKEN` / `MCP_API_KEY` は平文変数ではなく Cloudflare Secret で保存。OAuth JSONや秘密値はチャットで送らせない。公式: https://developers.cloudflare.com/workers/configuration/secrets/ （2026-10-15更新）。
