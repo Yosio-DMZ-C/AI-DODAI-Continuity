@@ -1,3 +1,5 @@
+> **2026-10-20 Cloudflare自動操作の推奨変更:** Python/Node/npmが利用者PCにないことを実機確認。Cloudflare操作は**[Cloudflare公式MCP + AD&Cプラグイン](CLOUDFLARE_API_MCP_V0.1.md)**で行う。私有プラグインの作成・読戻しPASS、OAuth接続・実API読書きNOT_RUN。以前の `setup_once.py` はGoogle Desktop OAuth検証用として残し、一般ユーザー向け標準手順にしない。 
+
 > **v0.3.1 Dashboard認証対応:** GUIでWorker/KV/チャンネルIDを作成済みの場合、`setup_once.py --dashboard-configured` を使用。古い `wrangler.toml` で再デプロイする必要はありません。OAuthは初期状態でYouTube権限のみ。 [実機向け最短手順](DASHBOARD_AUTH_STEPS.md)（実認証・実投稿は未実施）。
 
 > **v0.4 設計更新（2026-10-20）:** YouTubeを動画の保管・共有先とし、**Google Driveを必須としない**。ブラウザからの直接投稿を標準、チャット添付の直接転送は未実装（接続検証予定）、Drive→MCPは既存ファイル向け補助経路。Drive原本の整理はYouTube処理完了確認後に**明示的ポリシーに従いゴミ箱へ移動**する案で、**削除機能は未実装**。 [詳細設計](DIRECT_UPLOAD_DESIGN_v0.4_DRAFT.md)
