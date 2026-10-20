@@ -105,3 +105,27 @@ Cloudflare公式MCPをWindows Codexへ直接登録し、OAuth Read onlyでCloudf
 - レビューZIP内 `worker.mjs`（統合前の元ソース）：**12,391 bytes**、SHA-256 **`d91d362cee4a6387f95c066b031e7caf5de8b04c3b898500567111fb1fa5fa74`**。
 - レビューZIP内 `worker.integrated.mjs`（OAuth追加済みの候補、未デプロイ）：**22,190 bytes**、SHA-256 **`1adf526a545793aecca48643e920f60e6141f68481fa7f464af0cb071c126993`**。
 - バイト差は意図したレビュー対象であり、ライブWorkerのコードがリリース形式／改行処理により変わる場合はハッシュ一致しない。ハッシュ不一致だけで不具合断定せず、差分のレビューを要する。
+
+## 2026-10-21 本番ソース照合PASS／OAuth v0.4.2レビュー候補
+
+**入力証跡:** ユーザーがCodex Cloudflare公式MCPのRead only結果をこのチャットへ提示（実行レポート）。全対象GETはHTTP 200、デプロイなどの変更なし。
+
+| 項目 | 判定と根拠 |
+|---|---|
+| 本番Worker GET | PASS: `worker.js` 1ファイル、**12,392 bytes** |
+| 本番Worker SHA-256 | `28923a2bc522c7c79acb18f2ebeb8e20f08e7390b6a7a38a6dd82d7f9288560e` |
+| 先頭LF除去後の一致 | PASS: **12,391 bytes**、元ファイルSHA `d91d362cee4a6387f95c066b031e7caf5de8b04c3b898500567111fb1fa5fa74` |
+| GitHub参考ソースとの内容照合 | PASS（Codex報告）：先頭・末尾のLF各1文字のみ差分 |
+| `/health`、`/mcp`、`UPLOADS_KV`、認証・非公開アップロードの静的処理 | PASS（静的読取のみ） |
+| `MCP_API_KEY` / `GOOGLE_REFRESH_TOKEN` | 現在のBindings一覧に未登録との報告。Secretの値は取得なし |
+| 本番への実デプロイ・Google OAuth・動画アップロード | **NOT_RUN** |
+
+### v0.4.2 レビュー成果物（ローカル作成、未デプロイ）
+
+- v0.4.1統合候補に **PKCE S256** を追加。各リクエストの `code_verifier` を別の秘密 `AUTH_SETUP_KEY` と状態ノンスのHMACから導出、認可URLへ `code_challenge` と `code_challenge_method=S256`、Googleトークン交換時へ `code_verifier` を追加。既存Workerの本体コードは、OAuthへの早期分岐2行を追加する以外不変。
+- Node.js 22.16.0で `node --check` PASS。オリジナル/新OAuthモック含む **17/17 PASS**（新PKCEチャレンジとVerifier一致のテスト1件追加）。ライブAPI検証ではない。
+- 候補本体 `worker.oauth.v0.4.2.mjs` SHA-256: **`2f6710f915e63e507c4daa828db18d4c05bb52d23cbdb975cb72692d112c153a`**。
+- 差分 `worker.oauth.v0.4.2.patch`、元コード `worker.base.mjs`、検査テストと `REVIEW_NOTES.md` をまとめた**レビューZIP**を本チャットで出力。ZIPの名前 `ADNC_YouTube_OAuth_Integrated_v0.4.2_REVIEW.zip`。GitHubにレビューZIP本体は登録しておらず、実コードの正本化は次工程。**GitHub既存の `worker.mjs` を上書きしていない**。
+- 本番Workerへのコード変更は**ユーザーの明示承認待ち**。Cloudflare公式MCPはRead onlyなので、書込スコープを必要最小限にして再認可が必要。承認後は本番コードを個別バックアップし、差分をレビューしてからデプロイし、`/health` / 未認証`/mcp` の回帰テストを実施。
+- この段階でユーザーに依頼するCloudflare Secretの登録は**なし**。まずデプロイの承認と方法を決める。次段階でGoogle OAuth実認証→ `GOOGLE_REFRESH_TOKEN` Secret設定、その後別々の乱数Secret `MCP_API_KEY` の設定。両者を `AUTH_SETUP_KEY` と混同・再利用しない。
+- **要注意**：OAuth完了ページのHTML/JSには一時的に更新トークンが存在する。URLや通常の画面には表示しないが、ページソース・ブラウザ拡張からは見える可能性がある。チャットへのスクリーンショット・HTML・トークンの送付は禁止。Google Driveソースファイルの削除は引き続き禁止。
