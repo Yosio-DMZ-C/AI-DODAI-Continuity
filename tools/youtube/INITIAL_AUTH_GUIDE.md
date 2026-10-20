@@ -96,6 +96,13 @@
 - 選択値: **KV Namespace**、**Variable name `UPLOADS_KV`**、**KV namespace `adnc-youtube-uploads`**。確認して保存・Deploy後、Worker概要でBindingsが1件と表示されることを確認する。
 - 利用者がKV名前空間側のSettingsにいる場合、そこから更に操作を探させず「対象画面が違う」と明確に伝える。誤操作によるRename/Deleteを防ぐ。
 
+## 2026-10-20 UIレビュー：同じ「Add Binding」が2画面連続
+
+- **実機で確認**：Workerの Settings > Bindings > Add binding の最初のダイアログはリソース種別の選択とコード例の表示のみ。それなのに右下のボタン名は `Add Binding`。押すと初めて実際の設定フォーム `Add a KV namespace binding` が開く。後者の右下ボタンも `Add Binding`。
+- **利用者の指摘**：最初のボタンは `Next` の方が直感的。Cloudflareの製品UIはAD&C側から変更できないため、案内では **「1回目の Add Binding = 設定画面へ進む」「2回目の Add Binding = 設定を登録」** と実際の操作結果に結び付けて区別する。誤って設定完了と報告しない。
+- 実入力画面の目視確認：`Variable name = UPLOADS_KV`、`PRODUCTION KV namespace = adnc-youtube-uploads`、`PREVIEWS Use production value = ON`。ユーザーがこの画面まで入力済み。**Add Bindingを押した後の保存結果は未確認**。
+- **AD&CのUI設計原則として再利用**：次の画面へ移動する操作は「次へ（Next）」、書き込みを実行する操作は「登録／保存（Add／Save）」など、**操作結果が明確に異なるラベル**を使う。同じラベルを連続画面で使う場合、利用者の誤認を誘発するため避ける。
+
 ## 認証エラー時の分岐
 
 | 表示例 | 確認すること | 安全な対応 |
