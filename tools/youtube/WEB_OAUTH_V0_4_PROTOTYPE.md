@@ -99,3 +99,9 @@ Cloudflare公式MCPをWindows Codexへ直接登録し、OAuth Read onlyでCloudf
 - **次はCodex Cloudflare公式MCPを使用したGET専用確認**：現在デプロイ済みWorker `adnc-youtube-private` のスクリプト本文を読み取り、GitHubブランチ `feature/adnc-youtube-tools-v0-2-20261020` の `tools/youtube/worker.mjs` と比較。本文全体やSecretらしい値はユーザー宛てに表示しない（ハッシュ、ファイル長、差分概要、ルーティング・Binding確認など安全なメタ情報だけ出す）。ソース内の埋込認証情報に遭遇したら値は出さずに注意を促す。
 - 元ファイルが**完全に一致**すれば、同一版を元にしたOAuth統合コードを最小差分で適用する計画へ進める。不一致の場合は差分を慎重にレビューし、既存機能を消す可能性のある丸ごと上書きを行わない。
 - 本作業はCloudflare MCP `Read only` 権限のみ。API書き込み・再デプロイ・Secret取得・Drive削除・YouTube投稿は行わない。
+
+### 比較用ソース指紋（2026-10-20）
+
+- レビューZIP内 `worker.mjs`（統合前の元ソース）：**12,391 bytes**、SHA-256 **`d91d362cee4a6387f95c066b031e7caf5de8b04c3b898500567111fb1fa5fa74`**。
+- レビューZIP内 `worker.integrated.mjs`（OAuth追加済みの候補、未デプロイ）：**22,190 bytes**、SHA-256 **`1adf526a545793aecca48643e920f60e6141f68481fa7f464af0cb071c126993`**。
+- バイト差は意図したレビュー対象であり、ライブWorkerのコードがリリース形式／改行処理により変わる場合はハッシュ一致しない。ハッシュ不一致だけで不具合断定せず、差分のレビューを要する。
