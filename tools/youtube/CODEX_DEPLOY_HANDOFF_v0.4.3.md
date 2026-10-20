@@ -204,3 +204,10 @@ NEXT_HUMAN_ACTION: ...
 5. 成功確認後に認証ページを閉じ、クリップボードに残ったトークンを消す。独立した `MCP_API_KEY` は次工程で別の乱数から作成。動画投稿は秘密鍵の設定とAPI権限の実機検査後に実施。
 
 **手順上の注意**：認証中のCookieとstateの有効期限は10分。ブラウザは同一端末・同一プロファイルで行い、別タブや別端末で開始した認可を継続しない。ユーザーへ要求するのは本人のGoogle認可操作と秘密値のCloudflareへの転記だけ。
+
+## 2026-10-21 本番Google OAuthブランドアカウント拒否（v0.4.3の機能的阻害）
+
+- **本番WorkerデプロイPASSとGoogle OAuth成功は別**。本人が初回認証画面からYouTubeブランドチャンネル `AI-DODAI & Continuity` を選ぶとGoogleの `サービスをご利用いただけません`（当該アカウントで利用できないサービス）画面で中断。
+- v0.4.3が `youtube.force-ssl` と `drive.readonly` を**同じブランドアカウントに同時要求**していることが第一の原因仮説。Google公式Issue [538926827](https://issuetracker.google.com/issues/538926827) が同じ症状とDrive scope削除による解決を報告。
+- **本番v0.4.3は無変更で保全**。本人に個人Googleアカウントを選び直してチャンネル誤認証させない。OAuth再試行はv0.4.4の認証分離修正・デプロイ後まで停止。
+- [v0.4.4向け修正設計／試験仕様](BRAND_ACCOUNT_OAUTH_SPLIT_FIX.md) に従い、YouTubeブランドチャンネル用 `GOOGLE_REFRESH_TOKEN` と個人Drive用 `GOOGLE_DRIVE_REFRESH_TOKEN` を分離。どちらもSecretで、値はChatGPT／GitHubへ渡さない。既存CSP・CSRF・PKCE・MCP・KV・private確認は維持。修正候補の本番コード・テストは**まだ未作成／未実行**。
