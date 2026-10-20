@@ -166,3 +166,11 @@ NEXT_HUMAN_ACTION: ...
 - Cloudflare公式の [Get Worker Script Content](https://developers.cloudflare.com/api/resources/workers/subresources/scripts/subresources/content/methods/get/) / [List Worker Scripts](https://developers.cloudflare.com/api/resources/workers/subresources/scripts/methods/list/) / [Get Worker Script Settings](https://developers.cloudflare.com/api/resources/workers/subresources/scripts/subresources/settings/methods/get/) は、各GET APIのAccepted Permissionsに `Workers Scripts Write` を列挙する。よって**対象WorkerのコードGET/コード変更/コード読戻しのために `Workers Scripts Read` を重複付与する必要はない**。以前の「Scripts Readも必須」という案内は訂正。
 - Cloudflare APIの別リソース一覧（KV Namespaceの一覧やアカウント一覧など）は異なる権限を要する場合がある。デプロイの正本とBinding/Secret型の確認は、適切な既存GETが成功する範囲で行い、403なら必要スコープだけ後から追加する。認可だけでデプロイPASSとはしない。
 - 次の本人操作：`Back to Review` で **3 total permissions／Write 1件だけ**を最終確認した後 `Authorize`。Codexへ戻り、**本番現在ハッシュのGETとバックアップ確認から再開**して `/content` のコードのみ更新と回帰試験を実施。「一度だけ許可」でMCP実行コードを都度確認。旧Worker/Binding/Secret、YouTube/Driveは変更しない。
+
+### 実機追記：localhost OAuth callback ERR_CONNECTION_REFUSED の再試行
+
+- ユーザー実機でCloudflare OAuth画面にて Required `User Read`, `Background Access` と追加 `Workers Scripts Write` の**3 total permissions**を選択した。
+- 認可後、一度ブラウザで `127.0.0.1` の `ERR_CONNECTION_REFUSED` が発生。これはデスクトップ版Codexの一時OAuthコールバック受信先への接続失敗を示すが、根本原因が**タイムアウトであると確証はない**。
+- ユーザーが **再接続をやり直し、認証画面の操作を速やかに進めると成功した**と報告。これは**OAuth再接続のユーザー報告PASS**であり、`Workers Scripts Write` が実際のMCPトークンに含まれたか／Worker更新が成功したかは**別途未検証**。
+- 今後の案内：認可の最中は別のタスクに移らず、すぐに `Continue → Edit Permissions → 対象3権限の確認 → Authorize` を完了する。Chromeが接続拒否を表示した場合、ブラウザの再読込を繰り返すのではなく、Codexアプリの接続状態を確認し、必要なら**新しい再認証セッション**からやり直す。タイムアウト以外の可能性もあるため「必ず時間切れ」と断定しない。
+- 次ゲート：Codexから対象Workerの本番コードハッシュをGETで再確認→バックアップの存在→`/content` APIによるコードだけの更新→新規 `/auth/start` と既存 `/health` / 未認証 `/mcp` の回帰試験。**デプロイ結果までは未確認**。
