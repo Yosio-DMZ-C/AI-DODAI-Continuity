@@ -157,3 +157,12 @@
 - 黄色の「Update your Wrangler configuration with these changes to keep deployments in sync」は**将来のWranglerデプロイで設定を維持するための注意**。現在のバインディングが失敗した意味ではない。
 - 次工程は **Worker側 Settings > Variables and Secrets > Add** で平文変数 `EXPECTED_CHANNEL_ID = UCrLzqKRdeNsCpSrHPQy8Ifg` を設定。YouTubeチャンネルIDは公開識別子なのでSecretではなくTextでよい。Worker実画面で当該セクションの位置を確認する。公式: https://developers.cloudflare.com/workers/configuration/environment-variables/ （2026-08-21更新）。
 - 以後 `GOOGLE_CLIENT_SECRET` / `GOOGLE_REFRESH_TOKEN` / `MCP_API_KEY` は平文変数ではなく Cloudflare Secret で保存。OAuth JSONや秘密値はチャットで送らせない。公式: https://developers.cloudflare.com/workers/configuration/secrets/ （2026-10-15更新）。
+
+## 2026-10-20 実機修正：Variables and secretsへの正しい導線とKey
+
+- Cloudflare Worker `adnc-youtube-private` の **Settings > Variables and secrets（Runtime variables and secrets）** という画面上部にある **`+ Add variable`** が、環境変数の新規登録ボタン。従来案内の `Add` より実画面表記を優先する。
+- `+ Add variable` 後の **Add environment variable** ダイアログは、`Key` がWorkerが読み込む**変数名**、`Value` がその変数の内容。**`Key` はGoogle API keyや秘密鍵を求める欄ではない**。
+- 今回の入力：`Select environment`: Production=ON, Previews=OFF。 `Key = EXPECTED_CHANNEL_ID`、`Value = UCrLzqKRdeNsCpSrHPQy8Ifg`、`Secret = OFF`。画面下部の **`Add variable and deploy`** を選択し、一覧へ戻って値とProduction設定を再確認する。チャンネルIDは公開識別子。
+- **今後のGoogle OAuth認証**：`GOOGLE_CLIENT_ID` は用途に応じ公開設定でもよいが、`GOOGLE_CLIENT_SECRET`、`GOOGLE_REFRESH_TOKEN`、`MCP_API_KEY` は必ずSecret=ON。実トークンやOAuth JSONをチャットに表示・送付させず、ユーザー自身の端末から安全に登録する。
+- 複数の添付スクリーンショットで操作済みの同画面がある場合、画面撮影の手順案内は繰り返さない。入力前のスクリーンショットだけでは完了と判定せず、追加後の一覧で読戻す。
+
