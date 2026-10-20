@@ -174,3 +174,33 @@ NEXT_HUMAN_ACTION: ...
 - ユーザーが **再接続をやり直し、認証画面の操作を速やかに進めると成功した**と報告。これは**OAuth再接続のユーザー報告PASS**であり、`Workers Scripts Write` が実際のMCPトークンに含まれたか／Worker更新が成功したかは**別途未検証**。
 - 今後の案内：認可の最中は別のタスクに移らず、すぐに `Continue → Edit Permissions → 対象3権限の確認 → Authorize` を完了する。Chromeが接続拒否を表示した場合、ブラウザの再読込を繰り返すのではなく、Codexアプリの接続状態を確認し、必要なら**新しい再認証セッション**からやり直す。タイムアウト以外の可能性もあるため「必ず時間切れ」と断定しない。
 - 次ゲート：Codexから対象Workerの本番コードハッシュをGETで再確認→バックアップの存在→`/content` APIによるコードだけの更新→新規 `/auth/start` と既存 `/health` / 未認証 `/mcp` の回帰試験。**デプロイ結果までは未確認**。
+
+## 2026-10-21 実機報告：v0.4.3本番デプロイ PASS → Google Web OAuth実行待ち
+
+**証跡**：ユーザーがCodexの結果要約をチャットに貼付。詳細レポートのWindowsローカルパス `C:/Users/Yosio/Documents/Codex/2026-10-21/v0-4-3/outputs/deploy-result-v0.4.3.md` は本チャットから直接開いていないため、以下は**Codex結果要約に基づく判定**。
+
+| ゲート | 結果 |
+|---|---|
+| 本番再照合・バックアップ | PASS |
+| 公式MCPによるコードのみ更新・GET読戻し一致 | PASS |
+| Bindings / Variables / Secrets保持 | PASS |
+| `GET /health` | HTTP 200 |
+| 無認証 `POST /mcp` | HTTP 401 |
+| `GET /auth/start`／CSP／フォーム | PASS |
+| 無認証 `POST /auth/start` | HTTP 401 |
+| ロールバック | 不要 |
+| Google Web OAuth実同意・チャンネル確認 | NOT_RUN |
+| YouTubeへの非公開動画投稿・動画確認 | NOT_RUN |
+| Drive原本削除・公開/限定公開への変更 | NOT_RUN（引き続き禁止） |
+
+**重要**：本チャットから外部HTTPで `/health` / `/auth/start` の追加独立照合も試みたが、実行環境の名前解決／Webアクセス制約でアクセスできず、こちらでは再実証できていない。**Codexの検査報告PASSと、独立に確認したPASSを混同しない**。
+
+### 次工程：ユーザー本人のGoogle認証（人間操作ゲート）
+
+1. ブラウザで **[初回認証ページ](https://adnc-youtube-private.yosio-hasenaka.workers.dev/auth/start)** を開く。GitHub v0.4.3の実装では `GET /auth/start` は認証画面を返す。
+2. 入力欄へ本人が以前生成・登録した **`AUTH_SETUP_KEY`** の値のみを入力し、**「Googleで認証する」**。キーはチャット、スクリーンショット、GitHubへ送らない。**Cloudflare Secretの値は後から表示できない**。キーを紛失したら新しい十分長い暗号学的乱数で **Cloudflare側の `AUTH_SETUP_KEY` Secretのみローテーション**し、以前の値を推測・試行しない。
+3. Googleの許可画面で**本人のAD&C用アカウント・対象YouTubeチャンネルを選ぶ**。要求スコープは `youtube.force-ssl` と `drive.readonly`（アップロードの既存Drive運用を維持するため）。同意は本人操作。Google画面で「未確認のアプリ」や組織ポリシーの警告が出たら、警告内容を確認して作業を止めて相談する（認証トークンやURLの `state` / `code` を晒さない）。
+4. 認証後にWorkerが `channels?mine=true` の結果IDと `EXPECTED_CHANNEL_ID` を一致確認する。**異なるチャンネルならトークンを渡さず403**。一致した場合はブラウザ内で **「更新トークンをコピー（1回限り）」** を押し、その値をCloudflare Worker `Settings → Variables and secrets → ＋ Add variable` の **`GOOGLE_REFRESH_TOKEN`（Secret ON／Production）** に貼り付け、保存。成功画面は**トークンがページのJSに含まれるためスクリーンショット・HTML・画面共有・ブラウザ開発ツールのコピーは禁止**。チャットへは「認証成功／保存完了」の状態だけを報告。
+5. 成功確認後に認証ページを閉じ、クリップボードに残ったトークンを消す。独立した `MCP_API_KEY` は次工程で別の乱数から作成。動画投稿は秘密鍵の設定とAPI権限の実機検査後に実施。
+
+**手順上の注意**：認証中のCookieとstateの有効期限は10分。ブラウザは同一端末・同一プロファイルで行い、別タブや別端末で開始した認可を継続しない。ユーザーへ要求するのは本人のGoogle認可操作と秘密値のCloudflareへの転記だけ。
