@@ -104,3 +104,10 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - ユーザー提供のWindows版ChatGPT/Codexアプリの設定SSで、`一般 > 権限 > フルアクセス` が**ON**。画面の説明では、ローカルファイル編集とネットワーク使用のコマンドを承認なしで実行できるモード。**MCPサーバーのOAuth権限とは別の設定**。
 - AD&C Cloudflare点検（読み取り専用、変更前に承認）では、フルアクセスを使う必要があるかを確認し、必要性がないなら**OFFを推奨**。ただしフルアクセスをOFFにしただけでCloudflare OAuthのAPI側書込権限が制限されるわけではない。
 - 既存のユーザー設定を断りなく変更しない。変更するなら本人が現在の画面で判断する。
+
+## 2026-10-20 実機訂正：Codex「接続」はMCP設定ではない
+
+- ユーザーが Windows ChatGPT/Codex 設定画面「**コーディング → 接続**」を表示した。実画面は「このPCを操作」「他のデバイスを操作」「SSH」、「このPCを操作できるデバイス」「接続を許可」「このPCをスリープさせない」。**リモートPC操作用の設定であって、MCPサーバー追加ではない**。前回の案内「Settings → コーディング → 接続 → MCP server」は誤り。誤認による遠隔操作許可を有効化しない。
+- **次の最小確認**：ユーザーの既出プラグイン詳細画面には `MCP サーバー 1 > Cloudflare-api` の右に歯車アイコンがある。この**MCPサーバー行の歯車を開き**、その内容が接続／認証／有効化の設定なのか確認。操作前には実画面が表示されるまで設定内容を憶測で言わない。プラグイン画面へのリンク: https://chatgpt.com/plugins/plugins_6ad74d4a0554819195527e649e082852
+- **Codexの直接MCP登録の公式代替手段**: [OpenAI Developer Docs MCP](https://developers.openai.com/learn/docs-mcp) の記載で、Codex CLI/IDE拡張は `codex mcp add ... --url ...` またはユーザー個人設定 `~/.codex/config.toml` の `[mcp_servers.<name>] url = "..."` によりMCPを指定できる。Windows GUIで同じ設定が読まれるか／OAuth開始画面が出るかは未実機検証なので、プラグイン側の歯車を優先し、代替を行うなら確認とバックアップを先に取る。
+- Windows側では `py`/`node`/`npm` コマンドが利用できないことは確認済みであり、それらをいきなり必須としない。Secretやトークンのチャット送信禁止、無断のデプロイ禁止を維持。
