@@ -31,3 +31,30 @@
 
 - 初回Google OAuthのサービス拒否画面にはトークンはない。JSON/Secret/認証URLのcode・stateをスクリーンショット／チャットへ送らない。
 - v0.4.4をデプロイした後、まずYouTubeブランドアカウント認証→本人がSecret `GOOGLE_REFRESH_TOKEN` 登録。続いて個人GoogleアカウントのDrive認証→本人がSecret `GOOGLE_DRIVE_REFRESH_TOKEN` 登録。その後MCP_API_KEY設定・接続試験へ進む。
+
+## v0.4.4 本番デプロイ実機報告（2026-10-21）
+
+ユーザーがCodex実行結果をチャットに貼付。詳細ログのローカルパスはこのチャットから直接閲覧しておらず、以下はCodex報告に基づく。
+
+| 項目 | Codex報告 |
+|---|---|
+| YouTube/Driveの認証分離 | PASS |
+| モックテスト | PASS 16/16 |
+| 本番バックアップ・差分検証 | PASS |
+| コードのみの更新と本番GET読戻し一致 | PASS |
+| Bindings・Variables・Secrets保持 | PASS |
+| 本番回帰検査 | PASS 8/8 |
+| ロールバック | NOT_RUN：不要 |
+| Google本人認証・秘密値の登録 | NOT_RUN：本人操作待ち |
+| 動画の公開・Google Drive原本の削除 | NOT_RUN |
+
+詳しいCodex報告は本人PCの C:/Users/Yosio/Documents/Codex/2026-10-21/v0-4-3/outputs/v0.4.4/deploy-result-v0.4.4.md。
+
+### 人間だけが行うGoogle OAuth認証
+
+1. [YouTube認証](https://adnc-youtube-private.yosio-hasenaka.workers.dev/auth/start) にアクセスし、本人のAUTH_SETUP_KEYで開始。GoogleでAD&Cブランドチャンネル AI-DODAI & Continuity を選択し、YouTubeのみの権限を確認して本人が同意。チャンネルIDの一致を確認した後、表示される更新トークンを Cloudflare Worker Settings → Variables and secrets → ＋ Add variable → GOOGLE_REFRESH_TOKEN（Production、Secret ON）へ直接登録。
+2. [個人Drive認証](https://adnc-youtube-private.yosio-hasenaka.workers.dev/auth/start?mode=drive) にアクセスし、同じAUTH_SETUP_KEYで開始。個人Googleアカウントを選択してDrive読み取り権限だけ本人が同意。更新トークンを GOOGLE_DRIVE_REFRESH_TOKEN（Production、Secret ON）へ直接登録。
+3. OAuth成功ページには更新トークンが含まれる。スクリーンショット／HTML／トークン／code・state付き認証URLをチャットやGitHubへ共有しない。秘密値はユーザー本人がCloudflareへ転記し、成功後にクリップボードを消去。
+4. 両Secret登録後、独立したMCP_API_KEYの設定と、動画アップロードを伴わない接続試験へ進む。
+
+**ソース保管上の注意:** このチャットから同GitHubブランチの tools/youtube/worker.oauth.v0.4.4.mjs を確認したところ404。Codexの修正版が本番に導入されたとの報告はあるが、GitHubレビュー用ソースが同期されている証拠はない。現行本番コードを安全にバックアップ済みであることを確かめ、Secret値や認証情報をGitHubに載せずにレビュー候補を保存する工程が必要。既存v0.4.3ファイルをv0.4.4と誤認しない。
