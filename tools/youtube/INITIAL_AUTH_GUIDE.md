@@ -80,6 +80,15 @@
 - **実デプロイ確認**: `https://adnc-youtube-private.yosio-hasenaka.workers.dev/health` を開く。期待JSONは `{"name":"ADNC YouTube MCP","version":"0.1.0","status":"unconfigured_or_configured_not_disclosed"}`。初回はGoogle認証不要。 `Hello World!` のままなら旧デプロイが残っているか更新未完了。Webエディタの右プレビューにHello Worldが残るだけでは確定できない。
 - ツールから本番URLへアクセスできない場合は**成功と断定せず、ユーザーのブラウザでの表示を確認**。秘密鍵・OAuth JSONの送信は禁止。
 
+## 2026-10-20 実機修正：KVのConnectは説明画面
+
+- **実画面の事実**：KV namespace `adnc-youtube-uploads` の「Connect」を押すと、`Connect your Worker to KV` と表示され、`index.ts` と `wrangler.jsonc` のサンプルが出る。**これだけではバインディングは作成されない**。サンプルコードを既存 `worker.js` に上書きしない。
+- **正しい手順**（Cloudflare公式 https://developers.cloudflare.com/kv/concepts/kv-namespaces/ ）: 「Close」→ Cloudflare `Workers & Pages` → Worker `adnc-youtube-private` → **Settings > Bindings > Add > KV Namespace** → Variable name を `UPLOADS_KV` と正確に入力 → KV namespace `adnc-youtube-uploads` を選択 → `Deploy`。対象Workerのバインディング一覧を再読込して一致を確認する。
+- **英語UI対策**：Cloudflare公式 https://developers.cloudflare.com/fundamentals/user-profiles/customize-account/ に基づき Profile > Settings > Language = English。**これだけではブラウザの自動翻訳を止めたことにならない**。Chromeの翻訳アイコンから「原文に戻す」「このサイトは翻訳しない」を設定し、必要なら同じ措置を `github.com` に行う。Chrome公式 https://support.google.com/chrome/answer/173424?hl=ja
+- **言語強制URLを安易に捏造しない**：`?hl=en` 等を付ければ英語になるとは保証しない。英語表示の確実性はWebサービスの言語設定＋Chrome自動翻訳除外で確保する。技術案内は日本語、画面の操作ラベルは英語原文を基本にする。
+- GitHubでコードが日本語に翻訳された場合は、その表示をコピーせず、**APIから取得した元ソースのコードブロック**を一度でコピーできるように提示する。
+- **SS案内の基準**：既に現在のスクリーンショットがあるなら撮影案内や再送要求を省き、操作が止まったときのみ必要最小限を聞く。
+
 ## 認証エラー時の分岐
 
 | 表示例 | 確認すること | 安全な対応 |
