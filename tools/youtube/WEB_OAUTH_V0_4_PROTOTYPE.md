@@ -54,3 +54,11 @@ Cloudflare公式MCPをWindows Codexへ直接登録し、OAuth Read onlyでCloudf
 - 本Web OAuthクライアントは、ブラウザで本人が初回承認するが**継続的な用途はAIから起動するCloudflare WorkerのYouTube/Drive REST API呼び出し**。そのため `Use this client for an AI-powered agent` を**ON**にする。別のブラウザ人手操作用 `videos.html` のOAuth Web Clientは分離する。
 - GoogleのWeb OAuthクライアント作成後はこの種別チェックを変更できない旨が公式クイックスタートに明記されている。すでにOFFで作成した場合、基本は**別のWeb Clientを新規作成**してこちらに採用する。
 - Agenticタグは自動で追加権限を与えない。公式: https://developers.google.com/people/quickstart/js
+
+## 2026-10-20 実機確認：Web OAuthクライアントの作成とJSON取得
+
+- ユーザー本人がGoogle Cloud `WPGARankking` で `AD&C YouTube Web OAuth` をWeb applicationとして作成。 `Use this client for an AI-powered agent` を **ON** にして作成し、OAuth Client JSONを自身のPCにダウンロード済みと報告。
+- 作成画面の実機SSで **Authorized redirect URI** が `https://adnc-youtube-private.yosio-hasenaka.workers.dev/auth/callback`、JavaScript originsは空であることを確認済み。
+- JSON／Client Secret自体の取得・閲覧はユーザーのローカルPCのみ。**チャットにJSON/Secretを添付・貼り付けさせない**。まだCloudflare Worker Secretの登録・v0.4 Worker本番展開・Google OAuth本人同意・YouTube投稿は未実施。
+- 次工程：Cloudflare Worker `adnc-youtube-private` の **Settings → Variables and secrets → + Add variable** に、Production用 `GOOGLE_CLIENT_ID`（Variable）、`GOOGLE_CLIENT_SECRET`（**Secret**）、`AUTH_REDIRECT_URI`（Variable）を設定する。値はWeb Client JSONの `web.client_id`・`web.client_secret` を本人が転記。旧Desktop Clientの値と混ぜない。Secret値の画面共有禁止。
+- 本番WorkerコードへOAuth試作を組み込む作業は上記と別工程。**認証画面 `/auth/start` が既に動くと案内しない**。
