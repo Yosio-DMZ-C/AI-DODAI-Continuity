@@ -62,3 +62,12 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - v0.1のChatGPTプラグイン作成はPASSだが**ブラウザからCloudflare OAuthや管理APIを実行できるという案内は誤り**。接続とAPIテストは未実施。ユーザーがデスクトップアプリを使わない場合は**ChatGPT Webから接続できる代替設計の検証が必要**であり、無検証のURLや新しいプラグイン作成で解決済みと扱わない。
 - 操作案内で、紫色のカードの「→」をCloudflare接続画面と断定しない。実際にはデスクトップ起動だった（ユーザーのスクリーンショットで確認）。
 
+
+## 2026-10-20 続報：ユーザー端末にChatGPT Desktopなし、Plus Web版での制約
+
+- ユーザー確認：「ChatGPTデスクトップアプリはインストールしていない」。既存の個人プラグインは **Desktop only**。ブラウザの紫色カードを押してもWindowsアプリ起動画面になるだけ。**インストールを勝手に要求・実行しない**。
+- [OpenAI公式：Plugins in ChatGPT](https://help.openai.com/en/articles/20001256-plugins-in-chatgpt) によると、`mcp.json` / `.mcp.json` を持つプラグインはリモートHTTPSでもDesktop-onlyになり得る。スキルだけ追加してもWeb実行可能にはならない。
+- [OpenAI公式：Connecting custom MCP servers](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt)：ChatGPT Webの**フルMCPの書込機能はBusiness/Enterprise/Edu向け**。個人Plusで同じWeb接続・書込を自動化できると保証しない。
+- [OpenAI公式：Sites hosting](https://help.openai.com/en/articles/20001547-hosting-a-plugin-with-chatgpt-sites)：ChatGPT SitesにMCPをホストしてWeb対応プラグインを作る経路がある。ただし[Sites作成](https://help.openai.com/en/articles/20001339-creating-and-using-chatgpt-sites)はWebの**Work**を必要とする。ユーザーは通常Workを避ける方針のため、本人の了承なく利用しない。またCloudflare APIへの実認証・接続保証はない。
+- 暫定策：YouTube Worker・KV・EXPECTED_CHANNEL_IDは保全。Cloudflare管理の自動化は、**(1) ChatGPT Desktopを本人が導入して既存プラグイン接続試験、または (2) ブラウザから操作できる専用管理ページ/APIを別設計**の2案。後者はChatGPTから直接使えることを保証しない。追加実装の前に本人の優先順位を確認する。
+- APIトークン／OAuth JSONはチャットへ送らせない。Workerで認証情報を扱う場合は最小スコープ、秘密保管、監査ログ、読み取り検証→承認付き書込を必須にする。
