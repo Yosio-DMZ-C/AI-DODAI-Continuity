@@ -72,6 +72,14 @@
 - **省力化ルール**: 原語メニュー／直接リンク／既出の画面情報で確定できるならSSを求めない。既に送られた画面を再要求しない。スクリーンショットの撮り方リンクも、撮り方が分からず手が止まった場合だけ提示する。
 - **秘密保護**: アカウント画面を送る場合はトークン、APIキー、OAuth JSON内容を隠す。見えていない操作結果をPASSにしない。
 
+## 2026-10-20 実機フィードバック：Cloudflareコード貼付とDeploy後の検証
+
+- **症状**: CloudflareのWebエディタでCtrl+V後に「Unable to read from the browser's clipboard. Please make sure you have granted access for this website to read from the clipboard.」と表示。
+- **実際の復旧**: **編集ページを再読み込みしたところ貼付が成功**。ユーザーは元Hello WorldをAD&C用約99行のWorkerコードに置換し、画面右上「展開する（Deploy）」を押したと報告。**Worker本番への反映成功は、この報告だけでは未確認**。
+- **標準復旧案内**: 長いコードをコードブロックから1回コピー→Cloudflareで全選択・貼り付け。失敗時はまずコピー元とクリップボード状態を確認し、**未保存の変更があれば消えることを明示してからページ再読み込み**を提案。解決しなければCloudflareへのサイト単位クリップボード権限・ブラウザ翻訳を確認。ブラウザ全体の無差別許可は求めない。
+- **実デプロイ確認**: `https://adnc-youtube-private.yosio-hasenaka.workers.dev/health` を開く。期待JSONは `{"name":"ADNC YouTube MCP","version":"0.1.0","status":"unconfigured_or_configured_not_disclosed"}`。初回はGoogle認証不要。 `Hello World!` のままなら旧デプロイが残っているか更新未完了。Webエディタの右プレビューにHello Worldが残るだけでは確定できない。
+- ツールから本番URLへアクセスできない場合は**成功と断定せず、ユーザーのブラウザでの表示を確認**。秘密鍵・OAuth JSONの送信は禁止。
+
 ## 認証エラー時の分岐
 
 | 表示例 | 確認すること | 安全な対応 |
