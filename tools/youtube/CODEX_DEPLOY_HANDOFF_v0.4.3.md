@@ -103,3 +103,21 @@ NEXT_HUMAN_ACTION: ...
 4. 再認証ボタンが現れなければCloudflare公式の **Manage OAuth authorizations** から旧MCP承認のRevokeを行い、Codex側で再認証する予備手順。ただしRevokeは一時的にMCPを切断するため**本人の了承を得てから**実施する。Cloudflareアカウントや他のアプリは誤ってRevokeしない。
 
 **補足**：Cloudflare OAuthの `workers-scripts.write` は必ずしも当該Worker1件だけに限定されない可能性がある。「Worker単位Editor」等の別のCloudflare権限方式と混同しない。書込権限が追加されても対象Worker `adnc-youtube-private` だけを更新、他のWorker・KV・Secrets・動画・Google Driveは変更禁止。
+
+## 2026-10-21 公式MCPの再認証導線・Base scopes実画面
+
+### 再認証の導線（ユーザー実機スクリーンショットで確認）
+
+- Windows版ChatGPTの **左下ユーザーアイコン → 設定** を開いたところ、画面上部に橙色の通知 **「MCP サーバー『cloudflare-api』に再接続」** が表示された。
+- 通知の本文は **「認証の有効期限が切れました。この MCP サーバーを引き続き使用するには再接続してください」**。通知右端の黒いボタン名は **「再接続」**。このボタンを押すとChromeでCloudflare OAuthの `Authorize application` に遷移した。
+- ユーザーは設定画面の **コーディング → 接続**（PC/SSHの遠隔操作用）を開いていたが、**この画面とMCPの再認証は無関係**。
+- 上部の橙色通知は一時的なものであり、**通知が表示されない場合はこの方法では進められない**。「通知が出ないときの別導線（設定 → MCPサーバー → 対象行の歯車など）」はユーザー実機で未検証。**未確認のメニュー名・ボタン位置を断定しない**。通知がなければ現在のMCP管理画面を表示してもらい操作位置を再確認する。
+
+### Google Chrome上で開いたCloudflare公式OAuth画面
+
+- タイトル **`Authorize application`**、サブタイトル `Grant access to Cloudflare API`、接続アプリ `Codex`。Client ID `https://chatgpt.com/oauth/codex/client.json`、Redirect URI `http://127.0.0.1:<可変ポート>/callback`。可変ポートを手順に固定しない。認証URLの `state` / `code_challenge` をチャットへ貼り付けない。
+- **Base scopes** に `Minimal` / `Read only` / `Full access` / **`Requested scopes`** の選択肢（2026-10-21実画面）。この再接続では `Requested scopes` が**初期選択**され、下段に `This client asked for:` と多数の `... Read` ラベル、`and 180 more` が表示された。**Requested scopesが現在の権限をすべて維持する／書込みを含まないとは現画面だけでは判断できない**。
+- **安全な今回の操作**：`Read only` を選択 → `Continue` → 最終Cloudflare同意画面で **`Edit Permissions`** → `Search scopes` に `workers-scripts.write` または `Workers Scripts Write` を入力 → 一致した **`Workers Scripts Write` のみ有効化** → 最終同意画面で他の Write が選ばれていないことを確認 → 本人が `Authorize`。ボタンが表示されない／対象スコープが見つからない場合は**承認しない**でSSを確認。
+- 書込みスコープはCloudflare公式MCPに **403 `insufficient_scope` で要求された実名**。Full access一括選択はしない。Read onlyがアカウント横断の広範な読取りを許す点も、別途最小化を検討。
+- 参照: [Cloudflare 2026-08-22 OAuth権限の任意選択](https://developers.cloudflare.com/changelog/post/2026-08-22-wrangler-mcp-optional-oauth-scopes/) / [Cloudflare 2026-10-19 step-up authorization](https://developers.cloudflare.com/changelog/product/agents/)。
+- 認証が完了したら、Codexで元のデプロイ用手順書を**差分再検査・バックアップの確認から再開**し、更新後GETによる読戻しと `/health`, `/mcp` 401の回帰検査を行う。
