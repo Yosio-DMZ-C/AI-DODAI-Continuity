@@ -14,10 +14,9 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-SCOPES = [
-    "https://www.googleapis.com/auth/youtube.force-ssl",
-    "https://www.googleapis.com/auth/drive.readonly",
-]
+# Only YouTube permission by default. Drive read access is opt-in for the legacy Drive upload test.
+YOUTUBE_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl"
+DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.readonly"
 ROOT = Path(__file__).resolve().parent
 
 
@@ -93,9 +92,9 @@ def run(args):
         print("1. Google CloudでYouTube Data API v3 / Google Drive APIを有効にする")
         print("2. Google Auth PlatformでAudienceを設定し、自分をTest userに追加する")
         print("3. Google Auth Platform > ClientsでDesktop appのOAuth JSONをダウンロードする")
-        print("4. Cloudflare WranglerでログインしKVを作り、wrangler.tomlを設定・Workerをdeployする")
+        print("4. Cloudflare Dashboard作成済みならWorker+KV+チャンネル変数を維持（デプロイし直さない）")
         print("5. python -m pip install google-auth-oauthlib")
-        print("6. python setup_once.py --configure --credentials PATH --expected-channel-id UC... --worker-url https://YOUR.workers.dev")
+        print("6. python setup_once.py --configure --dashboard-configured --credentials PATH --expected-channel-id UC... --worker-url https://YOUR.workers.dev")
         print("認証情報をチャットや共有KBに貼り付けないでください。")
         return 0
     if not args.credentials or not args.expected_channel_id or not args.worker_url:
@@ -104,12 +103,21 @@ def run(args):
     url_host = urllib.parse.urlsplit(worker_origin).hostname
     if not (url_host.endswith('.workers.dev') and url_host.split('.')[0] == args.worker_name):
         raise ValueError('Worker URLは登録予定のCloudflare *.workers.dev ドメインとWorker名が一致する必要があります')
-    cfg = ROOT / 'wrangler.toml'
-    if not cfg.exists():
-        raise ValueError('wrangler.toml がありません。wrangler.toml.exampleをコピーし、KVと対象チャンネルを設定してください')
-    config_text = cfg.read_text(encoding='utf-8')
-    if 'REPLACE_' in config_text or f'EXPECTED_CHANNEL_ID = "{args.expected_channel_id}"' not in config_text:
-        raise ValueError('wrangler.toml に未設定の項目があるか、期待チャンネルIDが一致しません')
+    if args.dashboard_configured:
+        # Dashboard-created Worker+KV+channel var are already deployed. Do not redeploy from an old file.
+        request = urllib.request.Request(worker_origin + "/health", headers={"Accept": "application/json"})
+        with urllib.request.urlopen(request, timeout=20) as response:
+            info = json.load(response)
+        if info.get("name") != "ADNC YouTube MCP":
+            raise RuntimeError("指定WorkerがAD&CのMCPであることを/healthから確認できません。停止します")
+        print("PASS: 既存Cloudflare Workerのhealthを検証（SettingsのChannel ID/KVは後でcheck_connectionで再検査）")
+    else:
+        cfg = ROOT / 'wrangler.toml'
+        if not cfg.exists():
+            raise ValueError('wrangler.toml がありません。Dashboard構築済みなら --dashboard-configured を指定してください')
+        config_text = cfg.read_text(encoding='utf-8')
+        if 'REPLACE_' in config_text or f'EXPECTED_CHANNEL_ID = "{args.expected_channel_id}"' not in config_text:
+            raise ValueError('wrangler.toml に未設定の項目があるか、期待チャンネルIDが一致しません')
     if not args.expected_channel_id.startswith("UC") or len(args.expected_channel_id) != 24:
         raise ValueError("--expected-channel-id は UC で始まる24文字のYouTubeチャンネルIDを指定してください")
     client = check_client(args.credentials)
@@ -117,7 +125,9 @@ def run(args):
         from google_auth_oauthlib.flow import InstalledAppFlow
     except ImportError as exc:
         raise RuntimeError("必要モジュールがありません: python -m pip install google-auth-oauthlib") from exc
-    flow = InstalledAppFlow.from_client_secrets_file(str(args.credentials), SCOPES)
+    scopes = [YOUTUBE_SCOPE] + ([DRIVE_SCOPE] if args.include_drive_access else [])
+    print('OAuth権限:', ', '.join(scopes))
+    flow = InstalledAppFlow.from_client_secrets_file(str(args.credentials), scopes)
     print("Googleの承認画面を開きます。パスワードや認証情報はチャットに貼らないでください。")
     creds = flow.run_local_server(port=0, open_browser=True, prompt="consent", access_type="offline")
     if not creds.refresh_token or not creds.token:
@@ -156,6 +166,8 @@ def main():
     p.add_argument("--expected-channel-id", help="アップロード対象のYouTubeチャンネルID (UC...)")
     p.add_argument("--worker-url", help="デプロイ済WorkerのHTTPS origin")
     p.add_argument("--worker-name", default="adnc-youtube-private", help="wrangler Worker名")
+    p.add_argument("--dashboard-configured", action="store_true", help="Cloudflare Dashboardで作成・設定済みのWorkerにSecretだけ登録（Wrangler再デプロイをしない）")
+    p.add_argument("--include-drive-access", action="store_true", help="Drive経由の旧アップロード試験用。Google Drive全体の読み取り権限を追加取得する")
     a = p.parse_args()
     try:
         return run(a)
