@@ -114,3 +114,9 @@
 - 暫定策は**Codexデスクトップの共通MCP一覧 → ＋ サーバーを追加する → Streamable HTTP**、URL=`https://adnc-youtube-private.yosio-hasenaka.workers.dev/mcp`、Bearer Token Environment Variable=`ADNC_YOUTUBE_MCP_KEY` のようなローカル環境変数を設定する。値を直接UIに貼るのではなく**環境変数名**を指定する。Codex公式 `mcp_servers.<id>.bearer_token_env_var` が対応：https://developers.openai.com/docs/config-file/config-reference 。ただし、値の安全な供給方法（毎回非表示入力してプロセスのみに保持／OSの資格情報保管庫）を整備するまでは接続完了扱いしない。
 - 本命はWorker MCPへOAuth 2.1認証を実装し、ChatGPTのプラグイン認証画面で接続できる方式へ更新すること。GoogleのOAuth（YouTube/Drive連携）とは別の**MCPクライアントの認証レイヤー**。現行v0.4.4と既存Secretを変更せず別設計・検証後に切替える。
 - 現状：PowerShell経由の`initialize`・`check_connection`はPASS。ChatGPT/Codexプラグインからの実ツールはNOT_RUN。動画投稿もNOT_RUN。
+
+### 2026-10-21 Codex CLI MCP list確認
+
+ユーザー実機でCodex Windowsの `codex.exe mcp list` を実行。`adnc-youtube-private` がURL `https://adnc-youtube-private.yosio-hasenaka.workers.dev/mcp`、Bearer Token Env Var `ADNC_YOUTUBE_MCP_KEY`、Status `enabled`、Auth `Bearer token` と表示された。これは **設定認識PASS** だが、Codex内の実MCP呼出しは未検証。
+
+次工程では `Read-Host -AsSecureString` からキーを受け取り、同じPowerShellプロセスで `ADNC_YOUTUBE_MCP_KEY` を一時設定して Codex CLI の `exec --ephemeral --skip-git-repo-check --sandbox read-only` で `check_connection` のみ呼び出し、`finally` で環境変数を消す。キーをコマンド文字列・永続環境変数・GitHub・チャットに埋め込まない。CLI認証PASSとWindowsアプリ認証PASSは区別する。
