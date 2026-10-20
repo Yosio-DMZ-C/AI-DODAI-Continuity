@@ -1,3 +1,5 @@
+> **2026-10-21 v0.4.4：Codex報告では本番デプロイ・回帰検査PASS。** Google本人OAuthは未実施。YouTubeブランドアカウントと個人Driveで別認証し、Secretを分離して登録する。[実機結果・認証手順](BRAND_ACCOUNT_OAUTH_SPLIT_FIX.md)。従来のv0.4.3ではブランドアカウント認証がGoogle側で拒否されたため**古い認証フローの再試行は不要**。このブランチに修正版v0.4.4のGitHubコード本体がまだ見つからず、後でCodexのバックアップからSecret除外のうえ同期確認が必要。
+
 > **2026-10-21 認証障害：現行v0.4.3はGoogleブランドアカウントとDriveスコープの混用でOAuthが拒否されています。** 本番デプロイ・Worker回帰検査はPASSだが、Googleの初回同意はFAIL。v0.4.3への再ログインを繰り返さない。[YouTube/Drive分離修正指示](BRAND_ACCOUNT_OAUTH_SPLIT_FIX.md) に従い、GitHubにv0.4.4候補を作成・テスト後に本番へ反映する。既存動画の投稿・Drive削除は未実施。
 
 > **2026-10-21 本番導入はv0.4.3を使用**：[コード](worker.oauth.v0.4.3.mjs)／[Codexでのデプロイ・復旧手順](CODEX_DEPLOY_HANDOFF_v0.4.3.md)。v0.4.2はCSPの `connect-src` 指定欠落によりブラウザの認証開始が失敗するため**デプロイ禁止**。v0.4.3はローカル模擬18/18 PASS。GitHub上は候補であり、本番は未デプロイ。
