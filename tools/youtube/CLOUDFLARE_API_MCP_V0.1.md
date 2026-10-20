@@ -144,3 +144,12 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - Chromeの機械翻訳では「英語を常に翻訳」を有効化しない。技術画面で機械用文字列を書き換えないため、Cloudflareは英語UIのまま手順を案内する。
 - OAuthのアドレスバーには `state` 等の一時パラメータが含まれることがあるので、スクリーンショットを共有するなら**URLバーは隠す**。トークン、client_secret、APIキーをチャットに送らせない。
 - 現行公式根拠: [Cloudflare公式MCP](https://developers.cloudflare.com/agents/model-context-protocol/cloudflare/servers-for-cloudflare/) / [Cloudflare MCP OAuth](https://developers.cloudflare.com/agents/model-context-protocol/protocol/authorization/)。
+
+## 2026-10-20 実機：OAuth最終同意画面が194権限
+
+- 本人がCloudflare MCP OAuth 1段目の `Read only` を選び `Continue`。次にCloudflare公式の「Cloudflare MCP Server wants to access your account」同意画面が表示された。**`194 total permissions` が表示されており、`Authorize` はまだ押していない。**
+- この画面では `REQUIRED`：`User Read`、`Background Access`、`ADDITIONAL ACCESS` の `Edit Permissions` が表示。カテゴリ例：`Account & Billing`（7件）、`Cloudflare One / Zero Trust`（36件）、`Analytics & Logs`（6件）、`Rules & Configuration`（17件）。**読み取り専用でも横断的な閲覧権限が多数要求される**ため、AD&C目的に対して過大の可能性。
+- **手順**：`Authorize` を押さず `Edit Permissions` を開く。**Worker/Workers Scripts と Workers KVに必要な閲覧権限**を優先し、Billing、Zero Trust、Logs等の無関係な任意権限を除外できるか実画面で確認。必要なAPI権限名はエディタの原文で判断し、まだ見えていない権限ラベルは作らない。
+- Cloudflare公式2026-08-22更新「[Choose OAuth scopes for Wrangler and the Cloudflare API MCP server](https://developers.cloudflare.com/changelog/post/2026-08-22-wrangler-mcp-optional-oauth-scopes/)」では、必須スコープを維持したまま、Optional scopesを個別編集可能と明記。足りない権限が必要になった際は再認可する。**最初から広い全権限を付与しない**。
+- `Background Access` は必須として表示され、バックグラウンド利用に関わる権限を含む。現在の画面で除外不可なら、任意権限の限定と認可取り消し手順の確認を重視する。
+- 続く実機検証は `Read only` + 限定Optional権限 → OAuth許可（本人が判断）→ `search`/`execute` を読取限定で確認。認可・実読取ができるまではMCP接続をPASS扱いしない。APIキー・一時認証コード・URLバー内のOAuthパラメータは共有しない。
