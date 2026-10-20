@@ -108,3 +108,13 @@
 - Cloudflare: https://developers.cloudflare.com/workers/get-started/guide/
 - Cloudflare: https://developers.cloudflare.com/kv/get-started/
 - Cloudflare: https://developers.cloudflare.com/workers/wrangler/commands/workers/#secret
+
+## 2026-10-20 実機確認：/health 正常表示とKVのGUI設定
+
+- ユーザーのブラウザで `https://adnc-youtube-private.yosio-hasenaka.workers.dev/health` が開き、`name="ADNC YouTube MCP"`、`version="0.1.0"`、`status="未設定または設定済み（非公開）"` と表示された。**公開Workerへのコード配置確認はPASS（本人提示のブラウザ応答による）**。OAuth・YouTube認証・KVはまだ未検証。
+- `status` の表示はソースコードの原文 `unconfigured_or_configured_not_disclosed` と異なる。**ブラウザ自動翻訳の疑い**があるため、表示文字列を機械用のAPIの原文と混同しない。Chrome「このサイトを翻訳しない」または英語原文表示で再確認できる。実HTTPの生データ取得は未確認。
+- 初期構築はコマンドラインより、**Cloudflareダッシュボードを優先する**。公式2026-10-12更新 https://developers.cloudflare.com/kv/get-started/ のGUI手順: Workers KV → Create instance → namespace名指定 → Create。既存Worker `adnc-youtube-private` → Settings > Bindings → Add → KV Namespace → Variable name `UPLOADS_KV` → namespace選択 → Deploy。Workers版UIでBindingsが概要にある場合は表示を優先。
+- 推奨KV namespace名 `adnc-youtube-uploads`、Workerへ渡す変数名はコードと厳密一致する `UPLOADS_KV`。この2つは用途が異なるため明示して区別する。
+- 実機検証はKVがバインド済みと管理画面で確認してから進む。ユーザーがスクリーンショットを既に送っていれば撮り方の説明は省略。
+- KVは結果不明時の誤再投稿リスクを低減するが、**グローバルな強い整合性のある排他ロックではない**。重複排除の厳密性は負荷・同時実行を別途検証するまで保証しない。
+
