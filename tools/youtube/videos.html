@@ -11,6 +11,21 @@
 <nav class="navbar" aria-label="AD&C YouTubeツール"><a href="./channel.html">チャンネル開設 ↗</a><a href="./videos.html" aria-current="page">動画アップロード・管理</a></nav></header>
 <main>
 <section class="nextpanel activeNext"><p class="kicker">利用の流れ</p><h2>①Google接続 → ②非公開アップロード → ③一覧で公開範囲を選択</h2><p class="sub">タイトル・動画ファイル・子ども向けかどうかを指定します。対象チャンネル名とIDを必ず確認してからアップロードしてください。</p><div class="actions"><a class="btn secondary" href="https://studio.youtube.com/" rel="noopener" target="_blank">YouTube Studio ↗</a><a class="btn secondary" href="./channel.html">チャンネル開設ナビ ↗</a></div></section>
+<section id="setup-guide"><h2><span class="stepnum">00</span>初回認証がまだの場合</h2>
+<p class="sub"><b>AD&Cからチャットで非公開投稿するには、初回だけGoogle Cloud・Cloudflareの接続設定が必要です。</b> 画面変更に備え、実施時にはAD&Cが公式資料を再検索して簡単な手順を案内します。</p>
+<details><summary><b>初回設定の短い手順を表示</b>（約6工程・パスワードの送付不要）</summary>
+<ol>
+<li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a>でプロジェクトを選び、<a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">YouTube Data API v3</a> と <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com" target="_blank" rel="noopener">Google Drive API</a>を有効にします。</li>
+<li><a href="https://console.cloud.google.com/auth/overview" target="_blank" rel="noopener">Google Auth Platform</a>のブランディング・対象ユーザーを設定し、テスト状態なら自分のGoogleアカウントをテストユーザーへ追加します。</li>
+<li><a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noopener">Clients</a>から「デスクトップアプリ」のOAuthクライアントを作り、JSONをPCへダウンロードします。<b>JSONをチャットに貼らないでください。</b></li>
+<li><a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Cloudflare</a>でWorkerとKVを用意し、配布ZIPの<code>wrangler.toml.example</code>を<code>wrangler.toml</code>にコピー、期待するチャンネルID・KV IDを設定します。</li>
+<li>PCでZIPの<code>setup_once.py</code>を実行し、Googleの同意画面で承認します。接続先チャンネルを照合してから秘密情報をWorkerへ登録します。</li>
+<li>生成された個人用プラグインをChatGPTに接続し、<code>check_connection</code>で検査した後、非公開投稿を試します。</li>
+</ol>
+<p class="small">Google OAuthのテスト状態では更新トークンが約7日で期限切れになる場合があります。継続運用前に公開ステータスや審査要件を確認してください。</p>
+<p><b>わからないところは教えてください。現在の画面に合わせて案内します。</b></p>
+<p class="small">手順書：配布ZIP内<code>INITIAL_AUTH_GUIDE.md</code>。Webブラウザからの一時認証だけなら下の「01」で進められますが、チャット自動投稿には別途初回サーバー設定が必要です。</p>
+</details></section>
 <section id="auth-section"><h2><span class="stepnum">01</span>Googleに接続</h2>
 <p class="sub">初回のみGoogle Cloudで「YouTube Data API v3」を有効化し、Web OAuthクライアントIDと、このページの公開オリジンを登録する必要があります。<a href="./README.md" target="_blank" rel="noopener">設定手順（README）</a></p>
 <label for="clientId">Google OAuth WebクライアントID（秘密鍵ではありません）</label>
