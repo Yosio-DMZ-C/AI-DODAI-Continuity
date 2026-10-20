@@ -111,3 +111,9 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - **次の最小確認**：ユーザーの既出プラグイン詳細画面には `MCP サーバー 1 > Cloudflare-api` の右に歯車アイコンがある。この**MCPサーバー行の歯車を開き**、その内容が接続／認証／有効化の設定なのか確認。操作前には実画面が表示されるまで設定内容を憶測で言わない。プラグイン画面へのリンク: https://chatgpt.com/plugins/plugins_6ad74d4a0554819195527e649e082852
 - **Codexの直接MCP登録の公式代替手段**: [OpenAI Developer Docs MCP](https://developers.openai.com/learn/docs-mcp) の記載で、Codex CLI/IDE拡張は `codex mcp add ... --url ...` またはユーザー個人設定 `~/.codex/config.toml` の `[mcp_servers.<name>] url = "..."` によりMCPを指定できる。Windows GUIで同じ設定が読まれるか／OAuth開始画面が出るかは未実機検証なので、プラグイン側の歯車を優先し、代替を行うなら確認とバックアップを先に取る。
 - Windows側では `py`/`node`/`npm` コマンドが利用できないことは確認済みであり、それらをいきなり必須としない。Secretやトークンのチャット送信禁止、無断のデプロイ禁止を維持。
+
+## 2026-10-20 実機訂正：Web版のプラグイン「…」とデスクトップ版MCP歯車
+
+- ユーザーが開いた **Web版のプラグイン詳細**（右上に「デスクトップアプリで開く」と表示）にある **「…」** を押しても、メニューは **「プラグインのZIPファイルをダウンロード」「新しいバージョンをアップロード」「プラグインを削除」** の3項目。**OAuth・MCP接続操作ではない**。削除や更新を押さない。
+- 以前提供された **Windowsデスクトップ版のプラグイン詳細** には `MCP サーバー 1 > Cloudflare-api` 行の**右端に歯車**が映っていた。まず **Web版から「デスクトップアプリで開く」→デスクトップ版プラグイン詳細の `Cloudflare-api` 行右端の歯車**を確認する。歯車の表示結果を見て初めて接続／OAuth設定と判断する。トップの三点リーダーと混同しない。
+- 上記でMCPの管理操作が出なければ、公式Codex設定 `%USERPROFILE%\\.codex\\config.toml` の `[mcp_servers.cloudflare_api]\nurl = "https://mcp.cloudflare.com/mcp"` を**本人の許可と既存ファイルの確認・バックアップを前提に**代替試験。プラグイン同梱のMCP設定との二重登録に注意する。根拠: https://developers.openai.com/learn/docs-mcp と https://developers.openai.com/ja-JP/docs/config-file/config-reference 。OAuth連携が実際に走るかはこのユーザー端末では未検証。
