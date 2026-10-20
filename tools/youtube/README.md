@@ -1,4 +1,15 @@
-# AD&C YouTube Tools v0.2 (draft)
+# AD&C YouTube Tools v0.3 (draft / 初回認証導線追加)
+
+## v0.3 変更点（2026-10-20）
+
+- `INITIAL_AUTH_GUIDE.md`：Google / Cloudflare公式手順への直リンク、変更時の再検索、初回承認、トラブル時の分岐。
+- `videos.html`：開設ナビとは別ページのまま、初回設定ガイドを開閉表示。**「わからないところは教えてください。現在の画面に合わせて案内します。」**を常設。
+- `setup_once.py`：ローカルGoogle OAuthを取得し、期待チャンネルID一致後にCloudflare Secretsを標準出力へ露出せず設定。本人PC内に**共有禁止のプライベートプラグインZIP**を作成。Cloudflare/Google Cloudの初回準備を無断自動化はしない。
+- MCP `check_connection`：接続状況・チャンネルID一致を**動画投稿せず**確認。未接続・不一致時は投稿しない。
+- 旧 `setup_once.py`：更新トークンの画面表示を避けるため非推奨・実行停止。
+- GitHub `wrangler.toml` やトークンJSONをコミットしない `.gitignore` を追加。
+
+最新手順の要点は **[INITIAL_AUTH_GUIDE.md](INITIAL_AUTH_GUIDE.md)** を参照。Google/Cloudflareログイン・同意は必ず利用者のブラウザで実施します。自動投稿成功の証拠はGoogle/YouTube APIの実応答のみで、**ローカル試験PASSと混同しません**。
 
 ## 実装範囲
 
@@ -39,17 +50,18 @@ ChatGPTからの `upload_private_from_drive` はGoogle Driveに保存済みの**
 **認証情報を本リポジトリにコミットしない。** 以下は実運用者による一回限りのセットアップが必要。
 
 1. Google Cloudで OAuth クライアントを作成し、承認スコープを `https://www.googleapis.com/auth/drive.readonly` と `https://www.googleapis.com/auth/youtube.force-ssl` に設定する。DriveのGoogleアカウントとアップロード対象YouTubeチャンネルの権限を持つユーザーで同意する。
-2. Google Cloudの「デスクトップアプリ」型OAuthクライアントをダウンロードし、ローカルで `python -m pip install google-auth-oauthlib` → `python oauth_once.py --credentials client_secrets.json` を実行して同意し、`refresh token` を1回取得する（Google OAuth Authorization Codeフロー）。OAuthのTesting状態ではRefresh Tokenが短期間で無効化される場合があるため運用設定を確認。
+2. Google Cloudの「デスクトップアプリ」型OAuthクライアントをダウンロードし、ローカルで `python -m pip install google-auth-oauthlib` → `python setup_once.py` の案内を確認し、`python setup_once.py --configure ...` から同意・Secret登録を行う。トークンをターミナルへ表示しない。OAuth Testing+Externalは更新トークンが通常7日で失効するため運用設定を確認。
 3. Cloudflare Workerに `worker.mjs` をデプロイして、4つのSecret `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `MCP_API_KEY` と2つの環境変数 `EXPECTED_CHANNEL_ID`、`MANAGEMENT_URL`（動画管理ページの公開URL） を登録する。`MCP_API_KEY` は32文字以上の乱数を使う。
 4. Cloudflare KVネームスペースを作り、`UPLOADS_KV` としてWorkerにバインドする。これは不明なアップロード結果の**誤再実行・二重投稿防止**に必須。
 5. `/health` で稼働を確認。`/mcp` はBearer認証がない呼び出しを拒否する。Secretを含むURLやログを公開しない。
-6. `plugin-template` を基に*非公開プラグイン*を登録し、接続URL `https://<Worker>/mcp` およびBearerトークンを設定する。接続後に `tools/list` と `list_uploaded_videos` が使えることを検証する。
+6. ローカルPCの `.adnc_private/ADNC_YouTube_PRIVATE_PLUGIN.zip` を個人用*非公開プラグイン*へ登録する（**秘匿ファイル。共有禁止**）。接続URLとBearerはZIP生成時に設定済み。接続後に `tools/list` と `check_connection` の `state=ready` が使えることを検証する。
 7. Google Driveの小さいテスト動画を非公開で投稿 → プライバシーが `private` と確認できる場合のみチャットの自動アップロードを本利用。
 
 Workerは対象のGoogle Driveファイルを8MiB単位で取得し、YouTubeへ再開可能アップロードする。対象は**最大128MiBの動画**。投稿先チャンネルは認証済みGoogleアカウントのデフォルト選択に従う。ブラウザ版同様に、誤チャンネルへのアップロードを避けるにはチャンネル名／IDを事前照合する。
 
 MCPツール:
 
+- `check_connection()` : 動画投稿せずにGoogle OAuth / Secret / 期待チャンネルの一致を検査。
 - `list_uploaded_videos(limit=20)` : チャンネル名、チャンネルID、最近の動画・状態・URL一覧取得。
 - `upload_private_from_drive(drive_file_id,title,description,made_for_kids,request_key)` : **非公開固定**アップロード。`request_key` は再実行時も同じ値を渡す（KV上で途中状態なら再アップロードしない）。子ども向け設定は本人確認が必要で自動推測しない。
 
