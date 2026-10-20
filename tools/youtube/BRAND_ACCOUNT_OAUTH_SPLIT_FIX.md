@@ -58,3 +58,8 @@
 4. 両Secret登録後、独立したMCP_API_KEYの設定と、動画アップロードを伴わない接続試験へ進む。
 
 **ソース保管上の注意:** このチャットから同GitHubブランチの tools/youtube/worker.oauth.v0.4.4.mjs を確認したところ404。Codexの修正版が本番に導入されたとの報告はあるが、GitHubレビュー用ソースが同期されている証拠はない。現行本番コードを安全にバックアップ済みであることを確かめ、Secret値や認証情報をGitHubに載せずにレビュー候補を保存する工程が必要。既存v0.4.3ファイルをv0.4.4と誤認しない。
+
+
+### 2026-10-21 Google Drive refresh token Secret登録実機確認
+
+ユーザー提供のCloudflare Production設定画面で、YouTube側 `GOOGLE_REFRESH_TOKEN` とDrive側 `GOOGLE_DRIVE_REFRESH_TOKEN` がともにType=Secret、Value encryptedとして存在することを確認。Google Driveの権限同意画面では個人GoogleアカウントのDriveファイル表示・ダウンロード権限のみが提示された。Secret値やトークンの有効性は読み取っていない。次の作業は未登録の `MCP_API_KEY` を独立した乱数で生成し、Cloudflare ProductionのSecretとして登録後、投稿を伴わないMCP接続試験を実施すること。動画の投稿・公開とDrive原本削除は依然NOT_RUN。
