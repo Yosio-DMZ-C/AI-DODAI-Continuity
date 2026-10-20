@@ -91,3 +91,11 @@ Cloudflare公式MCPをWindows Codexへ直接登録し、OAuth Read onlyでCloudf
 
 - 本番デプロイ前に、**現在の実行中Workerのバックアップ→最小差分レビュー→人間承認→デプロイ→/health・/mcp認証拒否を再検証**。Google更新トークンは別工程で本人がCloudflare Secret `GOOGLE_REFRESH_TOKEN` に貼り付ける。
 - 今回生成した単体ZIPは本番Workerのソースバックアップではない。ローカルの模擬テストPASSと本番デプロイPASSを混同しない。
+
+## 2026-10-20 実機：AUTH_SETUP_KEY 登録完了
+
+- ユーザー提供Cloudflare Worker設定画面で `AUTH_SETUP_KEY` が **Secret / Value encrypted** として登録済み（Production）。既存 `GOOGLE_CLIENT_SECRET` もSecretのまま、`GOOGLE_CLIENT_ID`、`AUTH_REDIRECT_URI`、`EXPECTED_CHANNEL_ID` を確認。**設定項目の存在とSecret型はPASS**。値の正確さ／機能は未検証。
+- レビューパッケージ `ADNC_YouTube_OAuth_Integrated_v0.4.1_REVIEW.zip` を再検査。Node.js v22.16.0で `node --check worker.integrated.mjs` PASS、2つのテストスイート合計 **16/16 PASS**。ローカル模擬試験であり本番実動作の証明ではない。
+- **次はCodex Cloudflare公式MCPを使用したGET専用確認**：現在デプロイ済みWorker `adnc-youtube-private` のスクリプト本文を読み取り、GitHubブランチ `feature/adnc-youtube-tools-v0-2-20261020` の `tools/youtube/worker.mjs` と比較。本文全体やSecretらしい値はユーザー宛てに表示しない（ハッシュ、ファイル長、差分概要、ルーティング・Binding確認など安全なメタ情報だけ出す）。ソース内の埋込認証情報に遭遇したら値は出さずに注意を促す。
+- 元ファイルが**完全に一致**すれば、同一版を元にしたOAuth統合コードを最小差分で適用する計画へ進める。不一致の場合は差分を慎重にレビューし、既存機能を消す可能性のある丸ごと上書きを行わない。
+- 本作業はCloudflare MCP `Read only` 権限のみ。API書き込み・再デプロイ・Secret取得・Drive削除・YouTube投稿は行わない。
