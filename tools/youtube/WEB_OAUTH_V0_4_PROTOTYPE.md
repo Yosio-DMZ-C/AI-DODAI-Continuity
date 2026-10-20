@@ -71,3 +71,23 @@ Cloudflare公式MCPをWindows Codexへ直接登録し、OAuth Read onlyでCloudf
   対象は **Production**。各入力後 `Add variable and deploy` で保存。Secret値の画面共有禁止。旧Desktop Clientの値と混ぜない。
 - **実機結果（2026-10-20）**：ユーザーが上記3回の登録を完了。スクリーンショットで `AUTH_REDIRECT_URI` / `GOOGLE_CLIENT_ID` は `Variable`、`GOOGLE_CLIENT_SECRET` は `Secret` かつ `Value encrypted` を確認。既存 `EXPECTED_CHANNEL_ID` も維持。**環境変数登録 PASS**。ただしWorkerのOAuthコード本番デプロイとGoogle本人認証はまだ NOT_RUN。
 - 本番WorkerコードへOAuth試作を組み込む作業は上記と別工程。**認証画面 `/auth/start` が既に動くと案内しない**。
+
+## 2026-10-20 v0.4.1 統合済みレビューパッケージ／デプロイ前ゲート
+
+- 前回の `oauth_web_module.mjs` を **既存Worker単一ファイルへ統合**したレビュー用コード `worker.integrated.mjs` を作成。成果物：会話添付 `ADNC_YouTube_OAuth_Integrated_v0.4.1_REVIEW.zip`（ローカルコンテナで生成。GitHubに機密ファイルはコミットしない）。旧 `worker.mjs` を残し、変更差分 `worker_oauth_review.patch` も同梱。
+- セキュリティ改善：初回認証用キーを **`AUTH_SETUP_KEY`** としてCloudflare Secretに**新規独立**。Web認証画面へYouTube MCPの高権限Bearer `MCP_API_KEY` を入力させない（失効／漏えい時の影響を分離）。生成・設定は本人のWindows PowerShellとCloudflare管理画面で実施、チャットへ値は送らない。
+- 新規追加されるHTTP経路は `GET /auth/start`、`POST /auth/start`、`GET /auth/callback` のみ。`GET /health`、`POST /mcp` の本体は変更しない。
+- **検証**：Node.js v22で `node --check` に成功。古いWorkerの非公開アップロード・重複防止・想定チャンネルID・プライバシー判定等の回帰検査とOAuthの署名付きstate・Cookie・権限・別キー拒否・HTTPルーティングの模擬テストを合わせ **16/16 PASS**。外部APIの本番Google OAuth、トークン取得、Workerデプロイは **NOT_RUN**。
+- **要注意**：ローカルで統合した元のWorkerは `ADNC_YouTube_Tools_v0.3.1_DASHBOARD.zip` の `worker.mjs`。GitHubブランチの最新 `worker.mjs` とバイト数が異なる（GitHub読出し12,170文字／ローカル旧アーカイブ12,391 bytes）。**現行のデプロイ済みWorkerと差分を突き合わせず、統合ファイルを丸ごと貼り付けて上書きしない**。CodexのCloudflare公式MCP（現在Read only）で本番WorkerのコードをGET読戻しして照合するまではデプロイを止める。
+- **次のユーザー作業は1回のみ**：Cloudflare `adnc-youtube-private` → Settings → Variables and secrets → `＋ Add variable` → `Key=AUTH_SETUP_KEY`、`Secret=ON`、`Value=本人がPowerShellで生成した48バイト乱数のBase64`。登録後に存在だけ報告し値は送らない。PowerShell:
+
+  ```powershell
+  $b = New-Object byte[] 48
+  $r = [Security.Cryptography.RandomNumberGenerator]::Create()
+  try { $r.GetBytes($b) } finally { $r.Dispose() }
+  [Convert]::ToBase64String($b) | Set-Clipboard
+  Write-Host '初回認証キーをクリップボードへコピーしました'
+  ```
+
+- 本番デプロイ前に、**現在の実行中Workerのバックアップ→最小差分レビュー→人間承認→デプロイ→/health・/mcp認証拒否を再検証**。Google更新トークンは別工程で本人がCloudflare Secret `GOOGLE_REFRESH_TOKEN` に貼り付ける。
+- 今回生成した単体ZIPは本番Workerのソースバックアップではない。ローカルの模擬テストPASSと本番デプロイPASSを混同しない。
