@@ -71,3 +71,13 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - [OpenAI公式：Sites hosting](https://help.openai.com/en/articles/20001547-hosting-a-plugin-with-chatgpt-sites)：ChatGPT SitesにMCPをホストしてWeb対応プラグインを作る経路がある。ただし[Sites作成](https://help.openai.com/en/articles/20001339-creating-and-using-chatgpt-sites)はWebの**Work**を必要とする。ユーザーは通常Workを避ける方針のため、本人の了承なく利用しない。またCloudflare APIへの実認証・接続保証はない。
 - 暫定策：YouTube Worker・KV・EXPECTED_CHANNEL_IDは保全。Cloudflare管理の自動化は、**(1) ChatGPT Desktopを本人が導入して既存プラグイン接続試験、または (2) ブラウザから操作できる専用管理ページ/APIを別設計**の2案。後者はChatGPTから直接使えることを保証しない。追加実装の前に本人の優先順位を確認する。
 - APIトークン／OAuth JSONはチャットへ送らせない。Workerで認証情報を扱う場合は最小スコープ、秘密保管、監査ログ、読み取り検証→承認付き書込を必須にする。
+
+## 2026-10-20 モバイル対応調査・追加方針
+
+- **ChatGPT公式モバイルアプリ**は iOS / Android とも利用可能。公式: https://chatgpt.com/download/ 、iOS: https://apps.apple.com/app/chatgpt/id6448311069 、Android: https://play.google.com/store/apps/details?id=com.openai.chatgpt 。
+- **モバイルアプリがあることと、個人の「Desktop only」プラグインが動くことは別**。今回の `adnc-cloudflare-ops` はDesktop only表示であり、iOS/Android版でのMCP操作は未対応・未検証。OpenAI公式: https://help.openai.com/en/articles/20001256-plugins-in-chatgpt
+- **カスタムMCP接続**はOpenAIの現行公式文書で「Can I connect custom MCP servers on mobile? No - web only」。しかもフルMCPは主にBusiness/Enterprise/Edu向け。個人Plus＋モバイルへの直接MCPプラグインは標準ルートとしない。公式: https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt
+- **運用案（現時点）**：開発・管理者による初期構築はWindows ChatGPT Desktop＋公式Cloudflare MCPで実証（接続・権限確認は未了）。一般利用者向けAD&Cの動画アップロード／公開範囲選択／URL管理は、独立した**モバイル対応HTTPS管理画面（PWA化も検討）**を標準とする。iOS/Android/PCブラウザ共通の画面を提供し、ネイティブアプリ導入は必須にしない。既存 `videos.html` と `channel.html` を再利用する。
+- 管理画面をモバイル対応にしただけでは、**ChatGPTチャットからの自動操作がモバイルで実現したことにはならない**。動画のチャット添付→YouTube直送は別実装・別試験であり、達成と主張しない。
+- 将来ChatGPT/他AIのモバイルMCP対応が正式に確認できれば、アプリからの接続方式を追加する。変更の際は公式文書・利用者端末で検証してから標準化。
+
