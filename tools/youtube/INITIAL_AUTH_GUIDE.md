@@ -89,6 +89,13 @@
 - GitHubでコードが日本語に翻訳された場合は、その表示をコピーせず、**APIから取得した元ソースのコードブロック**を一度でコピーできるように提示する。
 - **SS案内の基準**：既に現在のスクリーンショットがあるなら撮影案内や再送要求を省き、操作が止まったときのみ必要最小限を聞く。
 
+## 2026-10-20 実画面での補足：BindingsはKV名前空間のSettingsにはない
+
+- ユーザーが `Storage & databases > Workers KV > adnc-youtube-uploads > Settings` を開いて「Bindingsってどこ？」と質問。**そのSettingsにはKVのRenameとDeleteしかなく、WorkerへのBindings設定は存在しない**。
+- **対象Worker側へ移動する**：Cloudflare [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → `adnc-youtube-private` → **Overview（概要）** → 画面右側の **Bindings（バインディング）** カードにある **Add binding（バインディングを追加する）**。WorkerのSettingsにBindingsがあるUIバージョンではSettingsからもよいが、今回実画面で確認した最短導線は**OverviewのBindingsカード**。
+- 選択値: **KV Namespace**、**Variable name `UPLOADS_KV`**、**KV namespace `adnc-youtube-uploads`**。確認して保存・Deploy後、Worker概要でBindingsが1件と表示されることを確認する。
+- 利用者がKV名前空間側のSettingsにいる場合、そこから更に操作を探させず「対象画面が違う」と明確に伝える。誤操作によるRename/Deleteを防ぐ。
+
 ## 認証エラー時の分岐
 
 | 表示例 | 確認すること | 安全な対応 |
