@@ -51,4 +51,4 @@ Safariなどで設計書をダウンロードしたら、通常は**「ファイ
 
 参考：[OpenAI公式：ファイルアップロード](https://help.openai.com/ja-jp/articles/8555545-uploading-files-and-audio-to-chatgpt)／[OpenAI Academy：ChatGPTでファイルを使う](https://openai.com/ja-JP/academy/working-with-files/)／[GitHub公式：Rawファイルのダウンロード](https://docs.github.com/en/repositories/working-with-files/using-files/viewing-and-understanding-files)
 
-> **検証範囲（2026-10-20）**：公式説明と、リンク先動画の検索結果・掲載情報を照合した編集Draftです。**動画の全編再生、各端末での実ダウンロード／実添付／AIによる読取、画面の最新性はNOT_RUN**。特にiPhone動画は2024年の旧画面です。表示が違うときは利用者の現在の画面を優先します。
+> **公開状態・検証範囲（2026-10-20）**：このガイドはGitHub mainで公開済みです。操作説明は公式資料、動画は検索結果・掲載情報を参考に作成しました。**動画の全編再生、各端末での実ダウンロード／実添付／AIによる読取、画面の最新性はNOT_RUN**。特にiPhone動画は2024年の旧画面です。表示が違うときは利用者の現在の画面を優先します。
