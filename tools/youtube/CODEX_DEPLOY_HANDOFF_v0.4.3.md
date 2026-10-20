@@ -142,3 +142,12 @@ NEXT_HUMAN_ACTION: ...
 - 結論：**Read only状態でWrite権限を同じ一覧から追加できるとは案内しない。** OAuthの権限編集は「何でも自由に追加」ではなく当該フローで要求されたスコープの選択画面。少なくとも今回の画面ではWriteを選べていない。
 - Cloudflare公式2026-10-19の [step-up authorization](https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/) に沿い、最初はRead onlyで認証を完了し、CodexがWrite APIを呼ぶ際に `insufficient_scope` を受けたら必要な `Workers Scripts Write` の追加認可が起動するか確認する。**Codex側のstep-up対応は未実証**。再403で追加承認画面が表示されなければ書込試行を停止し、別方式を検討。
 - **訂正**：『Read onlyを選択→Edit PermissionsでWriteを検索してON』という従来案内は実機と整合せず標準手順から撤回。Full access一括許可で代用しない。
+
+### 2026-10-21 「Advanced > Edit base scopes」でWriteスコープを発見
+
+- 期限切れでWindows版Codexの橙色通知 **「MCPサーバー『cloudflare-api』に再接続」→「再接続」** からOAuthをやり直した際の実機SS。
+- 最初の `Authorize application` 画面で **Base scopes = `Requested scopes`** が選択され、`This client asked for: … and 180 more` と多数の権限候補が表示される。**`Advanced` → `Edit base scopes` を展開すると、複数行のスコープ文字列一覧の末尾に `workers-scripts.write` が確かに含まれる**。UI表示名 `Workers Scripts Write` と内部識別子 `workers-scripts.write` の関係を確認。
+- 先に `Read only` を選ぶと最終画面の `Edit Permissions` 検索では `Scripts Write` が存在しなかった。これはRead onlyプリセットで書込み権限が候補から外れるためと考えられるが、実際の権限の反映方法を未検証。『そもそもOAuthで要求されていないから出ない』という断定は訂正する。
+- **重要なセキュリティ境界**：`Requested scopes` で `workers-scripts.write` が一覧に含まれることは、**その1件だけが許可されるという意味ではない**。そのまま続行すると、多数の要求権限をまとめて承認する危険がある。
+- **標準推奨**：Cloudflare公式の [Step-up authorization](https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/) に従い、`Minimal`（新規接続で最小）または既存検証を維持したい場合`Read only`で一旦接続し、Codexが403 `insufficient_scope` を受けた時に**不足スコープだけの追加認証**が起動するか確認する。Codex側のStep-up対応は未実証。 `Advanced > Edit base scopes` の自由編集が具体的にどう反映されるかは実機で未検証なので、194スコープの手動改変・一括認可を安易に指示しない。
+- 2026-10-21この時点で本番Worker v0.4.3は**未デプロイ**、書込用OAuth権限の追加は**未完了**。
