@@ -63,3 +63,8 @@
 ### 2026-10-21 Google Drive refresh token Secret登録実機確認
 
 ユーザー提供のCloudflare Production設定画面で、YouTube側 `GOOGLE_REFRESH_TOKEN` とDrive側 `GOOGLE_DRIVE_REFRESH_TOKEN` がともにType=Secret、Value encryptedとして存在することを確認。Google Driveの権限同意画面では個人GoogleアカウントのDriveファイル表示・ダウンロード権限のみが提示された。Secret値やトークンの有効性は読み取っていない。次の作業は未登録の `MCP_API_KEY` を独立した乱数で生成し、Cloudflare ProductionのSecretとして登録後、投稿を伴わないMCP接続試験を実施すること。動画の投稿・公開とDrive原本削除は依然NOT_RUN。
+
+### 2026-10-21 MCP_API_KEY 追加を画面で確認
+
+ユーザーのCloudflare Production / Runtime variables and secrets の画面に `MCP_API_KEY` がType=`Secret`、Value=`Value encrypted` と表示された。既存の `GOOGLE_REFRESH_TOKEN`、`GOOGLE_DRIVE_REFRESH_TOKEN`、`AUTH_SETUP_KEY`、`GOOGLE_CLIENT_SECRET` もSecretとして残っている。**設定項目の存在のみPASS**。MCP Bearer認証、refresh tokenのGoogle受理、対象YouTubeチャンネルID、Drive API疎通は**NOT_RUN**。
+次はMCPの `initialize` と `check_connection` を投稿なしで検証。`MCP_API_KEY` の値はChatGPTチャット、GitHub、ログに出さない。登録直後のクリップボードに鍵が残っている場合は利用者PC内のPowerShellからBearerヘッダーで試験できる。現在チャットからCloudflareのSecretを取得したり、公式Cloudflare MCPで同Workerの認証済みMCPツールを直接実行したりはできない。
