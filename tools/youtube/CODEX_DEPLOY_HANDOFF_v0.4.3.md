@@ -127,3 +127,11 @@ NEXT_HUMAN_ACTION: ...
 - 2026-10-21本人Cloudflare OAuth `Edit Permissions` のスクリーンショットで検索欄 `workers-scripts.write` は `No scopes match your search` と表示された。
 - Cloudflare公式API権限一覧の正式表示名は `Workers Scripts Write`：https://developers.cloudflare.com/fundamentals/api/reference/permissions/ 。**API内部スコープ識別子とUI検索表示名を混同しない**。まず `Workers` などの部分文字列で検索し、該当する権限のみON。
 - 同画面には `194 total permissions` と表示されている。他の書込権限が選ばれていないか最終確認し、確認できなければ Authorizeを押さない。
+
+### 2026-10-21 権限画面：Workers検索にRead項目だけ表示、Step-up方式へ移行
+
+- 2026-10-21のCloudflare OAuth `Edit Permissions` 実機SS：`workers` の検索では `Workers R2 Storage Read`、`Workers Routes Read`、`Workers Scripts Read` が表示された。スクロール領域の一部であり **`Workers Scripts Write` が一覧に存在しないと断定できない**。ただし `workers-scripts.write` では `No scopes match your search` を確認。
+- Cloudflare公式は2026-10-19に **Cloudflare API MCP Serverのstep-up authorization** を公開。[公式説明](https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/)では、MCPクライアントが対応していれば、接続時は低権限のまま、実行時の `insufficient_scope` チャレンジで必要な権限だけ追加認証させ、既存スコープを保持する。
+- **案内の修正**：Edit Permissionsで `Scripts Write` を検索して見つからない場合、Full accessプリセットで代用しない。既存Read onlyのまま通常再認証を完了し、Codexへ先の単一Workerコードのみ更新を再試行するよう依頼。その際にMCPクライアントの **step-up追加承認ダイアログが出るか**を確認する。**Codexクライアント側でstep-up対応済みとはまだ未検証**。403だけで承認UIが出なければ操作停止、別途安全なデプロイ経路の検討に切り替える。
+- 既存のローカルバックアップと元本照合は維持し、他のCloudflareサービスを変更しない。再認証しただけでは本番コード更新PASSにしない。更新実行前に現行SHAを再GETする。
+- 参考：[Cloudflare OAuth任意権限](https://developers.cloudflare.com/fundamentals/oauth/authorizing-an-application/) は「表示される**requested optional scopes**から個別選択」であり、対象Clientが要求していない権限をUIから自由追加できるわけではない。
