@@ -117,3 +117,11 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - ユーザーが開いた **Web版のプラグイン詳細**（右上に「デスクトップアプリで開く」と表示）にある **「…」** を押しても、メニューは **「プラグインのZIPファイルをダウンロード」「新しいバージョンをアップロード」「プラグインを削除」** の3項目。**OAuth・MCP接続操作ではない**。削除や更新を押さない。
 - 以前提供された **Windowsデスクトップ版のプラグイン詳細** には `MCP サーバー 1 > Cloudflare-api` 行の**右端に歯車**が映っていた。まず **Web版から「デスクトップアプリで開く」→デスクトップ版プラグイン詳細の `Cloudflare-api` 行右端の歯車**を確認する。歯車の表示結果を見て初めて接続／OAuth設定と判断する。トップの三点リーダーと混同しない。
 - 上記でMCPの管理操作が出なければ、公式Codex設定 `%USERPROFILE%\\.codex\\config.toml` の `[mcp_servers.cloudflare_api]\nurl = "https://mcp.cloudflare.com/mcp"` を**本人の許可と既存ファイルの確認・バックアップを前提に**代替試験。プラグイン同梱のMCP設定との二重登録に注意する。根拠: https://developers.openai.com/learn/docs-mcp と https://developers.openai.com/ja-JP/docs/config-file/config-reference 。OAuth連携が実際に走るかはこのユーザー端末では未検証。
+
+## 2026-10-20 実機：MCPサーバー画面の発見
+
+- ユーザーが**Windowsデスクトップ版の設定「MCP サーバー」画面**を表示。右タイトル「MCP サーバー／外部ツールとデータソースを接続する」、タブ「プラグイン 11」「アプリ 16」「MCP 1」、右側に **「＋ サーバーを追加する」**。
+- セクション「サーバー」には `node_repl` だけが一覧表示（有効）。「プラグインから」に `code-review`、`codex_apps` は表示されるが `cloudflare-api` は見当たらない。**Cloudflare公式MCPはこの画面の一覧に未登録**、前回のCodexで `search`/`execute`/`docs` が使えなかった結果と整合。
+- **次の正しい一手**は画面右の **「＋ サーバーを追加する」**。次ダイアログを確認して名前 `cloudflare-api`、公式URL `https://mcp.cloudflare.com/mcp` を入力する。入力UIの名前や認証方式は未確認なので、表示を見てから案内する。現時点でOAuth接続はNOT_RUN。
+- 過去の誤案内（コーディング→接続＝MCP）は撤回済み。今回のサーバー一覧の所在・ナビゲーションはユーザーの実機画面から確認した範囲のみを記載する。
+- プラグイン管理画面上にMCPの設定ファイルが存在することと、CodexのMCPサーバー一覧に実登録されることは別。登録後は読み取り専用でCloudflare Worker/KVを点検する。Secretやトークンをチャットへ送らせない。
