@@ -10,6 +10,13 @@
 6. CloudflareへのSecret登録とプライベートプラグインのChatGPTへの接続は利用者が明示操作。**実機の認証・投稿は未実行なら未実行と報告**。
 7. 接続後 `check_connection` → `list_uploaded_videos` → `upload_private_from_drive` （ユーザーが投稿指示した場合）→ `private_verified` → 管理画面で人間に公開判断を渡す。
 
+## 実機修正ケース：Google Cloud「URLが見つかりません」（2026-10-20）
+
+- 誤案内: `https://console.cloud.google.com/auth/data-access` は使用しない。公式資料の「データアクセス」の実際の遷移先は `https://console.cloud.google.com/auth/scopes`。
+- 画面上部が「プロジェクトの選択」の場合は、対象のGoogle Cloudプロジェクトを選択してから、左メニューの**「データアクセス」**をクリックするよう案内。
+- **リンクを再提示するより、実画面の操作を優先**。修正した直リンクも認証済み画面での動作を未検証なら保証しない。
+- ユーザーからエラー画像を受け取ったら、リンク/プロジェクト/権限をそれぞれ切り分け、確定原因を憶測で断定しない。
+
 ## チャット実行時
 
 1. **チャンネルを作りたい / 作れない**：`channel.html` に案内する。YouTubeではチャンネル作成のAPIはなく公式画面で人間が作る。iPhoneでPC版サイト案内。過去の事例では名前に `|` があると登録に失敗したため、まず `AD&C - AI-DODAI & Continuity` など区切り記号を変更して試す。ただし`|`がYouTube一般禁止文字と断定しない。必ず最後に「チャンネル開設ナビ」へのリンクを再提示する。
