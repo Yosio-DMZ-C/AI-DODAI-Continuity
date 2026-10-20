@@ -159,3 +159,10 @@ NEXT_HUMAN_ACTION: ...
 - 2段目の `Read only` プリセットを押すと書込権限がOFFになる可能性があるため、`Workers Scripts Write` 選択直前に押さない。すでに選択されていれば対象のON/OFFを実表示で確認する。UIの `194 total permissions` が**要求件数か実許可件数かを断定しない**。画面で最終的な選択を検査する。
 - この回避経路でWorkers Scripts Writeだけを承認できることは**まだ実機未確認**。対象が見つからないか権限の削減が難しければ`Authorize` を押さず停止し、Step-upまたはWorker限定の代替経路を検討。
 - 公式：[Cloudflare Authorizing an application / Edit optional permissions](https://developers.cloudflare.com/fundamentals/oauth/authorizing-an-application/) は、`Additional access → Edit Permissions` で任意権限をカテゴリーまたは個別に変更し、**確認後にAuthorize** と案内している。
+
+### 2026-10-21 実機：必須2件＋Scripts Write 1件のみで同意を構成
+
+- 本人のCloudflare OAuth同意画面（2026-10-21）で、Additional Accessをいったん全OFFにし、**`Workers Scripts Write` のみをON**にした。その結果は **`3 total permissions`**、Requiredは `User Read` / `Background Access` の2件、追加は `Workers Scripts Write` 1件。**最終Authorizeは現時点では未実施**。
+- Cloudflare公式の [Get Worker Script Content](https://developers.cloudflare.com/api/resources/workers/subresources/scripts/subresources/content/methods/get/) / [List Worker Scripts](https://developers.cloudflare.com/api/resources/workers/subresources/scripts/methods/list/) / [Get Worker Script Settings](https://developers.cloudflare.com/api/resources/workers/subresources/scripts/subresources/settings/methods/get/) は、各GET APIのAccepted Permissionsに `Workers Scripts Write` を列挙する。よって**対象WorkerのコードGET/コード変更/コード読戻しのために `Workers Scripts Read` を重複付与する必要はない**。以前の「Scripts Readも必須」という案内は訂正。
+- Cloudflare APIの別リソース一覧（KV Namespaceの一覧やアカウント一覧など）は異なる権限を要する場合がある。デプロイの正本とBinding/Secret型の確認は、適切な既存GETが成功する範囲で行い、403なら必要スコープだけ後から追加する。認可だけでデプロイPASSとはしない。
+- 次の本人操作：`Back to Review` で **3 total permissions／Write 1件だけ**を最終確認した後 `Authorize`。Codexへ戻り、**本番現在ハッシュのGETとバックアップ確認から再開**して `/content` のコードのみ更新と回帰試験を実施。「一度だけ許可」でMCP実行コードを都度確認。旧Worker/Binding/Secret、YouTube/Driveは変更しない。
