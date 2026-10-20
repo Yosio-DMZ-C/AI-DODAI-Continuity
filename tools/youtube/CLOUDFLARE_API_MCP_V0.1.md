@@ -53,3 +53,12 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 ## 再利用と展開
 
 一般利用者にはCloudflare公式MCPの接続リンクを提供し、同梱SkillやAD&C個人KBで操作対象・承認方針を管理する。個人に固有のIDを一般向けテンプレートへハードコードしない。使用できる権限・接続UIが変われば公式手順を確認して更新する。
+
+## 実機発見：個人用MCPプラグインのChatGPT Web利用制限（2026-10-20）
+
+- 作成済み個人用 `AD&C Cloudflare Ops v0.1` の詳細画面には **「デスクトップアプリで開く」** と表示され、紫色の開始カードを押すと `ChatGPT を開いています` の**デスクトップアプリ起動ページ**へ遷移した。**Cloudflare OAuthへ進んだわけではない**。
+- OpenAIの公式プラグイン資料は「Desktop only／デスクトップアプリで開く」と表示されたプラグインは**ChatGPT Webでは実行できない**と明記。根拠: https://help.openai.com/ja-jp/articles/20001256-plugins-in-chatgpt 、https://help.openai.com/ja-jp/articles/20001497-troubleshooting-plugins-and-apps-in-chatgpt
+- **ユーザーの次の操作**: PCにChatGPTデスクトップアプリがある場合は `ChatGPTを開く` を選択。ブラウザ継続ではOAuth接続不能。デスクトップアプリ未導入なら `Windows向けをダウンロード` は**追加インストールを伴う**ため本人に導入意思を確認する。Python/Node/npmは依然不要。
+- v0.1のChatGPTプラグイン作成はPASSだが**ブラウザからCloudflare OAuthや管理APIを実行できるという案内は誤り**。接続とAPIテストは未実施。ユーザーがデスクトップアプリを使わない場合は**ChatGPT Webから接続できる代替設計の検証が必要**であり、無検証のURLや新しいプラグイン作成で解決済みと扱わない。
+- 操作案内で、紫色のカードの「→」をCloudflare接続画面と断定しない。実際にはデスクトップ起動だった（ユーザーのスクリーンショットで確認）。
+
