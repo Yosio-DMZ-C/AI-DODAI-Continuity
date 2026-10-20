@@ -117,7 +117,7 @@ NEXT_HUMAN_ACTION: ...
 
 - タイトル **`Authorize application`**、サブタイトル `Grant access to Cloudflare API`、接続アプリ `Codex`。Client ID `https://chatgpt.com/oauth/codex/client.json`、Redirect URI `http://127.0.0.1:<可変ポート>/callback`。可変ポートを手順に固定しない。認証URLの `state` / `code_challenge` をチャットへ貼り付けない。
 - **Base scopes** に `Minimal` / `Read only` / `Full access` / **`Requested scopes`** の選択肢（2026-10-21実画面）。この再接続では `Requested scopes` が**初期選択**され、下段に `This client asked for:` と多数の `... Read` ラベル、`and 180 more` が表示された。**Requested scopesが現在の権限をすべて維持する／書込みを含まないとは現画面だけでは判断できない**。
-- **安全な今回の操作**：`Read only` を選択 → `Continue` → 最終Cloudflare同意画面で **`Edit Permissions`** → `Search scopes` に `workers-scripts.write` または `Workers Scripts Write` を入力 → 一致した **`Workers Scripts Write` のみ有効化** → 最終同意画面で他の Write が選ばれていないことを確認 → 本人が `Authorize`。ボタンが表示されない／対象スコープが見つからない場合は**承認しない**でSSを確認。
+- **安全な今回の操作（実機結果により訂正）**：Read onlyで一旦認証を完了し、Codexからの書込APIでStep-up認可が起動するか検証する。Write項目はこのRead onlyの同意画面では見つかっていない。Full accessは選択しない。
 - 書込みスコープはCloudflare公式MCPに **403 `insufficient_scope` で要求された実名**。Full access一括選択はしない。Read onlyがアカウント横断の広範な読取りを許す点も、別途最小化を検討。
 - 参照: [Cloudflare 2026-08-22 OAuth権限の任意選択](https://developers.cloudflare.com/changelog/post/2026-08-22-wrangler-mcp-optional-oauth-scopes/) / [Cloudflare 2026-10-19 step-up authorization](https://developers.cloudflare.com/changelog/product/agents/)。
 - 認証が完了したら、Codexで元のデプロイ用手順書を**差分再検査・バックアップの確認から再開**し、更新後GETによる読戻しと `/health`, `/mcp` 401の回帰検査を行う。
@@ -135,3 +135,10 @@ NEXT_HUMAN_ACTION: ...
 - **案内の修正**：Edit Permissionsで `Scripts Write` を検索して見つからない場合、Full accessプリセットで代用しない。既存Read onlyのまま通常再認証を完了し、Codexへ先の単一Workerコードのみ更新を再試行するよう依頼。その際にMCPクライアントの **step-up追加承認ダイアログが出るか**を確認する。**Codexクライアント側でstep-up対応済みとはまだ未検証**。403だけで承認UIが出なければ操作停止、別途安全なデプロイ経路の検討に切り替える。
 - 既存のローカルバックアップと元本照合は維持し、他のCloudflareサービスを変更しない。再認証しただけでは本番コード更新PASSにしない。更新実行前に現行SHAを再GETする。
 - 参考：[Cloudflare OAuth任意権限](https://developers.cloudflare.com/fundamentals/oauth/authorizing-an-application/) は「表示される**requested optional scopes**から個別選択」であり、対象Clientが要求していない権限をUIから自由追加できるわけではない。
+
+### 2026-10-21 Read only選択時にWriteが見つからない実機結果
+
+- ユーザーが `Read only` プリセットでCloudflare OAuthの `Edit Permissions` を操作したところ、`workers-scripts.write` / `Scripts Write` のどちらも **`No scopes match your search`**。一方、`workers` では `Workers Scripts Read` 等のみが確認できた。
+- 結論：**Read only状態でWrite権限を同じ一覧から追加できるとは案内しない。** OAuthの権限編集は「何でも自由に追加」ではなく当該フローで要求されたスコープの選択画面。少なくとも今回の画面ではWriteを選べていない。
+- Cloudflare公式2026-10-19の [step-up authorization](https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/) に沿い、最初はRead onlyで認証を完了し、CodexがWrite APIを呼ぶ際に `insufficient_scope` を受けたら必要な `Workers Scripts Write` の追加認可が起動するか確認する。**Codex側のstep-up対応は未実証**。再403で追加承認画面が表示されなければ書込試行を停止し、別方式を検討。
+- **訂正**：『Read onlyを選択→Edit PermissionsでWriteを検索してON』という従来案内は実機と整合せず標準手順から撤回。Full access一括許可で代用しない。
