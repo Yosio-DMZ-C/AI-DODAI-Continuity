@@ -125,3 +125,11 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - **次の正しい一手**は画面右の **「＋ サーバーを追加する」**。次ダイアログを確認して名前 `cloudflare-api`、公式URL `https://mcp.cloudflare.com/mcp` を入力する。入力UIの名前や認証方式は未確認なので、表示を見てから案内する。現時点でOAuth接続はNOT_RUN。
 - 過去の誤案内（コーディング→接続＝MCP）は撤回済み。今回のサーバー一覧の所在・ナビゲーションはユーザーの実機画面から確認した範囲のみを記載する。
 - プラグイン管理画面上にMCPの設定ファイルが存在することと、CodexのMCPサーバー一覧に実登録されることは別。登録後は読み取り専用でCloudflare Worker/KVを点検する。Secretやトークンをチャットへ送らせない。
+
+## 2026-10-20 実機：Cloudflare MCPを手動登録後「認証する」表示
+
+- **ユーザー提供SS（登録前）**：ChatGPT Windowsアプリの設定→MCPサーバー→「＋ サーバーを追加する」→「カスタム MCP に接続する」。名前 `cloudflare-api`、タイプ「ストリーミング可能な HTTP」、URL `https://mcp.cloudflare.com/mcp`。Bearerトークン環境変数／ヘッダー／環境変数からのヘッダーは未入力のまま「保存する」を実施。
+- **ユーザー提供SS（登録後）**：MCPサーバー数が **1→2**、一覧に `cloudflare-api` と `node_repl` が表示され、`cloudflare-api` は有効化ON。「**認証する**」ボタンを確認。**手動登録はPASS**、OAuthはNOT_RUNであり接続可能かは未検証。
+- **次の最小操作**：一覧の `cloudflare-api` 行にある「**認証する**」を押す。Cloudflareの認証画面が出たら本人にログインと要求権限を確認してもらう。最小権限の原則を守る。画面上のアクセストークン/APIキー/秘密情報はチャットに送付させない。サードパーティ偽装を避けるため認証画面のホストがCloudflare公式ドメインかを検査。
+- **登録成功と接続成功を混同しない**。認証後にMCPの`search`/`execute`の実応答が得られて初めて接続PASSとし、Worker `adnc-youtube-private`、KV `adnc-youtube-uploads`、バインディング `UPLOADS_KV` の読み取り確認を順番に実施。
+- 今回の手動MCP登録はプラグイン同梱 `.mcp.json` のランタイム認識不足を回避するための**Codex本体への独立登録**。SkillやCloudflareプラグインの構造そのものが直ったとは判定しない。将来の重複登録を確認する。
