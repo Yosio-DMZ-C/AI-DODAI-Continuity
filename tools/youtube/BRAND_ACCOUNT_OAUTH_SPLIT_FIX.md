@@ -104,3 +104,13 @@
 - **MCPプラグイン経由の初回接続・APIキー入力・ツール検査はNOT_RUN**。Codex/ChatGPTのAPIキー認証UIが現行環境で機能するかは本人画面を見て確認が必要。OpenAI公式は固定Bearerトークン用の `auth.type=api_key` / `headerScheme=bearer` を文書化するが、投稿ポータルや一部クライアントではセットアップ方法に制約がある：https://developers.openai.com/plugins/build/plugins
 - 次ゲート：本人がリンクを開き、接続UIに**秘密値をチャットへ送らず直接入力**できるならプラグインを有効化。接続先MCPの`check_connection`のみを起動してチャンネル一致を検査。安全なUIがない場合はSecretをマニフェストへ埋め込まず、CodexのローカルMCP接続でOSの秘密情報保管を使う方式を検討する。
 - **未解決**：Drive API疎通の独立検証、本番v0.4.4ソースのGitHub同期、テスト動画の非公開アップロード。接続確認に成功するまでユーザーの動画は投稿しない。
+
+### 2026-10-21 プラグイン画面からの接続：APIキーUI非対応（方式変更）
+
+- ユーザーのCodexデスクトップ版：インストールした個人用プラグイン `AD&C YouTube Ops` のページにはMCP `Adnc-youtube-private` が表示される。しかし右端の歯車を押すと、**プラグインの認証画面ではなく設定 → MCPサーバー管理一覧**へ遷移する。管理一覧には `cloudflare-api`, `node_repl` の2件のみが表示され、AD&C YouTube MCPは直接設定できない。
+- 既存プラグインの `mcp.json` が宣言する `auth.type=api_key`, `headerScheme=bearer` の構文は許容されるが、**OpenAI公式のプラグイン接続ポータルはBearerトークン入力UIを現在サポートしない**。プラグインの作成・インストールPASSはMCPの認証接続PASSではない。
+- OpenAI公式：https://developers.openai.com/plugins/deploy/submission （Authentication limitations）、https://developers.openai.com/plugins/build/plugins （Fixed bearer tokens and API keys）。
+- **訂正**：「プラグイン右側歯車からAPIキーを入力」は誤案内だった。公開/非公開を問わず、ZIPやmanifestのheadersへ秘密値を埋め込んで代用しない。
+- 暫定策は**Codexデスクトップの共通MCP一覧 → ＋ サーバーを追加する → Streamable HTTP**、URL=`https://adnc-youtube-private.yosio-hasenaka.workers.dev/mcp`、Bearer Token Environment Variable=`ADNC_YOUTUBE_MCP_KEY` のようなローカル環境変数を設定する。値を直接UIに貼るのではなく**環境変数名**を指定する。Codex公式 `mcp_servers.<id>.bearer_token_env_var` が対応：https://developers.openai.com/docs/config-file/config-reference 。ただし、値の安全な供給方法（毎回非表示入力してプロセスのみに保持／OSの資格情報保管庫）を整備するまでは接続完了扱いしない。
+- 本命はWorker MCPへOAuth 2.1認証を実装し、ChatGPTのプラグイン認証画面で接続できる方式へ更新すること。GoogleのOAuth（YouTube/Drive連携）とは別の**MCPクライアントの認証レイヤー**。現行v0.4.4と既存Secretを変更せず別設計・検証後に切替える。
+- 現状：PowerShell経由の`initialize`・`check_connection`はPASS。ChatGPT/Codexプラグインからの実ツールはNOT_RUN。動画投稿もNOT_RUN。
