@@ -68,3 +68,30 @@
 
 ユーザーのCloudflare Production / Runtime variables and secrets の画面に `MCP_API_KEY` がType=`Secret`、Value=`Value encrypted` と表示された。既存の `GOOGLE_REFRESH_TOKEN`、`GOOGLE_DRIVE_REFRESH_TOKEN`、`AUTH_SETUP_KEY`、`GOOGLE_CLIENT_SECRET` もSecretとして残っている。**設定項目の存在のみPASS**。MCP Bearer認証、refresh tokenのGoogle受理、対象YouTubeチャンネルID、Drive API疎通は**NOT_RUN**。
 次はMCPの `initialize` と `check_connection` を投稿なしで検証。`MCP_API_KEY` の値はChatGPTチャット、GitHub、ログに出さない。登録直後のクリップボードに鍵が残っている場合は利用者PC内のPowerShellからBearerヘッダーで試験できる。現在チャットからCloudflareのSecretを取得したり、公式Cloudflare MCPで同Workerの認証済みMCPツールを直接実行したりはできない。
+
+### 2026-10-21 実証：MCP initialize / check_connection PASS とキー管理改善
+
+**ユーザー実行のPowerShell応答（キー非表示、動画投稿なし）**：
+
+| 項目 | 確認結果 |
+|---|---|
+| `POST /mcp` → JSON-RPC `initialize` | `MCP initialize: PASS` |
+| `tools/call: check_connection` | `state: ready` |
+| 対象チャンネルID | `UCrLzqKRdeNsCpSrHPQy8Ifg` と一致 |
+| 投稿モード | `upload_mode: private_only` |
+| 公開操作 | `human_publication_required: true` |
+| Google Driveの実データ取得 | 未検査（応答にDrive個別の疎通結果なし） |
+| YouTube非公開アップロード / 動画公開 / Drive原本の削除 | 未実施 |
+
+ユーザー指摘：**『生成したキーをクリップボードにコピー』→『次のPowerShellコマンドをコピー』の順では秘密値が上書きされる**。これは手順設計上の欠陥。ユーザーがクリップボード履歴で復旧したことを汎用解決策として扱わない（履歴への秘密値残留・クラウド同期に注意）。
+
+**標準の修正案**：
+
+1. 最初に『この作業で使用する鍵』と役割を1行で説明し、利用者がキーやパスワードをチャットへ貼らないことを明記。設定項目名と値（乱数文字列）を混同しない。
+2. 既存のキーを試験する場合は、**検査コマンドの実行後に `Read-Host -AsSecureString` で入力させる**。値は表示させない。ただしSecureStringでもプロセス中に必要な平文に変換され得るので万能な秘密保護ではない。
+3. キーを新規発行してCloudflareに登録する場合は、**1本のPowerShell手順で生成→クリップボードへ一時コピー→人間がCloudflareのSecretに貼り付け→同じPowerShellプロセスのメモリ上に保持したキーで自動接続検査→クリップボード消去→プロセス終了**まで行う。途中で別のコードコピーを要求しない。この一時鍵はファイルに保存しない。
+4. **メモ帳などの平文ファイルへの一時保存は既定にしない**。誤保存・OneDrive同期・バックアップ・クリップボード履歴・画面共有で漏洩する可能性がある。もし手動転記が避けられない場合も一時的な取り扱いとし、秘密はスクリーンショット・ログ・GitHubへ載せない。
+5. 試験終了後に削除してよいのは**ユーザー側の一時コピーだけ**。CloudflareのSecret値は運用中必要なため削除しない。**クライアント側にも将来Bearer認証を行うためのキーが必要**：継続接続するならOSの資格情報保管庫・信頼できるパスワードマネージャー・プラグインの秘密入力機構のいずれかに保存し、平文 `.env` や公開ZIPへの直接埋込は避ける。保存せず一度限り使う方針なら再利用できず、失われたキーはCloudflare側でローテーションが必要。
+6. できるだけ将来はユーザーがキーを扱わないOAuth接続／安全なシークレット保管方式を検討。**最初から個人用の非公開プラグインやMCPクライアントへBearer値を保存してよいとは限らない**ため仕様・保存先を実機確認してから採用。
+
+**次ゲート**：`list_uploaded_videos` 等の**読み取りのみ**の検査、Drive用トークンを使用するコードと実Drive疎通の検証、ChatGPT/Codexへの専用MCP接続の安全な手順化。ユーザーによる明示指定までは `upload_private_from_drive` を実行しない。
