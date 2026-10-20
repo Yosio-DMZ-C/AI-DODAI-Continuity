@@ -125,7 +125,7 @@ Cloudflare公式MCPをWindows Codexへ直接登録し、OAuth Read onlyでCloudf
 - v0.4.1統合候補に **PKCE S256** を追加。各リクエストの `code_verifier` を別の秘密 `AUTH_SETUP_KEY` と状態ノンスのHMACから導出、認可URLへ `code_challenge` と `code_challenge_method=S256`、Googleトークン交換時へ `code_verifier` を追加。既存Workerの本体コードは、OAuthへの早期分岐2行を追加する以外不変。
 - Node.js 22.16.0で `node --check` PASS。オリジナル/新OAuthモック含む **17/17 PASS**（新PKCEチャレンジとVerifier一致のテスト1件追加）。ライブAPI検証ではない。
 - 候補本体 `worker.oauth.v0.4.2.mjs` SHA-256: **`2f6710f915e63e507c4daa828db18d4c05bb52d23cbdb975cb72692d112c153a`**。
-- 差分 `worker.oauth.v0.4.2.patch`、元コード `worker.base.mjs`、検査テストと `REVIEW_NOTES.md` をまとめた**レビューZIP**を本チャットで出力。ZIPの名前 `ADNC_YouTube_OAuth_Integrated_v0.4.2_REVIEW.zip`。GitHubにレビューZIP本体は登録しておらず、実コードの正本化は次工程。**GitHub既存の `worker.mjs` を上書きしていない**。
+- 差分 `worker.oauth.v0.4.2.patch`、元コード `worker.base.mjs`、検査テストと `REVIEW_NOTES.md` をまとめた**レビューZIP**を本チャットで出力。ZIPの名前 `ADNC_YouTube_OAuth_Integrated_v0.4.2_REVIEW.zip`。GitHubにレビューZIP本体は登録していないが、**実装候補ソースを [worker.oauth.v0.4.2.mjs](worker.oauth.v0.4.2.mjs) に新規コミット済み（commit ec840560475c3b5fb77ef9298a6ce426278a0782）**。登録後にローカルの候補ソースとGitHubから読み戻したテキストの完全一致を確認した。**GitHub既存の `worker.mjs` を上書きしていない。本番デプロイも未実施**。
 - 本番Workerへのコード変更は**ユーザーの明示承認待ち**。Cloudflare公式MCPはRead onlyなので、書込スコープを必要最小限にして再認可が必要。承認後は本番コードを個別バックアップし、差分をレビューしてからデプロイし、`/health` / 未認証`/mcp` の回帰テストを実施。
 - この段階でユーザーに依頼するCloudflare Secretの登録は**なし**。まずデプロイの承認と方法を決める。次段階でGoogle OAuth実認証→ `GOOGLE_REFRESH_TOKEN` Secret設定、その後別々の乱数Secret `MCP_API_KEY` の設定。両者を `AUTH_SETUP_KEY` と混同・再利用しない。
 - **要注意**：OAuth完了ページのHTML/JSには一時的に更新トークンが存在する。URLや通常の画面には表示しないが、ページソース・ブラウザ拡張からは見える可能性がある。チャットへのスクリーンショット・HTML・トークンの送付は禁止。Google Driveソースファイルの削除は引き続き禁止。
