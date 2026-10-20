@@ -60,6 +60,12 @@
 - WorkerにKVをバインドする場合は https://dash.cloudflare.com/ から対象Worker `adnc-youtube-private` の設定・Bindingsへ進む。深いリンクが未確認なら推測で組み立てない。
 - すでにユーザーが目的画面を開いている場合や直リンクでプロジェクト選択が失われる場合は、同じ画面のクリック操作を優先し、リンクの再起動を強制しない。
 
+## Cloudflare/GitHubの原語UI固定とKV接続の実機修正（2026-10-20）
+
+- Google翻訳によって「Workers & Pages」が「従業員とページ」、「Workers KV」が「労働者KV」と表示された事例。**原文UIを優先**し、Cloudflareの Profile > Settings > Language で English を選択し、Chrome翻訳で `dash.cloudflare.com` および `github.com` を原文に戻して「このサイトは翻訳しない」とする。URLパラメータだけで表示言語を強制できると未検証で約束しない。
+- **KVの「Connect」は実行ボタンではなくコード例の説明モーダル**。そこで出たサンプルをWorkerに貼り付けてはいけない。モーダルを閉じ、Worker側の Settings > Bindings > Add > KV Namespace から `UPLOADS_KV` に `adnc-youtube-uploads` をバインドし Deploy、読戻し確認。公式: https://developers.cloudflare.com/kv/concepts/kv-namespaces/
+- 操作画面へのリンクは提供できる確認済みURLを提示し、言語強制用の未検証URLを作らない。日本語で説明し、ユーザーが実際に操作する英語ラベルを正確に書く。英語表記が見えず止まった場合のみ現在画面を確認する。
+
 ## チャット実行時
 
 1. **チャンネルを作りたい / 作れない**：`channel.html` に案内する。YouTubeではチャンネル作成のAPIはなく公式画面で人間が作る。iPhoneでPC版サイト案内。過去の事例では名前に `|` があると登録に失敗したため、まず `AD&C - AI-DODAI & Continuity` など区切り記号を変更して試す。ただし`|`がYouTube一般禁止文字と断定しない。必ず最後に「チャンネル開設ナビ」へのリンクを再提示する。
