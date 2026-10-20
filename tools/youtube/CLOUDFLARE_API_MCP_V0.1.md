@@ -99,3 +99,8 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - 概念整理（OpenAI公式 https://developers.openai.com/plugins/concepts/mcp-server）：**MCP（Model Context Protocol）** はAIクライアントと外部ツール/情報をつなぐ規格、**MCPサーバー**はAIにツール等を公開し、呼び出しを実行して結果を返す側。**Skill**はAIの手順・ルール、**プラグイン**はSkillと接続設定等のパッケージ。Skill読込PASSでもMCPツールの実接続PASSではない。
 - 認証トークン／APIキー／OAuth JSONの送信禁止。本件は読み取り試験から再開し、書込み・デプロイ・削除は禁止のまま。
 
+## セキュリティ補足：デスクトップCodexのフルアクセス
+
+- ユーザー提供のWindows版ChatGPT/Codexアプリの設定SSで、`一般 > 権限 > フルアクセス` が**ON**。画面の説明では、ローカルファイル編集とネットワーク使用のコマンドを承認なしで実行できるモード。**MCPサーバーのOAuth権限とは別の設定**。
+- AD&C Cloudflare点検（読み取り専用、変更前に承認）では、フルアクセスを使う必要があるかを確認し、必要性がないなら**OFFを推奨**。ただしフルアクセスをOFFにしただけでCloudflare OAuthのAPI側書込権限が制限されるわけではない。
+- 既存のユーザー設定を断りなく変更しない。変更するなら本人が現在の画面で判断する。
