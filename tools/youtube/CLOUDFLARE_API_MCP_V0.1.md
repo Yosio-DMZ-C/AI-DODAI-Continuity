@@ -176,3 +176,24 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - 次の操作：認証完了ブラウザを閉じる→Windows版ChatGPT/Codexへ戻る→`Settings > MCP servers` の `cloudflare-api` が有効で、`認証する` ボタンがどう変化したかを確認→必要ならデスクトップアプリ再起動→**新規Codexチャット**でMCPツールの存在を確認し、`adnc-youtube-private` Worker、`adnc-youtube-uploads` KV、`UPLOADS_KV` Binding、`EXPECTED_CHANNEL_ID` の **読み取りのみ**を依頼。認証秘密情報やSecret値を取得・表示しない。
 - OAuthではRead onlyを選択していた。今後も書込・KV変更・Deploy・Secrets更新・削除は禁止。画面上のスコープ選択とは独立にAIの作業内容も読み取り限定とする。
 - 今回の公開Worker `/health` は以前ユーザーのブラウザでPASS済み。これは**MCP経由のAPI利用がPASSしたことを意味しない**。
+
+## 2026-10-20 実機検証：Codex→Cloudflare公式MCP→実API読取 全項目PASS
+
+**根拠**：ユーザーが実行したCodexの結果表（チャットに貼付）とMCP `execute` 実行承認ダイアログのスクリーンショット。ここでのPASSは**Codexから報告された実行結果に基づく**。この文書更新担当自身が同じAPIを直接再呼出したわけではない。
+
+| 検査項目 | 結果 | 証跡の内容 |
+|---|---|---|
+| `mcp__cloudflare_api__search` | **PASS** | 1回実行。OpenAPI仕様からGET API発見 |
+| `mcp__cloudflare_api__execute` | **PASS** | 2回実行。アカウント一覧・Worker・KV・SettingsのGET。全対象API HTTP 200 |
+| Worker | **PASS** | `adnc-youtube-private` の存在確認 |
+| KV | **PASS** | `adnc-youtube-uploads`、namespace ID `210bbeeee68442b5a02bff985cf8b04e` |
+| Binding | **PASS** | `UPLOADS_KV` 型 `kv_namespace`、KV namespace ID一致 |
+| 環境変数 | **PASS** | `EXPECTED_CHANNEL_ID` 型 `plain_text`、値 `UCrLzqKRdeNsCpSrHPQy8Ifg` |
+| Secret値取得 | **NOT_RUN** | 意図的に取得せず |
+| Worker/KVの変更・デプロイ・削除 | **NOT_RUN** | 禁止したため未実施 |
+
+- **承認UIの発見**：デスクトップ版Codexの実行途中、`Allow the cloudflare-api MCP server to run tool "execute"?` が出た。ユーザーが **「一度だけ許可」**を押して処理継続（2回程度の確認があったとの報告）。コード欄には `cloudflare.request({method:'GET',...})` を含む照会コードが表示。**一度だけ許可**は今回の都度確認方針と合致。「常に許可」を標準にしない。なお、見た目のGETを必ず読み取りだけだと過信せず、実行前にコードの内容を確認する。
+- **原因切り分けの結論**：個人用プラグインのSkillは以前から起動していたが、その同梱MCP設定はCodex実行環境に自動登録されず `search/execute/docs` 不在だった。ユーザーがWindows版ChatGPT設定の **「MCP サーバー」→「＋ サーバーを追加する」** で `cloudflare-api` をStreamable HTTPとして直接登録しOAuth（Read only）認証すると、実API読取が成功。**プラグイン本体を修正したとの判定ではない**。
+- **現在の認証はRead onlyでの実績**。OAuth同意画面では `194 total permissions` が表示されていたため、書き込みが不可でも広範な読み取り権限がある可能性。利用規模拡大前に不要な閲覧権限の限定を検討。
+- **次工程**：Cloudflare Workerの新規デプロイを急がず、YouTube動画の**プライベートアップロード実証**に必要なGoogle OAuth認証、Drive依存解消、チャットからの起動経路を別途設計。Cloudflare管理APIへ書き込みが必要になった時点で、具体的操作と差分を提示してからCloudflare OAuth権限を最小限だけ引き上げる。
+- 本件の正常系は汎用AD&Cに還元可能：アプリのプラグインの認識→MCPサーバーの登録→OAuth完了→MCPツール使用可能→**実APIの読戻し**を、それぞれ別のゲートとして定義。
