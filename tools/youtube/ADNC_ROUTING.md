@@ -53,6 +53,13 @@
 - 初回の期待内容: `{"name":"ADNC YouTube MCP","version":"0.1.0","status":"unconfigured_or_configured_not_disclosed"}`。Secret未設定なのでYouTube接続OKとは解釈しない。
 - 本番外部アクセスで確認できない場合は、本人のブラウザで非秘密の `/health` 表示のみ依頼する。
 
+## 操作画面への直接リンク（2026-10-20・実機改善）
+
+- ユーザーへの操作依頼では、**その工程の操作画面に直接進めるリンク**を添える。管理トップだけを貼って深い階層操作を強制しない。公式文書の直リンクを優先して確認する。
+- Cloudflare Workers KV作成の直リンクは **https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces**（Cloudflare公式ガイドが提示するWorkers KVリンク）。
+- WorkerにKVをバインドする場合は https://dash.cloudflare.com/ から対象Worker `adnc-youtube-private` の設定・Bindingsへ進む。深いリンクが未確認なら推測で組み立てない。
+- すでにユーザーが目的画面を開いている場合や直リンクでプロジェクト選択が失われる場合は、同じ画面のクリック操作を優先し、リンクの再起動を強制しない。
+
 ## チャット実行時
 
 1. **チャンネルを作りたい / 作れない**：`channel.html` に案内する。YouTubeではチャンネル作成のAPIはなく公式画面で人間が作る。iPhoneでPC版サイト案内。過去の事例では名前に `|` があると登録に失敗したため、まず `AD&C - AI-DODAI & Continuity` など区切り記号を変更して試す。ただし`|`がYouTube一般禁止文字と断定しない。必ず最後に「チャンネル開設ナビ」へのリンクを再提示する。
