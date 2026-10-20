@@ -70,3 +70,13 @@ YouTube Data API v3、Drive APIの有効化は利用者申告で済み。Google 
 - Google Driveゴミ箱操作: https://developers.google.com/workspace/drive/api/guides/delete
 
 案内末尾の定型文: **「わからないところは教えてください。現在の画面に合わせて案内します。」**
+
+## v0.4.1 OAuthクライアントの選択（2026-10-20 実画面レビュー）
+
+- Google Cloudのクライアント作成画面で `Use this client for an AI-powered agent` チェックボックスを確認。AD&CのAI代理操作用のクライアントは **チェックON推奨**。チェックの有無はデスクトップ/ウェブの種別と独立し、作成後は変更できない。Google Workspace公式MCPサーバーへの接続時の要件と、独自MCP→Google REST APIの構成は区別する。
+- **AIから起動する = Desktop app ではない**。v0.3の「Desktop app」は `setup_once.py` が利用者PC上でOAuth初回承認を行うための暫定実装上の選択。
+- **AD&Cの汎用・低負荷な本命はWeb application**: チャット→AD&C専用MCP/Cloudflare Worker→YouTube REST API。初回認証もWorkerのHTTPS OAuth callbackで行い、各利用者にPython/CLI/credential JSONを要求しない構成へ変更する。GoogleのWeb Server Applications OAuth推奨フローに沿い、厳密なredirect URI・state/PKCE、ユーザー単位のトークン暗号化、権限分離、取り消し・再認証を設計してから実装。
+- 現行WorkerにはWeb OAuth callbackやユーザー別トークン管理が**未実装**。したがってWebクライアントの作成を指示する際、仮のリダイレクトURLを捏造しない。実装とHTTPS Worker URL確定後に案内する。
+- 現行v0.3のDesktop OAuthは1ユーザーによる最小PoCを成立させる代替経路として保持してもよいが、一般ユーザー向け標準手順とは位置付けない。HTML `videos.html` のブラウザOAuthは別のWeb client IDが必要になる。
+
+参考: https://developers.google.com/identity/protocols/oauth2/native-app ; https://developers.google.com/youtube/data/guides/auth/server-side-web-apps ; https://developers.google.com/workspace/guides/configure-mcp-servers
