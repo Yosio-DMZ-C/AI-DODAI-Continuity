@@ -10,13 +10,13 @@
 <header><div class="head"><div class="eyebrow">AD&C / SIMPLE NAVI v0.2</div><h1>YouTube 動画アップロード・管理</h1><p>非公開で登録。公開範囲の変更とURL取得は、人間が一覧画面で決定します。</p><div class="topNote">Google公式OAuth / YouTube Data API / トークンはブラウザのメモリのみ</div></div>
 <nav class="navbar" aria-label="AD&C YouTubeツール"><a href="./channel.html">チャンネル開設 ↗</a><a href="./videos.html" aria-current="page">動画アップロード・管理</a></nav></header>
 <main>
-<section class="nextpanel activeNext"><p class="kicker">利用の流れ</p><h2>①Google接続 → ②非公開アップロード → ③一覧で公開範囲を選択</h2><p class="sub">タイトル・動画ファイル・子ども向けかどうかを指定します。対象チャンネル名とIDを必ず確認してからアップロードしてください。</p><div class="actions"><a class="btn secondary" href="https://studio.youtube.com/" rel="noopener" target="_blank">YouTube Studio ↗</a><a class="btn secondary" href="./channel.html">チャンネル開設ナビ ↗</a></div></section>
-<section id="channel-selection-guide"><h2><span class="stepnum">00</span>投稿先チャンネルを選択（ID確認より先）</h2>
+<section class="nextpanel activeNext"><p class="kicker">利用の流れ</p><h2>①投稿先チャンネル選択 → ②Google接続 → ③非公開アップロード → ④一覧で公開範囲を選択</h2><p class="sub">タイトル・動画ファイル・子ども向けかどうかを指定します。対象チャンネル名とIDを必ず確認してからアップロードしてください。</p><div class="actions"><a class="btn secondary" href="https://studio.youtube.com/" rel="noopener" target="_blank">YouTube Studio ↗</a><a class="btn secondary" href="./channel.html">チャンネル開設ナビ ↗</a></div></section>
+<section id="channel-selection-guide"><h2><span class="stepnum">事前</span>投稿先チャンネルを選択（ID確認より先）</h2>
 <p class="sub">普段使うチャンネルが表示されることがあります。<b>必ず投稿したいチャンネルへ切り替えてから</b>チャンネルIDを取得してください。</p>
 <ol><li><a href="https://www.youtube.com/" target="_blank" rel="noopener">YouTubeを開く</a> → 右上のプロフィール画像 → <b>「アカウントを切り替える」</b> → 投稿したいチャンネルを選択。</li>
 <li>右上のアイコン／チャンネル名を確認。一覧に出なければ <a href="https://studio.youtube.com/" target="_blank" rel="noopener">YouTube Studio</a> で切替を確認。</li>
 <li>切替後、<a href="https://www.youtube.com/account_advanced" target="_blank" rel="noopener">YouTube 詳細設定</a>を開き <b>チャンネルID</b>を確認（ユーザーIDではありません）。</li></ol>
-<p class="small">誤投稿防止のため、認証後もYouTube APIのチャンネルIDと事前指定IDを照合し、不一致ならアップロードを中止します。通常利用チャンネルの「デフォルト」設定は勝手に変更しません。</p></section>
+<p class="small">チャット自動投稿（MCP）では認証後のYouTube APIチャンネルIDを事前指定IDと照合し、不一致ならアップロードを停止します。ブラウザ画面から投稿する場合は、画面に表示されるチャンネル名・IDを利用者自身が確認してください。通常利用チャンネルの「デフォルト」設定は勝手に変更しません。</p></section>
 <section id="setup-guide"><h2><span class="stepnum">00</span>初回認証がまだの場合</h2>
 <p class="sub"><b>AD&Cからチャットで非公開投稿するには、初回だけGoogle Cloud・Cloudflareの接続設定が必要です。</b> 画面変更に備え、実施時にはAD&Cが公式資料を再検索して簡単な手順を案内します。</p>
 <details><summary><b>初回設定の短い手順を表示</b>（約6工程・認証情報の送信禁止）</summary>
