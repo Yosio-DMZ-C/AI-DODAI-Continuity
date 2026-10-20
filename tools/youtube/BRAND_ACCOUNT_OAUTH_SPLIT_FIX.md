@@ -120,3 +120,9 @@
 ユーザー実機でCodex Windowsの `codex.exe mcp list` を実行。`adnc-youtube-private` がURL `https://adnc-youtube-private.yosio-hasenaka.workers.dev/mcp`、Bearer Token Env Var `ADNC_YOUTUBE_MCP_KEY`、Status `enabled`、Auth `Bearer token` と表示された。これは **設定認識PASS** だが、Codex内の実MCP呼出しは未検証。
 
 次工程では `Read-Host -AsSecureString` からキーを受け取り、同じPowerShellプロセスで `ADNC_YOUTUBE_MCP_KEY` を一時設定して Codex CLI の `exec --ephemeral --skip-git-repo-check --sandbox read-only` で `check_connection` のみ呼び出し、`finally` で環境変数を消す。キーをコマンド文字列・永続環境変数・GitHub・チャットに埋め込まない。CLI認証PASSとWindowsアプリ認証PASSは区別する。
+
+### 2026-10-21 Codex対話型MCP接続 PASS・報告UX改善
+
+- Codex CLI の対話型セッションで `adnc-youtube-private.check_connection` を呼び出し、利用者が `Allow`（1回許可）を選択して実行成功。返答で `state=ready`、`channel_id=UCrLzqKRdeNsCpSrHPQy8Ifg`、`upload_mode=private_only`、`human_publication_required=true` を確認。**Codex → MCPツール実接続 PASS**。これまで `codex exec` では承認ポリシー `never` のためツールが実行されず NOT_RUN だった。Google Driveの個別ファイル取得と実動画アップロードは引き続き NOT_RUN。
+- 今回の改善指摘：利用者は人間への報告内容をターミナルから手作業で選択・コピーしなければならず、作業完了の判断も曖昧だった。再利用する実行手順では、秘匿情報を除いた報告本文を自動でクリップボードへセットし、Windowsターミナルには赤背景白文字で「報告をクリップボードにコピー済み」を目立つように表示する。PASS / FAIL / NOT_RUN と次に必要なアクションを明記。表示だけでなく**コピー実行の成功確認後**に「コピー済み」と表示すること。クリップボードへの書込みが失敗した場合は失敗を明示し、誤って成功と告げない。
+- 上記は**次回実行時のUX改善要件**として記録し、この時点では新規スクリプトやWorkerの実装を増やさない。ユーザーが求める優先事項は、既存のWorkerとMCPによる実動画1本の非公開投稿、YouTubeでの動画ID/公開範囲の照合、次回実行時の鍵再入力削減である。今回の `check_connection` 成功は実アップロードPASSを意味しない。
