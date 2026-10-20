@@ -57,14 +57,26 @@ async function uploadPrivate(args,env){
   await env.UPLOADS_KV.put(key,JSON.stringify(record));return {...record,url:`https://www.youtube.com/watch?v=${output.id}`,channel_id:currentChannel.id,manage_url:env.MANAGEMENT_URL?.startsWith('https://')?env.MANAGEMENT_URL:null,after_upload:'この画面から更新してください（公開範囲は必ず人間が管理ページで変更）'};
  }catch(e){await env.UPLOADS_KV.put(key,JSON.stringify({state:'needs_manual_check',drive_file_id,detail:String(e.message),request_key,failed:new Date().toISOString()}));throw e}
 }
+async function checkConnection(env){
+ const missing=['GOOGLE_CLIENT_ID','GOOGLE_CLIENT_SECRET','GOOGLE_REFRESH_TOKEN','MCP_API_KEY','EXPECTED_CHANNEL_ID'].filter(k=>!env[k]);
+ if(!env.UPLOADS_KV)missing.push('UPLOADS_KV');
+ if(missing.length)return {state:'not_ready',missing,action:'初回認証手順書を表示し、Google CloudとCloudflareの設定を案内してください。'};
+ const tok=await token(env);
+ const x=await google(`${BASE}/youtube/v3/channels?mine=true&part=id,snippet`,tok);
+ const c=x.items?.[0];
+ if(!c?.id)return {state:'not_ready',reason:'authenticated_youtube_channel_not_found'};
+ if(c.id!==env.EXPECTED_CHANNEL_ID)return {state:'channel_mismatch',actual_channel_id:c.id,expected_channel_id:env.EXPECTED_CHANNEL_ID,action:'チャンネルIDが一致するまでアップロード不可'};
+ return {state:'ready',channel_id:c.id,channel_name:c.snippet?.title||'',upload_mode:'private_only',human_publication_required:true,management_url:env.MANAGEMENT_URL?.startsWith('https://')?env.MANAGEMENT_URL:null};
+}
 async function listVideos(args,env){const tok=await token(env);const ch=await google(`${BASE}/youtube/v3/channels?mine=true&part=snippet,contentDetails`,tok);const item=ch.items?.[0];
- if(!item?.id)throw Error('YouTube channel not found');const pl=item.contentDetails?.relatedPlaylists?.uploads;if(!pl)throw Error('uploads playlist not found');
+ if(!item?.id)throw Error('YouTube channel not found');if(!env.EXPECTED_CHANNEL_ID||item.id!==env.EXPECTED_CHANNEL_ID)throw Error('Channel mismatch or EXPECTED_CHANNEL_ID missing');const pl=item.contentDetails?.relatedPlaylists?.uploads;if(!pl)throw Error('uploads playlist not found');
  const limit=Math.min(50,Math.max(1,Number(args?.limit||20)));const response=await google(`${BASE}/youtube/v3/playlistItems?part=contentDetails&maxResults=${limit}&playlistId=${esc(pl)}`,tok);
  const ids=(response.items||[]).map(x=>x.contentDetails?.videoId).filter(Boolean);if(!ids.length)return {channel:item.snippet?.title||'',channel_id:item.id,videos:[]};
  const videos=await google(`${BASE}/youtube/v3/videos?part=snippet,status&id=${esc(ids.join(','))}`,tok);
  return {channel:item.snippet?.title||'',channel_id:item.id,manage_url:env.MANAGEMENT_URL?.startsWith('https://')?env.MANAGEMENT_URL:null,videos:(videos.items||[]).map(x=>({id:x.id,title:x.snippet?.title,privacy_status:x.status?.privacyStatus,upload_status:x.status?.uploadStatus,url:`https://www.youtube.com/watch?v=${x.id}`})),has_more:Boolean(response.nextPageToken)};
 }
 const defs=[{name:'upload_private_from_drive',title:'Drive動画をYouTubeへ非公開登録',description:'Upload an existing Google Drive video to the authorized YouTube channel. ALWAYS private; never unlisted/public. Requires explicit user instruction. request_key is stable across retried chat tool calls.',inputSchema:{type:'object',additionalProperties:false,required:['drive_file_id','title','made_for_kids','request_key'],properties:{drive_file_id:{type:'string',description:'Owned Google Drive video file ID (not an arbitrary URL)'},title:{type:'string',maxLength:100},description:{type:'string',maxLength:5000},made_for_kids:{type:'boolean',description:'True only when user says the video is made for kids'},request_key:{type:'string',pattern:'^[a-zA-Z0-9_-]{8,100}$',description:'User-task unique stable idempotency key'}}}},
+{name:'check_connection',title:'初回認証・接続状態の確認',description:'Check OAuth, Worker secrets, KV and the expected YouTube channel without uploading or changing publication status. Returns only non-secret status.',inputSchema:{type:'object',properties:{},additionalProperties:false}},
 {name:'list_uploaded_videos',title:'YouTube登録済み動画一覧',description:'List owned channel recent videos, visibility, URL. No visibility changes.',inputSchema:{type:'object',properties:{limit:{type:'integer',minimum:1,maximum:50}},additionalProperties:false}}];
 export default {async fetch(req,env){const u=new URL(req.url);
  if(u.pathname==='/health'&&req.method==='GET')return json({name:'ADNC YouTube MCP',version:'0.1.0',status:'unconfigured_or_configured_not_disclosed'});
@@ -75,11 +87,11 @@ export default {async fetch(req,env){const u=new URL(req.url);
  let data;try{data=await req.json()}catch{return rpcError(null,-32700,'Invalid JSON')};
  const {id,method,params}=data||{};
  if(method==='notifications/initialized')return new Response(null,{status:202});
- if(method==='initialize')return rpc(id,{protocolVersion:PROTOCOL,capabilities:{tools:{}},serverInfo:{name:'adnc-youtube',version:'0.1.0'}});
+ if(method==='initialize')return rpc(id,{protocolVersion:PROTOCOL,capabilities:{tools:{}},serverInfo:{name:'adnc-youtube',version:'0.3.0'}});
  if(method==='ping')return rpc(id,{});
  if(method==='tools/list')return rpc(id,{tools:defs});
  if(method==='tools/call'){
-  try{const args=params?.arguments||{};let v;if(params?.name==='upload_private_from_drive')v=await uploadPrivate(args,env);else if(params?.name==='list_uploaded_videos')v=await listVideos(args,env);else return rpc(id,bad('Unknown tool'));
+  try{const args=params?.arguments||{};let v;if(params?.name==='upload_private_from_drive')v=await uploadPrivate(args,env);else if(params?.name==='list_uploaded_videos')v=await listVideos(args,env);else if(params?.name==='check_connection')v=await checkConnection(env);else return rpc(id,bad('Unknown tool'));
    return rpc(id,ok(v));}catch(e){return rpc(id,bad(e.message))}
  }
  return rpcError(id??null,-32601,'Method not found');
