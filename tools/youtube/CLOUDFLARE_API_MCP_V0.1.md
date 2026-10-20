@@ -153,3 +153,10 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - Cloudflare公式2026-08-22更新「[Choose OAuth scopes for Wrangler and the Cloudflare API MCP server](https://developers.cloudflare.com/changelog/post/2026-08-22-wrangler-mcp-optional-oauth-scopes/)」では、必須スコープを維持したまま、Optional scopesを個別編集可能と明記。足りない権限が必要になった際は再認可する。**最初から広い全権限を付与しない**。
 - `Background Access` は必須として表示され、バックグラウンド利用に関わる権限を含む。現在の画面で除外不可なら、任意権限の限定と認可取り消し手順の確認を重視する。
 - 続く実機検証は `Read only` + 限定Optional権限 → OAuth許可（本人が判断）→ `search`/`execute` を読取限定で確認。認可・実読取ができるまではMCP接続をPASS扱いしない。APIキー・一時認証コード・URLバー内のOAuthパラメータは共有しない。
+
+## 2026-10-20 実機：Chrome DevToolsの貼付防止機能
+
+- Cloudflare OAuthの追加権限は `194 total permissions` と非常に多い。ユーザーはブラウザコンソールによるDOMのチェック項目抽出を試すことにした。
+- Chrome DevTools Consoleに黄色警告 `Don't paste code into the DevTools Console that you don't understand or haven't reviewed yourself ... Type 'allow pasting' below and press Enter to allow pasting.` が実際に表示された（本人SS）。**サイト権限やCloudflare OAuthではなくChromeのSelf-XSS防止の貼付制限**。
+- 例外的に、提示したコードがユーザー自身で確認済みの場合のみ、Consoleに `allow pasting` を手入力して許可できる。**外部コードの安易な貼付やOAuth画面上での不明コード実行を標準化しない**。原則はCloudflare画面内の `Search scopes` / `Read only` / `Edit Permissions` による最小権限選択。抽出コードはDOM上のチェック項目と表示テキストだけを読むこと、外部送信がないことをレビューしてから使用。
+- DevToolsで得られたラベルは折り畳み／仮想スクロールで不完全な可能性があり、権限の全件検証PASSとは扱わない。認証トークン／URLバーの一時コード／Cookieをログ出力したりチャットへ貼り付けない。Cloudflare Authorizeは権限が十分絞られるまで押さない。
