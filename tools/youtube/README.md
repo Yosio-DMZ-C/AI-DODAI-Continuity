@@ -1,3 +1,5 @@
+> **2026-10-21 本番導入はv0.4.3を使用**：[コード](worker.oauth.v0.4.3.mjs)／[Codexでのデプロイ・復旧手順](CODEX_DEPLOY_HANDOFF_v0.4.3.md)。v0.4.2はCSPの `connect-src` 指定欠落によりブラウザの認証開始が失敗するため**デプロイ禁止**。v0.4.3はローカル模擬18/18 PASS。GitHub上は候補であり、本番は未デプロイ。
+
 > **2026-10-20 YouTube初回認証の次工程:** [ブラウザOAuth v0.4試作・実機準備](WEB_OAUTH_V0_4_PROTOTYPE.md)。WindowsのPython/Node.js導入を避けるため、GoogleのWeb application型OAuth Clientと既存Cloudflare Workerを利用する構想。モック6件PASS、**本番Workerへ未デプロイ／Google認証未実施**。既存のDesktop方式は旧手順として保持。機密JSON・Secret・トークンをチャットへ送らない。\n\n> **2026-10-20 Cloudflare自動操作の推奨変更:** Python/Node/npmが利用者PCにないことを実機確認。Cloudflare操作は**[Cloudflare公式MCP + AD&Cプラグイン](CLOUDFLARE_API_MCP_V0.1.md)**で行う。私有プラグインの作成・読戻しPASS、OAuth接続・実API読書きNOT_RUN。以前の `setup_once.py` はGoogle Desktop OAuth検証用として残し、一般ユーザー向け標準手順にしない。 
 
 > **v0.3.1 Dashboard認証対応:** GUIでWorker/KV/チャンネルIDを作成済みの場合、`setup_once.py --dashboard-configured` を使用。古い `wrangler.toml` で再デプロイする必要はありません。OAuthは初期状態でYouTube権限のみ。 [実機向け最短手順](DASHBOARD_AUTH_STEPS.md)（実認証・実投稿は未実施）。
