@@ -133,3 +133,14 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - **次の最小操作**：一覧の `cloudflare-api` 行にある「**認証する**」を押す。Cloudflareの認証画面が出たら本人にログインと要求権限を確認してもらう。最小権限の原則を守る。画面上のアクセストークン/APIキー/秘密情報はチャットに送付させない。サードパーティ偽装を避けるため認証画面のホストがCloudflare公式ドメインかを検査。
 - **登録成功と接続成功を混同しない**。認証後にMCPの`search`/`execute`の実応答が得られて初めて接続PASSとし、Worker `adnc-youtube-private`、KV `adnc-youtube-uploads`、バインディング `UPLOADS_KV` の読み取り確認を順番に実施。
 - 今回の手動MCP登録はプラグイン同梱 `.mcp.json` のランタイム認識不足を回避するための**Codex本体への独立登録**。SkillやCloudflareプラグインの構造そのものが直ったとは判定しない。将来の重複登録を確認する。
+
+
+## 2026-10-20 実機：OAuth認証画面、Full access初期選択
+
+- CodexのMCP画面で `cloudflare-api` の「認証する」を押したところ、ブラウザで**Cloudflare公式 `mcp.cloudflare.com/authorize`** の「Authorize application / Grant access to Cloudflare API」画面が表示された（本人のSS確認）。
+- **Client ID** は `https://chatgpt.com/oauth/codex/client.json`、**Redirect URI** は `http://127.0.0.1:<一時ポート>/callback`。127.0.0.1は本人PCへのローカルリダイレクトであり、初回デスクトップOAuthの挙動として自然。ただし正規起動かの判断はユーザーが開始した手順・ホスト名・同意画面全体を照合する。
+- 画面の **Base scopes** は `Minimal` / `Read only` / `Full access` の3択で、**Full accessが初期選択**されていた。読み取り専用の初期点検では**必ず`Read only`へ変更してから`Continue`**。Full accessのまま承認を誘導しない。Advancedは必要がない限り触らず、続く確認画面で利用アカウント・権限を再確認する。
+- この画面が表示されたことで **OAuth認証フロー開始はPASS** だが **OAuth承認・MCP API実呼出・Worker/KV実読取はまだNOT_RUN**。承認前に接続済みやAPI実行済みと報告しない。
+- Chromeの機械翻訳では「英語を常に翻訳」を有効化しない。技術画面で機械用文字列を書き換えないため、Cloudflareは英語UIのまま手順を案内する。
+- OAuthのアドレスバーには `state` 等の一時パラメータが含まれることがあるので、スクリーンショットを共有するなら**URLバーは隠す**。トークン、client_secret、APIキーをチャットに送らせない。
+- 現行公式根拠: [Cloudflare公式MCP](https://developers.cloudflare.com/agents/model-context-protocol/cloudflare/servers-for-cloudflare/) / [Cloudflare MCP OAuth](https://developers.cloudflare.com/agents/model-context-protocol/protocol/authorization/)。
