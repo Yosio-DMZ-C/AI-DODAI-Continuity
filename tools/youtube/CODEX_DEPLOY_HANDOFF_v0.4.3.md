@@ -76,3 +76,30 @@ NEXT_HUMAN_ACTION: ...
 3. GoogleのOAuthに本人がログイン・許可。チャンネルID `UCrLzqKRdeNsCpSrHPQy8Ifg` の一致を確認。ブラウザの更新トークンは第三者に公開しない。
 4. 表示されるコピー操作から `GOOGLE_REFRESH_TOKEN` をCloudflareのSecretとして登録。保存後はブラウザを閉じてクリップボードを消去。別の独立した鍵 `MCP_API_KEY` を後日登録し、`check_connection` で実機試験。
 5. Google Driveの原本はYouTubeの非公開投稿成功・映像確認後も本人の明示承認までは削除しない。
+
+
+## 2026-10-21 実機結果：初回デプロイ HTTP 403（変更なし）
+
+**実行証跡**：本人がCodexのデプロイレポートをチャットに転載。GitHub候補v0.4.3と本番コードを比較後、コードのみの更新が **HTTP 403** で拒否された。**DEPLOY: FAIL（権限不足、実変更なし）**。
+
+| チェック | 判定 |
+|---|---|
+| 本番/候補SHA-256照合 | PASS |
+| バックアップ・差分確認 | PASS（Codex報告）。詳細は本人側の `outputs/deploy-result-v0.4.3.md` |
+| コード本体のみの更新 | FAIL — HTTP 403 |
+| 403後、元コード維持 | PASS |
+| 現行 `/health` | PASS — HTTP 200 |
+| 無認証 `/mcp` | PASS — HTTP 401 |
+| `/auth/start`（更新後） | NOT_RUN |
+| ロールバック | NOT_RUN — 本番無変更のため不要 |
+
+**403の要求スコープ**：MCP実応答では **Workers Scripts Write (`workers-scripts.write`)** を要求。これはすでに許可されているRead onlyだけでは不可。Cloudflare公式はOAuth同意画面 `Additional access > Edit Permissions` で任意権限を個別にON/OFFでき、拒否したスコープが必要になれば再認可するよう案内（https://developers.cloudflare.com/changelog/post/2026-08-22-wrangler-mcp-optional-oauth-scopes/ 、https://developers.cloudflare.com/fundamentals/oauth/authorizing-an-application/）。
+
+### 次に人間が行うこと（OAuthだけ）
+
+1. Windows版ChatGPT/Codexの設定 **MCPサーバー > cloudflare-api** を表示し、サーバー行の歯車または再認証操作から、Cloudflare OAuthの再同意フローを起動する。実画面のボタン名が異なる可能性があるので、操作メニューを確認してから進む。
+2. Cloudflareの権限同意画面で `Additional access > Edit Permissions`、`Search scopes` に **`Workers Scripts Write`**（または `workers-scripts.write`）を入力。現在のRead only選択のまま、**この1項目の書込だけを追加し、その他のWriteはOFF**。最後に選択された権限を確認して `Authorize`。最初から `Full access` 全体を選んだまま承認しない。
+3. OAuth完了後、Codexで先の手順書を再実行。403が再発すれば中断し、勝手にグローバルAPIキーや別の書込スコープを追加しない。
+4. 再認証ボタンが現れなければCloudflare公式の **Manage OAuth authorizations** から旧MCP承認のRevokeを行い、Codex側で再認証する予備手順。ただしRevokeは一時的にMCPを切断するため**本人の了承を得てから**実施する。Cloudflareアカウントや他のアプリは誤ってRevokeしない。
+
+**補足**：Cloudflare OAuthの `workers-scripts.write` は必ずしも当該Worker1件だけに限定されない可能性がある。「Worker単位Editor」等の別のCloudflare権限方式と混同しない。書込権限が追加されても対象Worker `adnc-youtube-private` だけを更新、他のWorker・KV・Secrets・動画・Google Driveは変更禁止。
