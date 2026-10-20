@@ -1,3 +1,5 @@
+> **2026-10-21 認証障害：現行v0.4.3はGoogleブランドアカウントとDriveスコープの混用でOAuthが拒否されています。** 本番デプロイ・Worker回帰検査はPASSだが、Googleの初回同意はFAIL。v0.4.3への再ログインを繰り返さない。[YouTube/Drive分離修正指示](BRAND_ACCOUNT_OAUTH_SPLIT_FIX.md) に従い、GitHubにv0.4.4候補を作成・テスト後に本番へ反映する。既存動画の投稿・Drive削除は未実施。
+
 > **2026-10-21 本番導入はv0.4.3を使用**：[コード](worker.oauth.v0.4.3.mjs)／[Codexでのデプロイ・復旧手順](CODEX_DEPLOY_HANDOFF_v0.4.3.md)。v0.4.2はCSPの `connect-src` 指定欠落によりブラウザの認証開始が失敗するため**デプロイ禁止**。v0.4.3はローカル模擬18/18 PASS。GitHub上は候補であり、本番は未デプロイ。
 
 > **2026-10-20 YouTube初回認証の次工程:** [ブラウザOAuth v0.4試作・実機準備](WEB_OAUTH_V0_4_PROTOTYPE.md)。WindowsのPython/Node.js導入を避けるため、GoogleのWeb application型OAuth Clientと既存Cloudflare Workerを利用する構想。モック6件PASS、**本番Workerへ未デプロイ／Google認証未実施**。既存のDesktop方式は旧手順として保持。機密JSON・Secret・トークンをチャットへ送らない。\n\n> **2026-10-20 Cloudflare自動操作の推奨変更:** Python/Node/npmが利用者PCにないことを実機確認。Cloudflare操作は**[Cloudflare公式MCP + AD&Cプラグイン](CLOUDFLARE_API_MCP_V0.1.md)**で行う。私有プラグインの作成・読戻しPASS、OAuth接続・実API読書きNOT_RUN。以前の `setup_once.py` はGoogle Desktop OAuth検証用として残し、一般ユーザー向け標準手順にしない。 
