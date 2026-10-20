@@ -4,7 +4,7 @@
 
 ## ユーザーへの標準表示（これを最初に出す）
 
-> AD&CからYouTubeへ自動で**非公開アップロード**するための初回設定です。操作が必要なのは、Google CloudでAPIと認証を設定すること、Cloudflareで接続先を作ること、Googleの同意を承認することです。最新の公式手順を確認し、現在の画面に沿って短く案内します。秘密鍵や認証トークンはチャットに貼り付けないでください。**わからないところは教えてください。現在の画面に合わせて案内します。**
+> AD&CからYouTubeへ自動で**非公開アップロード**するための初回設定です。操作が必要なのは、Google CloudでAPIと認証を設定すること、Cloudflareで接続先を作ること、Googleの同意を承認することです。最新の公式手順を確認し、現在の画面に沿って短く案内します。**セキュリティ上、ダウンロードしたOAuthクライアントJSON（client_secretを含む）、パスワード、アクセストークン、更新トークン、秘密鍵、接続キーは、チャットへ送信・添付・貼り付けしてはいけません。第三者に認証情報を渡すリスクがあります。画面を送る場合も値を隠してください。****わからないところは教えてください。現在の画面に合わせて案内します。**
 
 ## 事前条件・実施順
 
@@ -14,7 +14,7 @@
 2. [Google Auth Platform](https://console.cloud.google.com/auth/overview)でブランディングと対象ユーザーを構成。`Audience` が外部かつ `Testing` の場合は、自分のGoogleアカウントをテストユーザーに加える。
    - https://console.cloud.google.com/auth/audience
    - **Testing + External** で `youtube.force-ssl` 等のスコープを使用した更新トークンは、通常**7日**で失効する。継続使用には公開ステータス・審査要否を確認し、Googleの案内に従う。**無審査のまま恒久利用できるとは断定しない**。
-3. [Clients](https://console.cloud.google.com/auth/clients)で **Desktop app / デスクトップアプリ** のOAuthクライアントを作成、JSONをPCにダウンロードする。**Web applicationクライアントのJSONでは `setup_once.py` は動かない**。同意画面のスコープには `youtube.force-ssl` と `drive.readonly` が使用される。
+3. [Clients](https://console.cloud.google.com/auth/clients)で **Desktop app / デスクトップアプリ** のOAuthクライアントを作成、JSONをPCにダウンロードする。**このJSONの中身は機密情報として扱い、チャットへの添付・コピー、公開GitHubへの保存を禁止する。画面を共有する場合は `client_secret` やIDの表示箇所を隠す。** **Web applicationクライアントのJSONでは `setup_once.py` は動かない**。同意画面のスコープには `youtube.force-ssl` と `drive.readonly` が使用される。
 4. [Cloudflare](https://dash.cloudflare.com/) のユーザーアカウントを用意する。PCにNode.jsとPythonを用意し、配布ZIP内の `worker.mjs`、`wrangler.toml.example`、`setup_once.py` を同一フォルダに置く。 `wrangler.toml.example` を `wrangler.toml` にコピー。YouTube Studioで見たチャンネルIDを `EXPECTED_CHANNEL_ID` に、後述のKV IDを該当欄に設定する。
    - `npx wrangler login`
    - `npx wrangler kv namespace create UPLOADS_KV`
@@ -51,6 +51,7 @@
 - `videos.update(part=status)` の公開変更をAIが自動実行しない。人間が管理ページで明示操作する。
 - `setup_once.py` はテスト済みの既存 `worker.mjs` を前提とする。Workerの生成やGoogle Cloudプロジェクト作成は自動化しない。
 - 初回セットアップ時は**必要な操作の短縮案内を優先**し、ユーザーが迷った箇所だけ詳しく説明する。
+- **秘密情報を「送らなくてもよい」「大丈夫」とだけ表現しない。** 必ず「セキュリティ上、JSON・認証トークン・秘密鍵はチャットに送信してはいけません。本人の端末内で利用してください」と明確に伝える。既に送った場合は認証情報を無効化・再発行する対応を案内する。
 
 ## 参照公式資料（次回実施時に再確認）
 
