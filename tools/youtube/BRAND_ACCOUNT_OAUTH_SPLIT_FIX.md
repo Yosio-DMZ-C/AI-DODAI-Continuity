@@ -95,3 +95,12 @@
 6. できるだけ将来はユーザーがキーを扱わないOAuth接続／安全なシークレット保管方式を検討。**最初から個人用の非公開プラグインやMCPクライアントへBearer値を保存してよいとは限らない**ため仕様・保存先を実機確認してから採用。
 
 **次ゲート**：`list_uploaded_videos` 等の**読み取りのみ**の検査、Drive用トークンを使用するコードと実Drive疎通の検証、ChatGPT/Codexへの専用MCP接続の安全な手順化。ユーザーによる明示指定までは `upload_private_from_drive` を実行しない。
+
+### 2026-10-21 個人用プラグイン AD&C YouTube Ops v0.1.0 作成
+
+- 私有プラグインの作成を完了（利用者個人スコープ、Private）。[AD&C YouTube Ops](https://chatgpt.com/plugins/plugins_6ad7b5f434e08191994c39a1c3e44203)、name=`adnc-youtube-private`、version=`0.1.0`。
+- MCP endpoint=`https://adnc-youtube-private.yosio-hasenaka.workers.dev/mcp`、`streamable-http`、クライアント側認証宣言=`api_key` + `headerScheme: bearer`。プラグインZIPはコードと設定だけで、**Bearer Secretの値、Cloudflare Secret、refresh tokenは含めていない**。作成後にAPIキースキームとSkillsの保存内容を読戻して確認した。
+- 権限表示はRead, Write。デフォルトプロンプトは`check_connection`専用、Skillsでは非公開投稿はユーザーから明示指示がある場合のみ許可し、公開・削除・Drive整理は禁止。秘密を会話に貼る案内禁止。
+- **MCPプラグイン経由の初回接続・APIキー入力・ツール検査はNOT_RUN**。Codex/ChatGPTのAPIキー認証UIが現行環境で機能するかは本人画面を見て確認が必要。OpenAI公式は固定Bearerトークン用の `auth.type=api_key` / `headerScheme=bearer` を文書化するが、投稿ポータルや一部クライアントではセットアップ方法に制約がある：https://developers.openai.com/plugins/build/plugins
+- 次ゲート：本人がリンクを開き、接続UIに**秘密値をチャットへ送らず直接入力**できるならプラグインを有効化。接続先MCPの`check_connection`のみを起動してチャンネル一致を検査。安全なUIがない場合はSecretをマニフェストへ埋め込まず、CodexのローカルMCP接続でOSの秘密情報保管を使う方式を検討する。
+- **未解決**：Drive API疎通の独立検証、本番v0.4.4ソースのGitHub同期、テスト動画の非公開アップロード。接続確認に成功するまでユーザーの動画は投稿しない。
