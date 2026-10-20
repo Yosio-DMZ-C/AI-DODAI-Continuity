@@ -134,3 +134,12 @@
 - 実機検証はKVがバインド済みと管理画面で確認してから進む。ユーザーがスクリーンショットを既に送っていれば撮り方の説明は省略。
 - KVは結果不明時の誤再投稿リスクを低減するが、**グローバルな強い整合性のある排他ロックではない**。重複排除の厳密性は負荷・同時実行を別途検証するまで保証しない。
 
+
+## 2026-10-20 実機修正：KV namespace選択後もサンプルコード画面
+
+- Worker `adnc-youtube-private` → Settings → Bindings → Add binding → 左側の `KV namespace` を選ぶと、右側に `env.KV.put()` などの汎用JavaScript例と、右下の `Add Binding` ボタンが表示される。**これは入力フォームではなくバインディング種別の説明**。コード例を既存のWorkerソースに貼り替えない。
+- まず **`Add Binding` を押す**。表示された実入力フォームに `Variable name = UPLOADS_KV`、`KV namespace = adnc-youtube-uploads` を設定し、保存／Deploy。実画面の表示を確認してから正確な次操作を案内する。バインディング一覧に項目が出るまではPASSとしない。
+- **再利用版の推奨**：CloudflareのWrangler設定（`wrangler.toml` または `wrangler.jsonc`）でバインディングをコード管理できる。既存の `wrangler.toml.example` には `[[kv_namespaces]]` と `binding = "UPLOADS_KV"` の設定がある。Cloudflare公式: https://developers.cloudflare.com/kv/concepts/kv-namespaces/
+- **今回の個別KV ID** はスクリーンショットのブラウザURLで取得可能だったが、一般配布版のサンプル設定には利用者固有IDを埋め込まず `REPLACE_WITH_CLOUDFLARE_KV_NAMESPACE_ID` を維持。Workerの紐付け先が別アカウントになることを防ぐ。
+- 今回はDashboardで既にWorkerとKVを作成済みなので、本人PCへのWrangler導入・Cloudflare認証を増やしてまで途中で操作経路を切替えない。**次回の初期構築ではコード管理を第一候補**として工数比較。
+
