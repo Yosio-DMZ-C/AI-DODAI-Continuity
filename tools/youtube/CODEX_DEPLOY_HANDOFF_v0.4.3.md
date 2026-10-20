@@ -151,3 +151,11 @@ NEXT_HUMAN_ACTION: ...
 - **重要なセキュリティ境界**：`Requested scopes` で `workers-scripts.write` が一覧に含まれることは、**その1件だけが許可されるという意味ではない**。そのまま続行すると、多数の要求権限をまとめて承認する危険がある。
 - **標準推奨**：Cloudflare公式の [Step-up authorization](https://developers.cloudflare.com/changelog/post/2026-10-19-cloudflare-mcp-step-up/) に従い、`Minimal`（新規接続で最小）または既存検証を維持したい場合`Read only`で一旦接続し、Codexが403 `insufficient_scope` を受けた時に**不足スコープだけの追加認証**が起動するか確認する。Codex側のStep-up対応は未実証。 `Advanced > Edit base scopes` の自由編集が具体的にどう反映されるかは実機で未検証なので、194スコープの手動改変・一括認可を安易に指示しない。
 - 2026-10-21この時点で本番Worker v0.4.3は**未デプロイ**、書込用OAuth権限の追加は**未完了**。
+
+### 2026-10-21 Requested scopes → 次の同意画面でEdit Permissions
+
+- 本人のスクリーンショットでCloudflare OAuth最初の `Authorize application` 画面の `Base scopes → Requested scopes` を選択すると、`Advanced → Edit base scopes` に内部スコープ `workers-scripts.write` が含まれていた。一方 `Read only` では書込項目が検索されなかった。
+- **今回の実機に適した手順**：最初の画面は `Requested scopes` のまま `Continue` → 次の正式なCloudflare Consent（アカウント選択／Required／Additional access）で `Edit Permissions` を開く → この段階で**必須以外の過大な権限を除外**しつつ、明示的に `Workers Scripts Write` を選択する → 他のWriteが選択されていないことを確認した上で初めて `Authorize`。**初回画面でContinue＝認証完了ではなく、最終Authorizeまで権限確認可能**。
+- 2段目の `Read only` プリセットを押すと書込権限がOFFになる可能性があるため、`Workers Scripts Write` 選択直前に押さない。すでに選択されていれば対象のON/OFFを実表示で確認する。UIの `194 total permissions` が**要求件数か実許可件数かを断定しない**。画面で最終的な選択を検査する。
+- この回避経路でWorkers Scripts Writeだけを承認できることは**まだ実機未確認**。対象が見つからないか権限の削減が難しければ`Authorize` を押さず停止し、Step-upまたはWorker限定の代替経路を検討。
+- 公式：[Cloudflare Authorizing an application / Edit optional permissions](https://developers.cloudflare.com/fundamentals/oauth/authorizing-an-application/) は、`Additional access → Edit Permissions` で任意権限をカテゴリーまたは個別に変更し、**確認後にAuthorize** と案内している。
