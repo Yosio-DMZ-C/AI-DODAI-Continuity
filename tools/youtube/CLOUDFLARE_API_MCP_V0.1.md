@@ -81,3 +81,12 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - 管理画面をモバイル対応にしただけでは、**ChatGPTチャットからの自動操作がモバイルで実現したことにはならない**。動画のチャット添付→YouTube直送は別実装・別試験であり、達成と主張しない。
 - 将来ChatGPT/他AIのモバイルMCP対応が正式に確認できれば、アプリからの接続方式を追加する。変更の際は公式文書・利用者端末で検証してから標準化。
 
+
+## 2026-10-20 実機試験 FAIL：Skillは読めるがMCPツール未公開
+
+- **ユーザーによる実試験**：Windowsデスクトップ上のChatGPT/Codexで個人プラグイン「AD&C Cloudflare Ops」を選択。「今すぐ試す」でSkillを読み込んだが、Codexの最終応答は `Cloudflare公式MCPの search・execute・docs が利用できず、実環境の点検を実行できませんでした`。Worker/KV/変数は **NOT_RUN**。Cloudflare接続も未確認。変更はなし。
+- プラグインのファイル読戻しにより、`.codex-plugin/plugin.json` の `mcpServers: './.mcp.json'`、`.mcp.json` の `cloudflare-api` URL `https://mcp.cloudflare.com/mcp` とOAuth指定は存在することを確認。**スキル読込と、MCPツールのランタイム登録は別**。OAuth未承認だけが原因とは断定しない。
+- **独立した再現報告**： https://github.com/openai/codex/issues/34859 で、Windows Codex Desktopにおける「Skillは存在するがプラグインMCPが登録されない」「OAuth認証対象にサーバーがない」問題が記載されている。今回も類似現象。サーバーURLの誤りが原因と断定しない。
+- **次の切分け：Codex本体へ直接MCP登録**。公式接続方法（https://learn.chatgpt.com/docs/extend/mcp）に従い、ChatGPTデスクトップの **Settings → MCP servers → Add server**。名前 `cloudflare-api`（既存プラグインMCPに登録されていないことを先に確認）、方式 **Streamable HTTP**、URL `https://mcp.cloudflare.com/mcp`。**保存→Restart→必要ならAuthenticate**。Cloudflare OAuthで必要最小限の権限を本人が承認する。/mcpまたはサーバーの状態表示で接続確認し、`search` の**読取のみ**を試す。登録済みなら二重登録せず「無効／要認証／実行不可」を確認する。
+- 手動登録も不可なら**Codexのランタイム制約/不具合として切り分け**。プラグイン名変更や再作成を盲目的に繰り返さない。次の代替策（Cloudflare管理用Web UI等）は利用者に選択を求める。
+- **安全**：Cloudflare Secret/API TokenやOAuth JSONの貼付禁止。APIへの書込・デプロイ・削除は実行しない。公式サーバーは検索から全Cloudflare APIを呼べるので、本人認証時の権限は必要最小限に制限する。成功と報告するにはAPIの実読取が必要。
