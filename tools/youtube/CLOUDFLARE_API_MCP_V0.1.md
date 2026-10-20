@@ -168,3 +168,11 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - **段階的な運用**：① Read onlyでOAuth接続・API実読取試験。② 設定を変える具体的な工程が確定した段階で、必要なリソースと書込APIのOAuthスコープに限定して**再認可**。③ 安定運用時に権限を精査して不要な範囲を取り消す。Read onlyは読み取り対象が狭い意味ではなく、広いアカウント横断参照を許す場合がある。
 - `Full access` を無条件で選ばず、運用指示で「変更前に確認」と書くことはOAuth/APIレベルのアクセス制御にならないと明記。
 - **2026-10-20時点でOAuth完了・MCPからのWorker/KV実読取は未確認**。次工程で実応答と承認スコープを確認してPASS/FAILを記録する。Secret値や認証コードは共有しない。
+
+## 2026-10-20 実機確認：Cloudflare OAuth認証完了
+
+- ユーザー本人がChrome上のCloudflare MCP OAuthの同意操作を完了し、ローカルのコールバック画面で **`Authentication complete. You may close this window.`** が表示された（スクリーンショット確認）。**OAuthのブラウザ側完了＝PASS**。
+- 本番APIへの読み取りリクエスト成功・`search`/`execute`の利用可能性は**未検証（NOT_RUN）**。CloudflareアカウントやWorker/KVへの実アクセスが可能と断定しない。
+- 次の操作：認証完了ブラウザを閉じる→Windows版ChatGPT/Codexへ戻る→`Settings > MCP servers` の `cloudflare-api` が有効で、`認証する` ボタンがどう変化したかを確認→必要ならデスクトップアプリ再起動→**新規Codexチャット**でMCPツールの存在を確認し、`adnc-youtube-private` Worker、`adnc-youtube-uploads` KV、`UPLOADS_KV` Binding、`EXPECTED_CHANNEL_ID` の **読み取りのみ**を依頼。認証秘密情報やSecret値を取得・表示しない。
+- OAuthではRead onlyを選択していた。今後も書込・KV変更・Deploy・Secrets更新・削除は禁止。画面上のスコープ選択とは独立にAIの作業内容も読み取り限定とする。
+- 今回の公開Worker `/health` は以前ユーザーのブラウザでPASS済み。これは**MCP経由のAPI利用がPASSしたことを意味しない**。
