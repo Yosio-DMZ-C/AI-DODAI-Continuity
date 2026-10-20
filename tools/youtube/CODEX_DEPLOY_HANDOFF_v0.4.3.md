@@ -98,7 +98,7 @@ NEXT_HUMAN_ACTION: ...
 ### 次に人間が行うこと（OAuthだけ）
 
 1. Windows版ChatGPT/Codexの設定 **MCPサーバー > cloudflare-api** を表示し、サーバー行の歯車または再認証操作から、Cloudflare OAuthの再同意フローを起動する。実画面のボタン名が異なる可能性があるので、操作メニューを確認してから進む。
-2. Cloudflareの権限同意画面で `Additional access > Edit Permissions`、`Search scopes` に **`Workers Scripts Write`**（または `workers-scripts.write`）を入力。現在のRead only選択のまま、**この1項目の書込だけを追加し、その他のWriteはOFF**。最後に選択された権限を確認して `Authorize`。最初から `Full access` 全体を選んだまま承認しない。
+2. Cloudflareの権限同意画面で `Additional access > Edit Permissions`、`Search scopes` にまず **`Workers`** または **`Workers Scripts`** を入力して、UI表示名 **`Workers Scripts Write`** を探す。実機で `workers-scripts.write` は `No scopes match your search` となったため、API内部スコープ名をUI検索に入れる案内はしない。現在のRead only選択のまま、**この1項目の書込だけを追加し、その他のWriteはOFF**。最後に選択された権限を確認して `Authorize`。最初から `Full access` 全体を選んだまま承認しない。
 3. OAuth完了後、Codexで先の手順書を再実行。403が再発すれば中断し、勝手にグローバルAPIキーや別の書込スコープを追加しない。
 4. 再認証ボタンが現れなければCloudflare公式の **Manage OAuth authorizations** から旧MCP承認のRevokeを行い、Codex側で再認証する予備手順。ただしRevokeは一時的にMCPを切断するため**本人の了承を得てから**実施する。Cloudflareアカウントや他のアプリは誤ってRevokeしない。
 
@@ -121,3 +121,9 @@ NEXT_HUMAN_ACTION: ...
 - 書込みスコープはCloudflare公式MCPに **403 `insufficient_scope` で要求された実名**。Full access一括選択はしない。Read onlyがアカウント横断の広範な読取りを許す点も、別途最小化を検討。
 - 参照: [Cloudflare 2026-08-22 OAuth権限の任意選択](https://developers.cloudflare.com/changelog/post/2026-08-22-wrangler-mcp-optional-oauth-scopes/) / [Cloudflare 2026-10-19 step-up authorization](https://developers.cloudflare.com/changelog/product/agents/)。
 - 認証が完了したら、Codexで元のデプロイ用手順書を**差分再検査・バックアップの確認から再開**し、更新後GETによる読戻しと `/health`, `/mcp` 401の回帰検査を行う。
+
+### 実機補足：権限検索にはAPIの内部識別子を使わない
+
+- 2026-10-21本人Cloudflare OAuth `Edit Permissions` のスクリーンショットで検索欄 `workers-scripts.write` は `No scopes match your search` と表示された。
+- Cloudflare公式API権限一覧の正式表示名は `Workers Scripts Write`：https://developers.cloudflare.com/fundamentals/api/reference/permissions/ 。**API内部スコープ識別子とUI検索表示名を混同しない**。まず `Workers` などの部分文字列で検索し、該当する権限のみON。
+- 同画面には `194 total permissions` と表示されている。他の書込権限が選ばれていないか最終確認し、確認できなければ Authorizeを押さない。
