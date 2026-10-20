@@ -160,3 +160,11 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - Chrome DevTools Consoleに黄色警告 `Don't paste code into the DevTools Console that you don't understand or haven't reviewed yourself ... Type 'allow pasting' below and press Enter to allow pasting.` が実際に表示された（本人SS）。**サイト権限やCloudflare OAuthではなくChromeのSelf-XSS防止の貼付制限**。
 - 例外的に、提示したコードがユーザー自身で確認済みの場合のみ、Consoleに `allow pasting` を手入力して許可できる。**外部コードの安易な貼付やOAuth画面上での不明コード実行を標準化しない**。原則はCloudflare画面内の `Search scopes` / `Read only` / `Edit Permissions` による最小権限選択。抽出コードはDOM上のチェック項目と表示テキストだけを読むこと、外部送信がないことをレビューしてから使用。
 - DevToolsで得られたラベルは折り畳み／仮想スクロールで不完全な可能性があり、権限の全件検証PASSとは扱わない。認証トークン／URLバーの一時コード／Cookieをログ出力したりチャットへ貼り付けない。Cloudflare Authorizeは権限が十分絞られるまで押さない。
+
+## 2026-10-20 段階的権限方針：Read onlyで初回接続し書込前に限定
+
+- 本人判断: `194 total permissions` のままでも `Read only` で**最初の接続試験を進める方針**。現在はCloudflare公式OAuthの `Edit Permissions` 画面。DevToolsのDOM抽出は40個のスイッチを取得したが194件の網羅ではなく、これ以上の全項目手調査は初期接続には不要と判断。
+- **ただし承認前**に、初回OAuth画面で `Read only` を選択したこと、最終の同意項目に書込や危険な権限がないことをユーザーが確認する。 `Back to Review` → `Authorize`。 `Background Access` は必須権限として表示されており、読み取りでも広範囲の機微情報へのアクセスが可能な点を説明。
+- **段階的な運用**：① Read onlyでOAuth接続・API実読取試験。② 設定を変える具体的な工程が確定した段階で、必要なリソースと書込APIのOAuthスコープに限定して**再認可**。③ 安定運用時に権限を精査して不要な範囲を取り消す。Read onlyは読み取り対象が狭い意味ではなく、広いアカウント横断参照を許す場合がある。
+- `Full access` を無条件で選ばず、運用指示で「変更前に確認」と書くことはOAuth/APIレベルのアクセス制御にならないと明記。
+- **2026-10-20時点でOAuth完了・MCPからのWorker/KV実読取は未確認**。次工程で実応答と承認スコープを確認してPASS/FAILを記録する。Secret値や認証コードは共有しない。
