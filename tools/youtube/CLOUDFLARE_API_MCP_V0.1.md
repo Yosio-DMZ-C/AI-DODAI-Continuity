@@ -90,3 +90,12 @@ Cloudflare公式MCPの `search`、`execute`、`docs` を通じて、そのOAuth�
 - **次の切分け：Codex本体へ直接MCP登録**。公式接続方法（https://learn.chatgpt.com/docs/extend/mcp）に従い、ChatGPTデスクトップの **Settings → MCP servers → Add server**。名前 `cloudflare-api`（既存プラグインMCPに登録されていないことを先に確認）、方式 **Streamable HTTP**、URL `https://mcp.cloudflare.com/mcp`。**保存→Restart→必要ならAuthenticate**。Cloudflare OAuthで必要最小限の権限を本人が承認する。/mcpまたはサーバーの状態表示で接続確認し、`search` の**読取のみ**を試す。登録済みなら二重登録せず「無効／要認証／実行不可」を確認する。
 - 手動登録も不可なら**Codexのランタイム制約/不具合として切り分け**。プラグイン名変更や再作成を盲目的に繰り返さない。次の代替策（Cloudflare管理用Web UI等）は利用者に選択を求める。
 - **安全**：Cloudflare Secret/API TokenやOAuth JSONの貼付禁止。APIへの書込・デプロイ・削除は実行しない。公式サーバーは検索から全Cloudflare APIを呼べるので、本人認証時の権限は必要最小限に制限する。成功と報告するにはAPIの実読取が必要。
+
+## 2026-10-20 実機：Windows版ChatGPTの設定画面への入り口（ユーザーSS確認）
+
+- **ユーザー提供SS1**：アプリ左下の本人アイコン → ドロップダウン内の **「設定」** を選択することで設定画面が開く。設定画面の左メニューを下にスクロールすると「コーディング」という見出しが現れる。
+- **ユーザー提供SS2**：「コーディング」の下に **「接続」** が表示されている（周辺は「フック」「Codex Cloud」「コードレビュー」など）。**次に押すべき実画面の表示名は「接続」**。前回案内した Settings > MCP servers > Add server は、この利用者のアプリで実画面検証されていない名称。未確認の「MCP servers」メニューを存在すると断言しない。
+- 「接続」を押した先がMCPサーバー管理なのか、一般の接続管理なのかは **NOT_RUN／次画面の確認待ち**。リンク・ボタン名・サーバー追加方法はその結果で調整。新規サーバー追加を急がず、既存 `cloudflare-api` の有無と状態を先に確認する。
+- 概念整理（OpenAI公式 https://developers.openai.com/plugins/concepts/mcp-server）：**MCP（Model Context Protocol）** はAIクライアントと外部ツール/情報をつなぐ規格、**MCPサーバー**はAIにツール等を公開し、呼び出しを実行して結果を返す側。**Skill**はAIの手順・ルール、**プラグイン**はSkillと接続設定等のパッケージ。Skill読込PASSでもMCPツールの実接続PASSではない。
+- 認証トークン／APIキー／OAuth JSONの送信禁止。本件は読み取り試験から再開し、書込み・デプロイ・削除は禁止のまま。
+
