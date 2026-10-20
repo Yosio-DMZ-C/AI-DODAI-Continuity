@@ -18,6 +18,7 @@
 <li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a>でプロジェクトを選び、<a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">YouTube Data API v3</a> と <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com" target="_blank" rel="noopener">Google Drive API</a>を有効にします。</li>
 <li><a href="https://console.cloud.google.com/auth/overview" target="_blank" rel="noopener">Google Auth Platform</a>のブランディング・対象ユーザーを設定し、テスト状態なら自分のGoogleアカウントをテストユーザーへ追加します。</li>
 <li><a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noopener">Clients</a>から「デスクトップアプリ」のOAuthクライアントを作り、JSONをPCへダウンロードします。<b>セキュリティ上、ダウンロードしたOAuth JSONをチャットへ送信・添付してはいけません。認証情報を含む画面の共有も避けてください。</b></li>
+<li>権限（スコープ）を確認するときは、<a href="https://console.cloud.google.com/auth/scopes" target="_blank" rel="noopener">Google Auth Platform「データアクセス」</a>へ進みます。先に画面上部で正しいGoogle Cloudプロジェクトを選び、表示が不安定なら左メニューの「データアクセス」から開いてください。旧URL <code>/auth/data-access</code> は使いません。</li>
 <li><a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Cloudflare</a>でWorkerとKVを用意し、配布ZIPの<code>wrangler.toml.example</code>を<code>wrangler.toml</code>にコピー、期待するチャンネルID・KV IDを設定します。</li>
 <li>PCでZIPの<code>setup_once.py</code>を実行し、Googleの同意画面で承認します。接続先チャンネルを照合してから秘密情報をWorkerへ登録します。</li>
 <li>生成された個人用プラグインをChatGPTに接続し、<code>check_connection</code>で検査した後、非公開投稿を試します。</li>
