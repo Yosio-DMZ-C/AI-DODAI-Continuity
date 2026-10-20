@@ -26,7 +26,7 @@ Cloudflare公式MCPをWindows Codexへ直接登録し、OAuth Read onlyでCloudf
 ## 次のユーザー操作：Google Web OAuth Clientの作成
 
 1. [Google Auth Platform > Clients](https://console.cloud.google.com/auth/clients) で対象Google Cloudプロジェクトを選択する。以前使ったデスクトップ用Clientは**そのまま維持**。
-2. 新しいOAuth Clientの種類 **Web application / ウェブアプリケーション** を選び、任意名 `AD&C YouTube Web OAuth`。
+2. 新しいOAuth Clientの種類 **Web application / ウェブアプリケーション** を選び、任意名 `AD&C YouTube Web OAuth`。**「Use this client for an AI-powered agent」はON**。このクライアントは将来ChatGPT→Cloudflare Worker→YouTube REST APIの自動投稿（AIによるツール実行）専用に使用する。GoogleはAIエージェントの代理操作に専用OAuthクライアントを使用するよう案内している。
 3. **Authorized redirect URI** を次の値で登録（完全一致）：`https://adnc-youtube-private.yosio-hasenaka.workers.dev/auth/callback`
 4. 作成完了だけをAIへ報告。Client SecretやJSONは**安全上チャットへ送信・添付禁止**。
 5. 次工程でCloudflare WorkerにWeb Client ID、Web Client Secret、`AUTH_REDIRECT_URI`、`MCP_API_KEY` を設定。現在のCloudflare公式MCPはRead onlyで接続済み。書込みが必要なら影響箇所と対象Workerを示し、最小限の権限をユーザーに再承認してもらう。**これらのSecretをCloudflare公式MCPのチャット実行引数に直接貼らせない**。秘密値はCloudflare管理画面へ本人が入力する。
@@ -47,3 +47,10 @@ Cloudflare公式MCPをWindows Codexへ直接登録し、OAuth Read onlyでCloudf
 - [Cloudflare Workers Secrets](https://developers.cloudflare.com/workers/configuration/secrets/)
 - [Cloudflare Workers limits](https://developers.cloudflare.com/workers/platform/limits/)
 - [YouTube videos.insert](https://developers.google.com/youtube/v3/docs/videos/insert)
+
+## 追補（2026-10-20）：AI-powered agentチェック
+
+- Google公式 [Manage OAuth Clients](https://support.google.com/cloud/answer/15549257) は、AIがユーザーに代わって操作するOAuth ClientをAgenticとして区別し、通常の対話型クライアントとは別IDを維持するよう推奨している。
+- 本Web OAuthクライアントは、ブラウザで本人が初回承認するが**継続的な用途はAIから起動するCloudflare WorkerのYouTube/Drive REST API呼び出し**。そのため `Use this client for an AI-powered agent` を**ON**にする。別のブラウザ人手操作用 `videos.html` のOAuth Web Clientは分離する。
+- GoogleのWeb OAuthクライアント作成後はこの種別チェックを変更できない旨が公式クイックスタートに明記されている。すでにOFFで作成した場合、基本は**別のWeb Clientを新規作成**してこちらに採用する。
+- Agenticタグは自動で追加権限を与えない。公式: https://developers.google.com/people/quickstart/js
