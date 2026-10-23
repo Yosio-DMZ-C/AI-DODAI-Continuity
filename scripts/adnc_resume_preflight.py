@@ -84,6 +84,71 @@ def make_work_contract(state, report):
     return result
 
 
+def reconcile_outputs(state, root):
+    """Compare restored output obligations to staged files; never assert playback QA."""
+    result = {"status": "NOT_RUN", "acceptance": "NOT_RUN",
+              "items": [], "missing": [], "extra": [],
+              "reason": "output obligations were not restored"}
+    expected = state.get("expected_outputs")
+    observed = state.get("observed_outputs", [])
+    if expected is None:
+        return result
+    if (not isinstance(expected, list) or not expected
+            or not isinstance(observed, list)
+            or type(state.get("production_finished", False)) is not bool):
+        return {**result, "status": "FAIL", "reason": "invalid output contract"}
+    try:
+        expected_ids = [item["id"] for item in expected]
+        observed_ids = [item["id"] for item in observed]
+        if (any(not isinstance(i, str) or not i for i in expected_ids + observed_ids)
+                or len(set(expected_ids)) != len(expected_ids)
+                or len(set(observed_ids)) != len(observed_ids)
+                or any(not isinstance(item, dict) for item in expected + observed)):
+            return {**result, "status": "FAIL", "reason": "invalid/duplicate output ID"}
+    except (KeyError, TypeError):
+        return {**result, "status": "FAIL", "reason": "missing output ID"}
+    wanted = set(expected_ids)
+    seen = set(observed_ids)
+    result["extra"] = sorted(seen - wanted)
+    index = {i["id"]: i for i in observed}
+    root = Path(root).resolve()
+    failures = bool(result["extra"])
+    incomplete = False
+    finished = state["production_finished"] if "production_finished" in state else False
+    for item in expected:
+        output_id = item["id"]
+        obs = index.get(output_id)
+        if obs is None:
+            result["missing"].append(output_id)
+            result["items"].append({"id": output_id, "status": "FAIL" if finished else "NOT_RUN",
+                                    "reason": "no observed output"})
+            incomplete = True
+            continue
+        rel = obs.get("path")
+        if not isinstance(rel, str) or not rel or Path(rel).is_absolute():
+            result["items"].append({"id": output_id, "status": "FAIL", "reason": "invalid path"})
+            failures = True
+            continue
+        p = (root / rel).resolve()
+        if p == root or root not in p.parents:
+            result["items"].append({"id": output_id, "status": "FAIL", "reason": "path outside staging"})
+            failures = True
+        elif not p.is_file() or p.stat().st_size == 0:
+            result["missing"].append(output_id)
+            result["items"].append({"id": output_id,
+                                    "status": "FAIL" if finished else "NOT_RUN",
+                                    "reason": "no nonempty file observed"})
+            incomplete = True
+        else:
+            result["items"].append({"id": output_id, "status": "PASS",
+                                    "reason": "basic presence/size only; media QA not verified",
+                                    "bytes": p.stat().st_size})
+    result["status"] = ("FAIL" if failures or (finished and incomplete)
+                        else "NOT_RUN" if incomplete else "PASS")
+    result["reason"] = "basic output coverage only, not content or playback acceptance"
+    return result
+
+
 def preflight(state, root):
     """Check explicit work state and derive only the needed work stages."""
     report = {"status": "PASS", "flow": "RESEARCH", "issues": [],
@@ -189,6 +254,8 @@ def preflight(state, root):
     # Neither a reused-runner candidate nor a generated proposal is verified execution.
     report["execution_ready"] = False
     report["work_contract"] = make_work_contract(state, report)
+    report["deliverable_coverage"] = reconcile_outputs(state, root)
+    report["work_contract"]["expected_outputs"] = state.get("expected_outputs")
     return report
 
 
@@ -340,6 +407,51 @@ class SelfTest(unittest.TestCase):
         self.assertFalse(r["execution_ready"])
         self.assertIn("Do not auto-run external APIs", r["work_contract"]["invariants"][2])
 
+
+
+    def test_output_expectations_unresolved(self):
+        r = preflight(self.base, self.root)
+        self.assertEqual(r["deliverable_coverage"]["status"], "NOT_RUN")
+
+    def test_both_video_outputs_basic_coverage(self):
+        (self.root / "regular.mp4").write_bytes(b"fictional regular fixture")
+        (self.root / "short.mp4").write_bytes(b"fictional short fixture")
+        state = {**self.base, "production_finished": True,
+                 "expected_outputs": [{"id": "regular", "ratio": "16:9"},
+                                      {"id": "shorts", "ratio": "9:16"}],
+                 "observed_outputs": [{"id": "regular", "path": "regular.mp4"},
+                                      {"id": "shorts", "path": "short.mp4"}]}
+        r = preflight(state, self.root)
+        c = r["deliverable_coverage"]
+        self.assertEqual(c["status"], "PASS")
+        self.assertEqual([v["status"] for v in c["items"]], ["PASS", "PASS"])
+        self.assertEqual(c["acceptance"], "NOT_RUN")  # no codec/playback evidence
+
+    def test_one_video_missing_after_finish(self):
+        (self.root / "short.mp4").write_bytes(b"fictional short fixture")
+        state = {**self.base, "production_finished": True,
+                 "expected_outputs": [{"id": "regular"}, {"id": "shorts"}],
+                 "observed_outputs": [{"id": "shorts", "path": "short.mp4"}]}
+        c = preflight(state, self.root)["deliverable_coverage"]
+        self.assertEqual(c["status"], "FAIL")
+        self.assertEqual(c["missing"], ["regular"])
+        self.assertEqual([v["status"] for v in c["items"]], ["FAIL", "PASS"])
+
+    def test_missing_before_finish_not_run(self):
+        state = {**self.base, "production_finished": False,
+                 "expected_outputs": [{"id": "regular"}, {"id": "shorts"}],
+                 "observed_outputs": []}
+        self.assertEqual(preflight(state, self.root)["deliverable_coverage"]["status"],
+                         "NOT_RUN")
+
+    def test_extra_or_wrong_file_rejected(self):
+        (self.root / "unexpected.mp4").write_bytes(b"fictional")
+        state = {**self.base, "production_finished": True,
+                 "expected_outputs": [{"id": "regular"}],
+                 "observed_outputs": [{"id": "unexpected", "path": "unexpected.mp4"}]}
+        c = preflight(state, self.root)["deliverable_coverage"]
+        self.assertEqual(c["status"], "FAIL")
+        self.assertEqual(c["extra"], ["unexpected"])
 
 
 def demo():
