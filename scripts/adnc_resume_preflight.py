@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
-"""AD&C beta: read-only work-state preflight (no cloud/API calls)."""
+"""AD&C beta: read-only work-state preflight (no cloud/API calls).
+
+Prepare a temporary JSON from existing START_HERE / Project Context / BUILD_PLAN:
+{
+  "artifact_id": "episode-1", "adopted_version": "v1.5",
+  "inputs": ["01", "02", "03", "04"], "requested": ["02", "04"],
+  "preview_limit": 3, "paid_action": true,
+  "same_failed_approach_count": 0,
+  "required_assets": [
+    {"role": "logo", "path": "staged-logo.png", "sha256": "<64 hex chars>"}
+  ]
+}
+
+Run: python scripts/adnc_resume_preflight.py work-state.json --root fetched-files
+Test: python scripts/adnc_resume_preflight.py --self-test
+
+The script checks only bytes actually fetched into the local staging folder.
+Cloud links without downloaded bytes remain NOT_RUN, never assumed absent.
+This does not perform edits, API calls, payment, or external delivery.
+"""
 import argparse
 import hashlib
 import json
