@@ -120,6 +120,10 @@ def reconcile_outputs(state, root):
         output_id = item["id"]
         obs = index.get(output_id)
         if obs is None:
+            if not item.get("required", True):
+                result["items"].append({"id": output_id, "status": "NOT_RUN",
+                                        "reason": "optional output not produced; no completion failure"})
+                continue
             result["missing"].append(output_id)
             result["items"].append({"id": output_id, "status": "FAIL" if finished else "NOT_RUN",
                                     "reason": "no observed output"})
