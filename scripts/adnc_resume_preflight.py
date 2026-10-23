@@ -103,7 +103,8 @@ def reconcile_outputs(state, root):
         if (any(not isinstance(i, str) or not i for i in expected_ids + observed_ids)
                 or len(set(expected_ids)) != len(expected_ids)
                 or len(set(observed_ids)) != len(observed_ids)
-                or any(not isinstance(item, dict) for item in expected + observed)):
+                or any(not isinstance(item, dict) for item in expected + observed)
+                or any(type(item.get("required", True)) is not bool for item in expected)):
             return {**result, "status": "FAIL", "reason": "invalid/duplicate output ID"}
     except (KeyError, TypeError):
         return {**result, "status": "FAIL", "reason": "missing output ID"}
