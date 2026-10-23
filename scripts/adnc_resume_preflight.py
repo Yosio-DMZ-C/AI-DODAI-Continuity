@@ -28,6 +28,61 @@ from tempfile import TemporaryDirectory
 import unittest
 
 
+
+def make_work_contract(state, report):
+    """Build a constrained handoff for an AI; do not generate or execute code."""
+    ids = report["preview"] + report["remainder"]
+    result = {
+        "artifact_id": state.get("artifact_id"),
+        "adopted_version": state.get("adopted_version"),
+        "targets": ids,
+        "stages": (
+            [{"name": "preview", "targets": report["preview"]}] if report["preview"] else []
+        ) + ([{"name": "remainder", "targets": report["remainder"]}]
+             if report["remainder"] else []),
+        "invariants": [
+            "Preserve unselected artifacts and adopted version",
+            "Never substitute an unverified identity asset",
+            "Do not auto-run external APIs, paid calls, publish, send or delete",
+            "Verify produced target IDs match requested target IDs",
+            "Human/meaning quality is a separate acceptance gate"
+        ],
+        "approval_required": report["approval_required"],
+        "implementation": "HOLD",
+        "reason": ""
+    }
+    if report["status"] != "PASS":
+        result["reason"] = "preflight failed or actual bytes are not verified"
+    elif report["flow"] == "RESEARCH":
+        result["implementation"] = "RESEARCH"
+        result["reason"] = "no adopted version or explicit reconsideration"
+    elif not ids:
+        result["implementation"] = "NOOP"
+        result["reason"] = "zero selected targets"
+    elif report["checkpoint"]:
+        result["implementation"] = "REASSESS"
+        result["reason"] = "same approach failed at least twice"
+    else:
+        implementation = state.get("implementation")
+        if implementation is not None:
+            role = implementation["asset_role"]
+            available_roles = {item["role"] for item in state.get("required_assets", [])}
+            if role in available_roles:
+                count = len(ids)
+                within = count <= implementation["max_items"]
+                if implementation.get("exact_items") is not None:
+                    within = within and count == implementation["exact_items"]
+                elif not implementation.get("supports_subset", False):
+                    within = False
+                if within:
+                    result["implementation"] = "REUSE_CANDIDATE"
+                    result["reason"] = "runner bytes verified; declared input compatibility still requires execution test"
+        if result["implementation"] == "HOLD":
+            result["implementation"] = "GENERATE_PROPOSAL"
+            result["reason"] = "construct a draft method from constraints; do not execute without verification"
+    return result
+
+
 def preflight(state, root):
     """Check explicit work state and derive only the needed work stages."""
     report = {"status": "PASS", "flow": "RESEARCH", "issues": [],
@@ -42,6 +97,18 @@ def preflight(state, root):
     preview_limit = state.get("preview_limit", 0)
     attempts = state.get("same_failed_approach_count", 0)
     max_items = state.get("max_items")
+    implementation = state.get("implementation")
+    if implementation is not None:
+        if (not isinstance(implementation, dict)
+                or not isinstance(implementation.get("asset_role"), str)
+                or not implementation.get("asset_role")
+                or type(implementation.get("max_items")) is not int
+                or implementation["max_items"] < 1
+                or type(implementation.get("supports_subset", False)) is not bool
+                or (implementation.get("exact_items") is not None
+                    and (type(implementation["exact_items"]) is not int
+                         or implementation["exact_items"] < 1))):
+            failures.append("invalid implementation capability declaration")
     if (not isinstance(items, list) or not isinstance(chosen, list)
             or not isinstance(assets, list)
             or any(not isinstance(x, str) or not x for x in items + chosen)
@@ -106,7 +173,10 @@ def preflight(state, root):
     report["execution_ready"] = (report["status"] == "PASS"
                                   and report["flow"] == "RESTORE"
                                   and bool(chosen) and not report["checkpoint"])
-    # Readiness never authorizes paid calls, publishing, deletion or external sending.
+    # Readiness is a planning signal, never approval for external actions.
+    report["execution_ready"] = (report["execution_ready"]
+                                  and not report["approval_required"])
+    report["work_contract"] = make_work_contract(state, report)
     return report
 
 
@@ -131,7 +201,7 @@ class SelfTest(unittest.TestCase):
         self.assertEqual(r["status"], "PASS")
         self.assertEqual((len(r["preview"]), len(r["remainder"])),
                          (min(n, 3), max(n-3, 0)))
-        self.assertEqual(r["execution_ready"], n > 0)
+        self.assertFalse(r["execution_ready"])  # paid_action requires separate approval
         self.assertEqual(r["approval_required"], n > 0)
 
     def test_zero(self): self.check_count(0)
@@ -181,6 +251,65 @@ class SelfTest(unittest.TestCase):
         s = {**self.base, "required_assets": [{"role": "audio", "path": "missing.zip",
                                                "sha256": "0"*64}]}
         self.assertEqual(preflight(s, self.root)["status"], "NOT_RUN")
+
+
+    def test_four_item_generation_contract(self):
+        r = preflight(self.base, self.root)
+        c = r["work_contract"]
+        self.assertEqual((c["implementation"], c["targets"]),
+                         ("GENERATE_PROPOSAL", ["2", "4", "6", "8"]))
+        self.assertEqual([len(x["targets"]) for x in c["stages"]], [3, 1])
+        self.assertTrue(c["approval_required"])
+
+    def test_zero_is_noop(self):
+        s = {**self.base, "requested": []}
+        self.assertEqual(preflight(s, self.root)["work_contract"]["implementation"], "NOOP")
+
+    def test_reuse_verified_runner_candidate(self):
+        runner = self.root / "runner.bin"
+        runner.write_bytes(b"fictional tested runner")
+        s = {**self.base,
+             "paid_action": False,
+             "required_assets": [
+                 *self.base["required_assets"],
+                 {"role": "runner", "path": "runner.bin",
+                  "sha256": hashlib.sha256(runner.read_bytes()).hexdigest()}],
+             "implementation": {"asset_role": "runner", "max_items": 15,
+                                "supports_subset": True}}
+        r = preflight(s, self.root)
+        self.assertEqual(r["work_contract"]["implementation"], "REUSE_CANDIDATE")
+        self.assertTrue(r["execution_ready"])
+
+    def test_incompatible_fixed_runner_generates_new_proposal(self):
+        runner = self.root / "runner.bin"
+        runner.write_bytes(b"fictional fixed-15 runner")
+        s = {**self.base,
+             "required_assets": [
+                 *self.base["required_assets"],
+                 {"role": "runner", "path": "runner.bin",
+                  "sha256": hashlib.sha256(runner.read_bytes()).hexdigest()}],
+             "implementation": {"asset_role": "runner", "max_items": 15,
+                                "exact_items": 15}}
+        self.assertEqual(preflight(s, self.root)["work_contract"]["implementation"],
+                         "GENERATE_PROPOSAL")
+
+    def test_invalid_implementation_rejected(self):
+        s = {**self.base, "implementation": {"asset_role": "runner", "max_items": True}}
+        self.assertEqual(preflight(s, self.root)["status"], "FAIL")
+
+    def test_missing_kit_blocks_generation(self):
+        s = {**self.base, "required_assets": [
+            *self.base["required_assets"],
+            {"role": "kit", "path": "not-downloaded.zip", "sha256": "a"*64}]}
+        r = preflight(s, self.root)
+        self.assertEqual(r["status"], "NOT_RUN")
+        self.assertEqual(r["work_contract"]["implementation"], "HOLD")
+
+    def test_no_approval_is_not_execution(self):
+        s = {**self.base, "paid_action": False}
+        r = preflight(s, self.root)
+        self.assertTrue(r["execution_ready"])
+        self.assertIn("Do not auto-run external APIs", r["work_contract"]["invariants"][2])
 
 
 def main():
