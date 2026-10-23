@@ -255,6 +255,9 @@ def preflight(state, root):
     report["execution_ready"] = False
     report["work_contract"] = make_work_contract(state, report)
     report["deliverable_coverage"] = reconcile_outputs(state, root)
+    # Basic file coverage never proves content/decoding/recipient playback.
+    report["task_completion"] = ("FAIL" if report["deliverable_coverage"]["status"] == "FAIL"
+                                 else "NOT_RUN")
     report["work_contract"]["expected_outputs"] = state.get("expected_outputs")
     return report
 
@@ -426,6 +429,7 @@ class SelfTest(unittest.TestCase):
         self.assertEqual(c["status"], "PASS")
         self.assertEqual([v["status"] for v in c["items"]], ["PASS", "PASS"])
         self.assertEqual(c["acceptance"], "NOT_RUN")  # no codec/playback evidence
+        self.assertEqual(r["task_completion"], "NOT_RUN")
 
     def test_one_video_missing_after_finish(self):
         (self.root / "short.mp4").write_bytes(b"fictional short fixture")
@@ -436,6 +440,7 @@ class SelfTest(unittest.TestCase):
         self.assertEqual(c["status"], "FAIL")
         self.assertEqual(c["missing"], ["regular"])
         self.assertEqual([v["status"] for v in c["items"]], ["FAIL", "PASS"])
+        self.assertEqual(preflight(state, self.root)["task_completion"], "FAIL")
 
     def test_missing_before_finish_not_run(self):
         state = {**self.base, "production_finished": False,
