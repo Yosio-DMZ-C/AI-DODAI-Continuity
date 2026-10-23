@@ -1,0 +1,9 @@
+{
+  "purchase_price_man_yen": 3800,
+  "savings_man_yen": 900,
+  "down_payment_man_yen": 700,
+  "closing_costs_man_yen": 300,
+  "minimum_reserve_man_yen": 300,
+  "annual_interest_rate_percent": 1.0,
+  "loan_term_years": 35
+}
