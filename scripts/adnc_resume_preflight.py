@@ -341,7 +341,47 @@ class SelfTest(unittest.TestCase):
         self.assertIn("Do not auto-run external APIs", r["work_contract"]["invariants"][2])
 
 
+
+def demo():
+    """Synthetic local-only resume: 4 of 15; demonstrate gates, not real execution."""
+    with TemporaryDirectory() as directory:
+        root = Path(directory)
+        (root / "fictional-logo.bin").write_bytes(b"AD&C fictional brand fixture")
+        state = {
+            "artifact_id": "fictional-episode", "adopted_version": "draft-v1",
+            "inputs": [f"{n:02d}" for n in range(1, 16)],
+            "requested": ["01", "04", "10", "15"],
+            "frozen": ["02", "03"],
+            "preview_limit": 3,
+            "paid_action": True,
+            "required_assets": [{
+                "role": "brand", "path": "fictional-logo.bin",
+                "sha256": hashlib.sha256(
+                    (root / "fictional-logo.bin").read_bytes()).hexdigest()
+            }]
+        }
+        report = preflight(state, root)
+        contract = report["work_contract"]
+        ok = (report["status"] == "PASS"
+              and contract["implementation"] == "GENERATE_PROPOSAL"
+              and contract["targets"] == state["requested"]
+              and [len(step["targets"]) for step in contract["stages"]] == [3, 1]
+              and not report["execution_ready"]
+              and contract["approval_required"]
+              and not set(state["requested"]).intersection(state["frozen"]))
+        result = {
+            "fixture": "fictional/offline only", "test_pass": ok,
+            "preflight_status": report["status"],
+            "contract": contract,
+            "warning": "No model was invoked; no generated code, audio, external action or human evaluation was executed."
+        }
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if ok else 1
+
+
 def main():
+    if "--demo" in sys.argv:
+        sys.exit(demo())
     if "--self-test" in sys.argv:
         argv = [sys.argv[0]]
         unittest.main(argv=argv)
