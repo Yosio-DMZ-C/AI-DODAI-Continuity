@@ -464,6 +464,38 @@ class SelfTest(unittest.TestCase):
         self.assertEqual(c["extra"], ["unexpected"])
 
 
+    def test_optional_short_video_not_mandatory(self):
+        outputs = [{"id": "long_script"}, {"id": "long_kit"},
+                   {"id": "short_script"}, {"id": "short_kit"},
+                   {"id": "long_mp4", "required": False},
+                   {"id": "short_mp4", "required": False}]
+        found = []
+        for item in outputs[:4]:
+            name = item["id"] + ".txt"
+            (self.root / name).write_text("fictional content", encoding="utf-8")
+            found.append({"id": item["id"], "path": name})
+        state = {**self.base, "production_finished": True,
+                 "expected_outputs": outputs, "observed_outputs": found}
+        result = preflight(state, self.root)["deliverable_coverage"]
+        self.assertEqual(result["status"], "PASS")
+        self.assertEqual(result["missing"], [])
+        self.assertEqual([x["status"] for x in result["items"]][-2:], ["NOT_RUN", "NOT_RUN"])
+
+    def test_missing_required_short_kit_is_failure(self):
+        state = {**self.base, "production_finished": True,
+                 "expected_outputs": [{"id": "long_kit"}, {"id": "short_kit"}],
+                 "observed_outputs": []}
+        result = preflight(state, self.root)["deliverable_coverage"]
+        self.assertEqual(result["status"], "FAIL")
+        self.assertIn("short_kit", result["missing"])
+
+    def test_required_flag_must_be_boolean(self):
+        state = {**self.base, "production_finished": True,
+                 "expected_outputs": [{"id": "short_mp4", "required": "false"}],
+                 "observed_outputs": []}
+        self.assertEqual(preflight(state, self.root)["deliverable_coverage"]["status"], "FAIL")
+
+
 def demo():
     """Synthetic local-only resume: 4 of 15; demonstrate gates, not real execution."""
     with TemporaryDirectory() as directory:
