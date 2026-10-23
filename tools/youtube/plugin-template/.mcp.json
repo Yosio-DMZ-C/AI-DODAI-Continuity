@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "adnc-youtube": {
+      "type": "streamable-http",
+      "url": "https://REPLACE_WITH_DEPLOYED_WORKER.example/mcp",
+      "headers": {"Authorization":"Bearer REPLACE_WITH_SECRET"},
+      "extensions": {"com.openai": {"auth": {"type":"none"}}}
+    }
+  }
+}

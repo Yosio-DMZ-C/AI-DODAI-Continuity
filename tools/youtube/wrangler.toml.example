@@ -1,0 +1,17 @@
+name = "adnc-youtube-private"
+main = "worker.mjs"
+compatibility_date = "2026-10-20"
+
+# Set the actual channel ID before deploying. A mismatch blocks uploads.
+[vars]
+EXPECTED_CHANNEL_ID = "REPLACE_WITH_YOUTUBE_CHANNEL_ID"
+MANAGEMENT_URL = "https://REPLACE_WITH_HTTPS_HOST/tools/youtube/videos.html"
+
+[[kv_namespaces]]
+binding = "UPLOADS_KV"
+id = "REPLACE_WITH_CLOUDFLARE_KV_NAMESPACE_ID"
+
+# wrangler secret put GOOGLE_CLIENT_ID
+# wrangler secret put GOOGLE_CLIENT_SECRET
+# wrangler secret put GOOGLE_REFRESH_TOKEN
+# wrangler secret put MCP_API_KEY

@@ -1,0 +1,10 @@
+# Google OAuth JSON and credentials, never check in.
+client_secret*.json
+client_secrets*.json
+credentials*.json
+*.token
+.adnc_private/
+wrangler.toml
+.dev.vars*
+.env*
+__pycache__/

@@ -1,0 +1,97 @@
+# AD&C / YouTube操作ルーティング v0.3
+
+## 初回認証・未接続時の標準プロセス（追加 2026-10-20）
+
+1. **毎回** Google Auth Platform / YouTube Data API / Cloudflare Workers の公式資料をWeb検索し、確認日と更新された項目を短く記録。過去のUI名称を未検証で押し付けない。
+2. `check_connection` が利用可能なら最初に実行。`ready` なら設定作業を提案せず、そのままチャンネルIDと非公開指定を検査。未接続なら下記の案内をユーザーへ提示。
+3. **ユーザー向けの第一声**：「初回だけGoogle CloudでAPI・OAuth設定を行い、Cloudflare Workerへ安全に接続します。次の公式画面から順に操作してください。**セキュリティ上、OAuth JSON・秘密鍵・トークンをチャットへ送信・添付・貼り付けしてはいけません。本人の端末内で使い、画面共有時には認証情報を隠してください。****わからないところは教えてください。現在の画面に合わせて案内します。**」
+4. `INITIAL_AUTH_GUIDE.md` に沿って **一度に短い工程だけ**提示する。ユーザーが途中で困ったら、その画面の実際のラベルを確認し、手順差分を修正。長いコマンド一括提示を初手で行わない。
+5. Google CloudのTesting+ExternalはRefresh Tokenが通常7日で期限切れ。継続運用はプロジェクト公開ステータス・確認要件を検証。期限切れ時は `setup_once.py` を再実行、秘密情報は出力しない。
+6. CloudflareへのSecret登録とプライベートプラグインのChatGPTへの接続は利用者が明示操作。**実機の認証・投稿は未実行なら未実行と報告**。
+7. 接続後 `check_connection` → `list_uploaded_videos` → `upload_private_from_drive` （ユーザーが投稿指示した場合）→ `private_verified` → 管理画面で人間に公開判断を渡す。
+
+## 実機修正ケース：Google Cloud「URLが見つかりません」（2026-10-20）
+
+- 誤案内: `https://console.cloud.google.com/auth/data-access` は使用しない。公式資料の「データアクセス」の実際の遷移先は `https://console.cloud.google.com/auth/scopes`。
+- 画面上部が「プロジェクトの選択」の場合は、対象のGoogle Cloudプロジェクトを選択してから、左メニューの**「データアクセス」**をクリックするよう案内。
+- **リンクを再提示するより、実画面の操作を優先**。修正した直リンクも認証済み画面での動作を未検証なら保証しない。
+- ユーザーからエラー画像を受け取ったら、リンク/プロジェクト/権限をそれぞれ切り分け、確定原因を憶測で断定しない。
+
+## 操作の文字列を統一する（2026-10-20 実画面フィードバック）
+
+- **コピー欄と入力先説明は原文完全一致**。スコープ、URL、ファイルパス、コマンド、IDなど機械に渡す文字列は、省略記法・短縮名・表示用別名に変えない。複数箇所で同じ値を使うときは、長くても同じ内容を繰り返す。
+- 例：「コピーする値：`https://www.googleapis.com/auth/youtube.force-ssl`」→「フィルタに `https://www.googleapis.com/auth/youtube.force-ssl` を貼り付ける」。片方だけ `youtube.force-ssl` と表示しない。
+- すでに画面がユーザーから送られている時は撮影方法リンクを出さず、その画面上で次に押す箇所だけ示す。
+- スコープ追加の「検証が必要」は非公開テストに直ちに不可とは限らない。個人利用の例外・警告表示・将来の一般公開審査を区別する。リンクや現行UIを検証できていない部分は成功と断定しない。
+
+## 2026-10-20 実機フィードバック：チャンネルID取得前に切り替える
+
+- **間違い**: [YouTube詳細設定](https://www.youtube.com/account_advanced) を最初に開かせると通常利用している別チャンネルのIDが表示される。
+- **標準ルート**: [YouTubeトップ](https://www.youtube.com/) → 右上プロフィール → **アカウントを切り替える** → ユーザーが対象チャンネルを選択 → 右上の表示を確認 → [詳細設定](https://www.youtube.com/account_advanced) で**チャンネルID**を取得。公式根拠: https://support.google.com/youtube/answer/3046356?hl=ja
+- 一覧に出なければ [YouTube Studio](https://studio.youtube.com/) 側の切替を案内。無関係なチャンネルIDをアップロード先に確定しない。
+- **本人の通常利用チャンネルのデフォルト設定を変えることは要求しない**。YouTube画面の切替とAPIの投稿先一致は別に検査し、OAuthで別チャンネルが選択された場合は **`channel_mismatch`で停止**する。
+
+## UIの機械翻訳が意味不明なとき（2026-10-20 実機フィードバック）
+
+1. **元の英語ラベルを公式文書で確認**。異常翻訳されたラベルをそのまま一般向け標準名だと断定しない。今回のCloudflareは「計算する」= Compute、「従業員とページ」= Workers & Pages、「建てる」= Build と解釈できる。
+2. **設定による恒久対処を一度だけ提案**。Cloudflareプロフィールの Language を English に変更する／Chromeの自動翻訳をそのサイトでは止める。設定元が不明ならChrome翻訳が原因と断定しない。 https://developers.cloudflare.com/fundamentals/user-profiles/customize-account/ ; https://support.google.com/chrome/answer/173424
+3. できない・望まないなら**実画面のラベル**を優先して短く案内。従来の日本語名だけを当てずっぽうで提示しない。
+4. 判断材料が足りず、ユーザーが操作に困ったときは「**翻訳が不自然で案内と表示が違う可能性があります。お手数ですが、いま開いている画面のスクリーンショットを1枚送ってください。わからないところは教えてください。**」と依頼。ただし既にその画面が届いていれば再依頼しない。
+5. スクリーンショットの撮影ガイドは撮り方自体が不明で停止したときだけ添付。秘密鍵・トークンなどが写る画像は送らせない。
+
+## 長いコードの受け渡し（2026-10-20 実機フィードバック）
+
+- 利用者がWebエディタに貼り付けるコードは、**可能な限りChatGPTのコードブロックで全文表示して一度にコピーできるようにする**。GitHubを開く→Raw→選択→コピーという不要な手順を押し付けない。
+- Webブラウザの自動翻訳は**GitHub上のソースコード自体を書き換えたように見せる**場合がある。翻訳されたコード画面からコピーさせない。GitHub API等から取得した元ソースとコードブロックの内容を一致させる。秘密情報を含むコードはチャットへ貼らせない。
+- 長文だからという理由だけで別画面参照を標準にしない。再利用のためのリポジトリ保存と、現場ユーザーへの1クリックコピーは両立させる。
+- 例外は巨大ファイル、機密情報、バイナリ、正確な差分適用が必要なケース。必要な理由を説明し、別の安全な配布方法を選ぶ。
+
+## 2026-10-20 Cloudflare Webエディタ貼付復旧の実例
+
+- ブラウザのクリップボード読取エラー時、利用者が**ページ再読み込み→貼付成功**と報告。再読み込み前に未保存編集がないか確認する。Raw表示の日本語翻訳コードをコピーさせず、GitHubの元データ由来のコードブロックを優先。
+- `Deploy`を押したとの報告だけでは完了判定せず、**Worker公開URL `/health` のJSONレスポンス**かデプロイ履歴で検証する。右側のプレビューが古い場合があるので、公開URLの直接表示を優先。
+- 初回の期待内容: `{"name":"ADNC YouTube MCP","version":"0.1.0","status":"unconfigured_or_configured_not_disclosed"}`。Secret未設定なのでYouTube接続OKとは解釈しない。
+- 本番外部アクセスで確認できない場合は、本人のブラウザで非秘密の `/health` 表示のみ依頼する。
+
+## 操作画面への直接リンク（2026-10-20・実機改善）
+
+- ユーザーへの操作依頼では、**その工程の操作画面に直接進めるリンク**を添える。管理トップだけを貼って深い階層操作を強制しない。公式文書の直リンクを優先して確認する。
+- Cloudflare Workers KV作成の直リンクは **https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces**（Cloudflare公式ガイドが提示するWorkers KVリンク）。
+- WorkerにKVをバインドする場合は https://dash.cloudflare.com/ から対象Worker `adnc-youtube-private` の設定・Bindingsへ進む。深いリンクが未確認なら推測で組み立てない。
+- すでにユーザーが目的画面を開いている場合や直リンクでプロジェクト選択が失われる場合は、同じ画面のクリック操作を優先し、リンクの再起動を強制しない。
+
+## Cloudflare/GitHubの原語UI固定とKV接続の実機修正（2026-10-20）
+
+- Google翻訳によって「Workers & Pages」が「従業員とページ」、「Workers KV」が「労働者KV」と表示された事例。**原文UIを優先**し、Cloudflareの Profile > Settings > Language で English を選択し、Chrome翻訳で `dash.cloudflare.com` および `github.com` を原文に戻して「このサイトは翻訳しない」とする。URLパラメータだけで表示言語を強制できると未検証で約束しない。
+- **KVの「Connect」は実行ボタンではなくコード例の説明モーダル**。そこで出たサンプルをWorkerに貼り付けてはいけない。モーダルを閉じ、Worker側の Settings > Bindings > Add > KV Namespace から `UPLOADS_KV` に `adnc-youtube-uploads` をバインドし Deploy、読戻し確認。公式: https://developers.cloudflare.com/kv/concepts/kv-namespaces/
+- 操作画面へのリンクは提供できる確認済みURLを提示し、言語強制用の未検証URLを作らない。日本語で説明し、ユーザーが実際に操作する英語ラベルを正確に書く。英語表記が見えず止まった場合のみ現在画面を確認する。
+
+## チャット実行時
+
+1. **チャンネルを作りたい / 作れない**：`channel.html` に案内する。YouTubeではチャンネル作成のAPIはなく公式画面で人間が作る。iPhoneでPC版サイト案内。過去の事例では名前に `|` があると登録に失敗したため、まず `AD&C - AI-DODAI & Continuity` など区切り記号を変更して試す。ただし`|`がYouTube一般禁止文字と断定しない。必ず最後に「チャンネル開設ナビ」へのリンクを再提示する。
+2. **動画をアップロード**：MCP接続済・`check_connection`で`ready`かつDrive動画IDが確認できる場合のみ `upload_private_from_drive`。未接続なら `videos.html` を提示し手動選択＋OAuthを案内。**チャットへの依頼は動画の非公開登録だけ**。
+3. **アップロード直後**：動画ID・URL・公開状態の取得が成功したら **「非公開アップロード済み。公開範囲とURLは動画管理ページから確認・更新してください」** と `videos.html` を提示。
+4. **限定公開・公開へ変更**：必ず管理ページ（またはYouTube Studio）で人間が手動選択。チャットMCP側に勝手に公開できるツールを置かない。
+5. **URLがほしい**：`list_uploaded_videos` などでURL取得後、`private` のURLは第三者閲覧不可と伝える。レビュー共有が目的なら人間の `unlisted` 変更後の視聴確認を推奨。
+6. **チャットへ結果を返す**：「実際に呼び出したツール」と「確認した公開範囲」を区別する。未認証・未デプロイを成功扱いしない。
+
+## UIと安全性
+
+- ページは **2枚に分離**：開設 `channel.html`／動画 `videos.html`。元の配色・入力欄・ボタンのパターンを踏襲。
+- 既存元ファイル `ADNC_YouTube_iPhone_Navi_v0.1.html` は変更しない。
+- ブラウザはユーザー操作を要するOAuthを使用。バックグラウンド自動投稿を偽装しない。
+- Workerはアップロード時privateに固定。DriveファイルID以外の外部URLを受け付けない。毎回同じrequest_keyを使い、結果不明時は自動再試行せず調査する。
+- OAuthやMCP用秘密情報をGitHub、ブラウザlocalStorage、AD&C共有KBに保存しない。
+- 利用者がOAuthクライアントJSONをダウンロードした際は「大丈夫です」等の曖昧な表現ではなく、**セキュリティ上チャットへの添付・貼付は禁止**と明言し、ダウンロード完了だけを確認する。画面のトークンやシークレットもマスクしてから共有してもらう。
+
+## Windowsデスクトップ版 ChatGPTのMCPサーバー管理（2026-10-20実機確認）
+
+1. **左下の本人アイコン→「設定」** を開く。**「MCP サーバー」** 管理画面からMCPタブを開き、「＋ サーバーを追加する」を選択する。具体的なメニュー階層は画面更新で変わるため、存在しないパスを断定しない。
+2. Cloudflare公式MCP: 名前 `cloudflare-api`、種類「ストリーミング可能なHTTP」、URL `https://mcp.cloudflare.com/mcp`。OAuthなのでBearer token / header手入力なし。
+3. 保存後「認証する」→ Cloudflare OAuthで `Read only`（初期選択のFull accessのまま進めない）→ 必要な範囲を本人確認してAuthorize。
+4. Codexの新規チャットからMCP `search` / `execute` を使用してGETのみでWorker・KV・Binding・Variableを点検。**実機で全項目PASS・GET HTTP200**（2026-10-20、Codexの結果に基づく）。`execute`の承認は「一度だけ許可」、書込み・削除・デプロイは未試験。
+
+**誤案内の訂正**：「コーディング→接続」はリモートPC・SSHの接続設定であり、**MCPサーバー設定ではない**。「接続を許可」をONにしない。プラグインのSkillが読めても、そのプラグインのMCPが自動登録されるとは限らない。Cloudflare MCPは今回はアプリ設定から個別登録した。
+
+- API認証情報・OAuthコード・Secret値をチャットに送らない。初期権限はRead only。Full accessや「常に許可」は標準にしない。
+
