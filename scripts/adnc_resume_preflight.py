@@ -6,7 +6,7 @@ Prepare a temporary JSON from existing START_HERE / Project Context / BUILD_PLAN
   "artifact_id": "episode-1", "adopted_version": "v1.5",
   "inputs": ["01", "02", "03", "04"], "requested": ["02", "04"],
   "preview_limit": 3, "paid_action": true,
-  "same_failed_approach_count": 0,
+  "same_failed_approach_count": 0, "frozen": ["01", "03"],
   "required_assets": [
     {"role": "logo", "path": "staged-logo.png", "sha256": "<64 hex chars>"}
   ]
@@ -36,6 +36,7 @@ def make_work_contract(state, report):
         "artifact_id": state.get("artifact_id"),
         "adopted_version": state.get("adopted_version"),
         "targets": ids,
+        "frozen": state.get("frozen", []),
         "stages": (
             [{"name": "preview", "targets": report["preview"]}] if report["preview"] else []
         ) + ([{"name": "remainder", "targets": report["remainder"]}]
@@ -97,6 +98,7 @@ def preflight(state, root):
     preview_limit = state.get("preview_limit", 0)
     attempts = state.get("same_failed_approach_count", 0)
     max_items = state.get("max_items")
+    frozen = state.get("frozen", [])
     implementation = state.get("implementation")
     if implementation is not None:
         if (not isinstance(implementation, dict)
@@ -110,9 +112,12 @@ def preflight(state, root):
                          or implementation["exact_items"] < 1))):
             failures.append("invalid implementation capability declaration")
     if (not isinstance(items, list) or not isinstance(chosen, list)
-            or not isinstance(assets, list)
-            or any(not isinstance(x, str) or not x for x in items + chosen)
+            or not isinstance(assets, list) or not isinstance(frozen, list)
+            or any(not isinstance(x, str) or not x for x in items + chosen + frozen)
             or len(set(items)) != len(items) or len(set(chosen)) != len(chosen)
+            or len(set(frozen)) != len(frozen) or not set(frozen).issubset(set(items))
+            or bool(set(frozen) & set(chosen))
+            or type(state.get("paid_action", False)) is not bool
             or not isinstance(preview_limit, int) or isinstance(preview_limit, bool)
             or preview_limit < 0 or not isinstance(attempts, int)
             or isinstance(attempts, bool) or attempts < 0
@@ -161,8 +166,13 @@ def preflight(state, root):
             elif not isinstance(digest, str) or len(digest) != 64 or any(
                     c not in "0123456789abcdefABCDEF" for c in digest):
                 unknowns.append(role + ": no usable expected SHA-256")
-            elif hashlib.sha256(p.read_bytes()).hexdigest() != digest.lower():
-                failures.append(role + ": SHA-256 mismatch")
+            else:
+                hasher = hashlib.sha256()
+                with p.open("rb") as binary:
+                    for block in iter(lambda: binary.read(1024 * 1024), b""):
+                        hasher.update(block)
+                if hasher.hexdigest() != digest.lower():
+                    failures.append(role + ": SHA-256 mismatch")
     if failures:
         report["status"] = "FAIL"
     elif unknowns:
@@ -174,8 +184,10 @@ def preflight(state, root):
                                   and report["flow"] == "RESTORE"
                                   and bool(chosen) and not report["checkpoint"])
     # Readiness is a planning signal, never approval for external actions.
-    report["execution_ready"] = (report["execution_ready"]
+    report["preflight_ready"] = (report["execution_ready"]
                                   and not report["approval_required"])
+    # Neither a reused-runner candidate nor a generated proposal is verified execution.
+    report["execution_ready"] = False
     report["work_contract"] = make_work_contract(state, report)
     return report
 
@@ -278,7 +290,8 @@ class SelfTest(unittest.TestCase):
                                 "supports_subset": True}}
         r = preflight(s, self.root)
         self.assertEqual(r["work_contract"]["implementation"], "REUSE_CANDIDATE")
-        self.assertTrue(r["execution_ready"])
+        self.assertTrue(r["preflight_ready"])
+        self.assertFalse(r["execution_ready"])
 
     def test_incompatible_fixed_runner_generates_new_proposal(self):
         runner = self.root / "runner.bin"
@@ -305,10 +318,26 @@ class SelfTest(unittest.TestCase):
         self.assertEqual(r["status"], "NOT_RUN")
         self.assertEqual(r["work_contract"]["implementation"], "HOLD")
 
+    
+    def test_frozen_target_rejected(self):
+        s = {**self.base, "frozen": ["2"]}
+        self.assertEqual(preflight(s, self.root)["status"], "FAIL")
+
+    def test_frozen_non_target_preserved(self):
+        s = {**self.base, "frozen": ["1", "3"]}
+        c = preflight(s, self.root)["work_contract"]
+        self.assertEqual(c["frozen"], ["1", "3"])
+
+    def test_untrusted_paid_action_type_rejected(self):
+        s = {**self.base, "paid_action": "false"}
+        self.assertEqual(preflight(s, self.root)["status"], "FAIL")
+
+
     def test_no_approval_is_not_execution(self):
         s = {**self.base, "paid_action": False}
         r = preflight(s, self.root)
-        self.assertTrue(r["execution_ready"])
+        self.assertTrue(r["preflight_ready"])
+        self.assertFalse(r["execution_ready"])
         self.assertIn("Do not auto-run external APIs", r["work_contract"]["invariants"][2])
 
 
