@@ -31,6 +31,8 @@ NAMES = {
     "MUSE-A-LEGACY-ADOPTION": "Muse A：旧KB互換導入（独立読戻し）",
     "MUSE-A-SECRETARY-HOOK": "Muse A：既存秘書への更新確認接続",
     "MUSE-A-DAILY-CHECK": "Muse A：秘書の日次バージョン確認",
+    "MUSE-B-152-UPGRADE": "Muse B：共通版への差分更新・読戻し試験",
+    "T002-UNIFIED-RELEASE": "T002：現行共通ガイド配布・旧無料版保全",
     "MUSE-CROSS-AI-TRANSFER": "Muse B：別AIへの受渡し",
     "T014-FORMAL-SCHEMA": "T014：正式JSON Schema検査",
     "T014-CONCURRENT-UPDATE": "T014：実同時更新検査",
