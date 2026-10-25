@@ -1,6 +1,6 @@
 # AD&C（AI-DODAI & Continuity）設計・構築運用指示書 — 一般配布版
 
-- 配布版：1.5.1（2026-10-25：更新処理を単一UPDATE.mdに集約、厳密なFROM→TO品質ゲートを先頭へ配置。秘書日次版チェックも専用参照へ分離）
+- 配布版：1.5.2（2026-10-25：既存の版不明KBを安全に互換導入する入口を追加。更新・日次確認の詳細は別ファイルを正本として維持）
 - 用途：個人・案件・チームで始め、必要に応じて共有へ接続するナレッジベースの構築
 - 本書の内容：構造、記録形式、購入・調査・在庫管理、品質管理、共有、AIへの実行指示
 - 本書に含めないもの：実在する利用者の記録、個人台帳、会話引用、保管先URL、ファイルID、既存環境の設定値
@@ -8,7 +8,7 @@
 
 ## 使い方
 
-> **アップデート専用入口**：導入済みKBを更新するときは、[UPDATE.md](updates/UPDATE.md) の**冒頭「FROM→TO品質ゲート」から実取得**する。現在のインストーラー版とmanifestで固定した目標版が一致しないとき、連続した全差分手順を順番に照合する。**本人承認前の書込は禁止**。本書の初回構築手順を再実行しない。
+> **アップデート専用入口**：導入済みKBを更新するときは、[UPDATE.md](updates/UPDATE.md) の**冒頭「FROM→TO品質ゲート」から実取得**する。旧KBに導入版がない場合は[ADOPT_LEGACY.md](updates/ADOPT_LEGACY.md)へ分岐し、`ADNC_INSTALLER_VERSION`を推定しない。数値版が確定している場合だけ、取得した目標版まで連続した全差分手順を順番に照合する。**本人承認前の書込は禁止**。本書の初回構築手順を再実行しない。
 
 第1〜19章が設計と運用契約、第20章がAIへ渡す実行指示、第21章が公式参考資料、第22章が導入チェックリストである。利用者が本書を添付し、チャット本文で `実行` と送ることで初期導入を開始する。**無料／有料でインストーラーを分けない。** ローカルディスクへのダウンロードが選ばれた場合は手動保存モードに、実証済みのクラウド直接読書きが選ばれた場合はクラウド連携モードに分岐する。AIの課金プランと保存方式は同義ではない。
 
@@ -100,7 +100,7 @@
 
 ### 導入済みKBの更新入口（詳細は別ファイル）
 
-初回構築時、既存`START_HERE.md`の冒頭に**`ADNC_INSTALLER_VERSION: 1.5.1`**と、公開の固定入口`ADNC_UPDATE_RUNBOOK: https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/UPDATE.md`を記録する。`ADNC_UPDATE_MANIFEST`（[LATEST.json](updates/LATEST.json)）も併記する。KBの設計版・schema_version・各レコードrevisionとは混同しない。
+初回構築時、既存`START_HERE.md`の冒頭に**`ADNC_INSTALLER_VERSION: 1.5.2`**と、公開の固定入口`ADNC_UPDATE_RUNBOOK: https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/UPDATE.md`を記録する。`ADNC_UPDATE_MANIFEST`（[LATEST.json](updates/LATEST.json)）も併記する。KBの設計版・schema_version・各レコードrevisionとは混同しない。旧KB（導入版不明）にこの数値を後付けしてはならない。旧KBは[ADOPT_LEGACY.md](updates/ADOPT_LEGACY.md)の互換レイヤーだけを提案し、正式導入版の更新と区別する。
 
 利用者が「アップデートして」と依頼した場合は、**更新専用実行正本[UPDATE.md](updates/UPDATE.md)を最初から実取得して実行**。この本文を更新手順書として代用しない。秘書の日次読取確認は[DAILY_CHECK.md](updates/DAILY_CHECK.md)を参照し、自動更新はしない。
 
@@ -735,7 +735,7 @@ AIは、考察を広げず、次のような短い選択肢を提示する。
 #### 初回
 
 1. AIが正本構造、START_HERE、BUILD_PLAN、registry、必要なKnowledge / Context / Skill等を自動生成する。 
-   - START_HEREに導入版 `ADNC_INSTALLER_VERSION: 1.5.1`、公開の `ADNC_UPDATE_RUNBOOK`（上記UPDATE.mdの個別URL）、`ADNC_UPDATE_MANIFEST`（LATEST.jsonの個別URL）を短く記録する。既存KBは作り直さず、既存のIDと記録を保護する。
+   - START_HEREに導入版 `ADNC_INSTALLER_VERSION: 1.5.2`、公開の `ADNC_UPDATE_RUNBOOK`（上記UPDATE.mdの個別URL）、`ADNC_UPDATE_MANIFEST`（LATEST.jsonの個別URL）を短く記録する。導入版不明の旧KBでは新規導入済みと偽らず、専用の互換ガイドに従う。既存KBは作り直さず、既存のIDと記録を保護する。
 2. 生成物の構造・ID・参照・表示をレビューする。
 3. 可能なら1つの `AgentOS-C_initial.zip` にまとめる。ZIPを扱えない環境では、相対パス・各ファイル全文・固定IDを含む単一Markdown/TXTにまとめる。
 4. 受渡し前に成果物を読戻し、件数、NodeID、本文欠落、参照、構造、文字化け、可能ならhashを検査する。内容を完全復元できない出力を「全件バックアップ」と表現しない。
@@ -967,6 +967,8 @@ PARA、Zettelkasten、Medallion等の考え方は第2章に示す役割へ限定
 
 
 ## 変更履歴
+
+- 1.5.2（旧KB互換導入）：導入版の記録がない旧KBは別ガイドADOPT_LEGACY.mdへ誘導。元のインストーラー版は未確認のまま、更新確認機構だけを導入する。秘書の設定元・日記フォルダが見つからない環境も、利用可能な読取確認と連動設定のNOT_RUNを区別する。既存の初回導入フローと更新の明示承認は維持。
 
 - 1.5.1（読み落とし防止・手順分離）：更新ロジックを専用のUPDATE.md冒頭のFROM→TO品質ゲートへ移し、版別ガイドの連続適用を義務化。秘書の通知専用ロジックをDAILY_CHECK.mdへ分離。インストーラーには入口だけを残し、既存導入フロー・承認・個人データ保全を維持。
 
