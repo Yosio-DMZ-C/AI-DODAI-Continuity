@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.2",
+  "latest_version": "1.5.3",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -104,6 +104,35 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.1-to-1.5.2.md"
+    },
+    {
+      "from_version": "1.5.2",
+      "to_version": "1.5.3",
+      "title": "案件固有採用条件の復元、状態整合の局所検査、再開導線",
+      "summary": "既存のIDとデータを維持したまま共通実行標準への固定入口を追加。案件採用条件は一般標準より先に復元し、書込前の基準照合と保存後の実読戻しを区別する。読取専用のKB整合検査器は対応環境に限って任意利用。",
+      "changes": [
+        {
+          "target": "START_HERE.md",
+          "kind": "入口追記",
+          "detail": "共通実行標準への1行参照とインストーラー版の1.5.3更新"
+        },
+        {
+          "target": "BUILD_PLAN.md",
+          "kind": "必要な案件のみの局所整合",
+          "detail": "現在の再開位置と歴史、案件固有の採用状態と未実施を混同しない"
+        },
+        {
+          "target": "registry.json",
+          "kind": "該当レコードのみの整合",
+          "detail": "更新した実体の改訂番号・ハッシュを同期。NodeID/fileId等は維持"
+        },
+        {
+          "target": "新たな検査器・秘書機能",
+          "kind": "非強制",
+          "detail": "公開コードは取得したローカルKBでのみ任意実行。既存KBへのコード・ジョブ・日記の自動生成はしない"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.2-to-1.5.3.md"
     }
   ]
 }
