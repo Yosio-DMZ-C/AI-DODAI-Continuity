@@ -15,6 +15,7 @@ import urllib.request
 
 ISSUE_NO = 13
 MARKER = "ADNC-STATE-V1"
+TASK_MARKER = "ADNC-TASK-V1"
 BEGIN = "<!-- ADNC-CURRENT-STATE-BEGIN -->"
 END = "<!-- ADNC-CURRENT-STATE-END -->"
 OPEN_BEGIN = "<!-- ADNC-OPEN-WORK-BEGIN -->"
@@ -130,6 +131,83 @@ def replace_block(body, states):
         return pattern.sub(lambda _: new, body, count=1)
     first_line, sep, rest = body.partition("\n")
     return first_line + "\n\n" + new + "\n" + (rest if sep else "")
+
+
+def parse_task_event(comment):
+    """Trusted owner's append-only task registration; never execute a comment."""
+    body = comment.get("body") or ""
+    if comment.get("user", {}).get("login") != OWNER or len(body) > 2500:
+        return None
+    head, sep, payload = body.partition("\n")
+    if not sep or head.strip() != TASK_MARKER:
+        return None
+    try:
+        entry = json.loads(payload)
+    except (ValueError, TypeError):
+        return None
+    if not isinstance(entry, dict) or set(entry) != {"id", "priority", "next", "owner", "state", "notes"}:
+        return None
+    if not isinstance(entry["id"], str) or not TASK_ID.fullmatch(entry["id"]):
+        return None
+    if not isinstance(entry["priority"], str) or not re.fullmatch(r"P[0-3]", entry["priority"]):
+        return None
+    if not isinstance(entry["state"], str) or entry["state"] not in {
+        "PROPOSED", "READY", "IN_PROGRESS", "REVIEW_PENDING", "BLOCKED", "DONE", "DROPPED", "WAITING"
+    }:
+        return None
+    for key, limit in {"next": 260, "owner": 100, "notes": 600}.items():
+        value = entry[key]
+        if not isinstance(value, str) or not value.strip() or len(value) > limit or any(x in value for x in "|\r\n<>"):
+            return None
+    return entry
+
+
+def recover_registered_tasks(body, comments):
+    """Rebuild missing task rows from append-only events, preserving existing edits."""
+    events = {}
+    for comment in sorted(comments, key=lambda c: (c.get("created_at", ""), c.get("id", 0))):
+        entry = parse_task_event(comment)
+        if entry:
+            events.setdefault(entry["id"], (entry, comment.get("html_url", "")))
+    if not events:
+        return body
+    start = body.find(TASK_HEADER)
+    if start < 0:
+        raise RuntimeError("Task table missing; cannot safely recover")
+    end = body.find("\n## ", start + len(TASK_HEADER))
+    if end < 0:
+        end = len(body)
+    before, section, after = body[:start], body[start:end], body[end:]
+    lines = section.splitlines(keepends=True)
+    existing = set()
+    last = None
+    for idx, line in enumerate(lines):
+        if not line.startswith("|"):
+            continue
+        columns = [c.strip() for c in line.strip().strip("|").split("|")]
+        if columns and TASK_ID.fullmatch(columns[0]):
+            if columns[0] in existing:
+                raise RuntimeError("Duplicate task ID; abort recovery")
+            existing.add(columns[0])
+            last = idx
+    if last is None:
+        raise RuntimeError("No canonical task table rows; abort recovery")
+    extra = []
+    for ident, (entry, url) in sorted(events.items()):
+        if ident in existing:
+            continue
+        if not url.startswith("https://github.com/"):
+            raise RuntimeError("Missing trusted registration event URL")
+        extra.append("| " + " | ".join([
+            ident, entry["priority"], entry["next"], entry["owner"],
+            entry["state"] + "（" + entry["notes"] + "）",
+            "[登録証拠](" + url + ")"
+        ]) + " |\n")
+    if not extra:
+        return body
+    lines[last+1:last+1] = extra
+    print(f"RESTORED_TASKS: {len(extra)} from append-only events")
+    return before + "".join(lines) + after
 
 
 def pending_tasks(body):
@@ -277,6 +355,17 @@ def self_test():
         raise AssertionError("Missing task list must not be silently successful")
     except RuntimeError:
         pass
+    registered = c(10, [])
+    registered["body"] = TASK_MARKER + "\n" + json.dumps({
+        "id": "ADNC-T017", "priority": "P1", "next": "画像素材の一覧確認",
+        "owner": "担当AI", "state": "IN_PROGRESS", "notes": "別AIによる実受信待ち"})
+    recovered = recover_registered_tasks(synthetic, [registered])
+    assert "| ADNC-T017 |" in recovered
+    assert recover_registered_tasks(recovered, [registered]) == recovered
+    assert any(x[0] == "ADNC-T017" for x in pending_tasks(recovered))
+    invalid_task = dict(registered)
+    invalid_task["user"] = {"login": "not-owner"}
+    assert recover_registered_tasks(synthetic, [invalid_task]) == synthetic
     print("SELF_TEST_PASS: latest-wins, idempotent, authenticated events, pending-work flags, refusal on missing list")
 
 
@@ -296,7 +385,7 @@ def main():
         return
     issue, _ = request(f"/repos/{repo}/issues/{ISSUE_NO}")
     before = issue["body"] or ""
-    after = replace_pending_block(replace_block(before, state))
+    after = replace_pending_block(replace_block(recover_registered_tasks(before, comments), state))
     if after == before:
         print(f"NO_CHANGE: {len(state)} current states")
         return
@@ -307,7 +396,7 @@ def main():
     latest_issue, _ = request(f"/repos/{repo}/issues/{ISSUE_NO}")
     if latest_issue.get("body", "") != before:
         before = latest_issue.get("body") or ""
-        after = replace_pending_block(replace_block(before, state))
+        after = replace_pending_block(replace_block(recover_registered_tasks(before, comments), state))
         print("REFRESHED: issue body changed during synchronization")
     if after == before:
         print(f"NO_CHANGE: {len(state)} current states after refresh")
