@@ -53,6 +53,8 @@ jobs:
           mkdir -p saved-release
           gh release download "$tag" --pattern "$legacy" --dir saved-release --clobber
           old_free_sha="$(sha256sum "saved-release/$legacy" | awk '{print $1}')"
+          echo "Legacy downloaded bytes: $(wc -c < "saved-release/$legacy"), SHA-256: $old_free_sha"
+          echo "Legacy expected SHA-256: $expected_legacy"
           if [ "$old_free_sha" != "$expected_legacy" ]; then
             echo "::error::Legacy free download differs from archived SHA; refusing publish"
             exit 1
