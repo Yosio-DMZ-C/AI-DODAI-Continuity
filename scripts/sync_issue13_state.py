@@ -298,6 +298,18 @@ def main():
     if after == before:
         print(f"NO_CHANGE: {len(state)} current states")
         return
+    # Narrow the stale-read window: an Issue edit may add a task while
+    # a previous sync is running. Never patch the original stale body.
+    # GitHub Issues REST PATCH is not an atomic compare-and-swap; races
+    # after this final read still require post-write monitoring.
+    latest_issue, _ = request(f"/repos/{repo}/issues/{ISSUE_NO}")
+    if latest_issue.get("body", "") != before:
+        before = latest_issue.get("body") or ""
+        after = replace_pending_block(replace_block(before, state))
+        print("REFRESHED: issue body changed during synchronization")
+    if after == before:
+        print(f"NO_CHANGE: {len(state)} current states after refresh")
+        return
     request(f"/repos/{repo}/issues/{ISSUE_NO}", method="PATCH", data={"body": after})
     readback, _ = request(f"/repos/{repo}/issues/{ISSUE_NO}")
     if readback.get("body") != after:
