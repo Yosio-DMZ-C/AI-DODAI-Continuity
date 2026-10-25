@@ -37,6 +37,10 @@ NAMES = {
     "T014-FORMAL-SCHEMA": "T014：正式JSON Schema検査",
     "T014-CONCURRENT-UPDATE": "T014：実同時更新検査",
     "PR31-REAL-AI-RESTORE": "PR #31：実AIによる復元",
+    "ARCH-2026-IMPLEMENTATION": "2026暫定設計：採用事項の実装照合",
+    "KB-PROBE-BETA-CI": "KB整合検査器：読取専用βと合成CI",
+    "WORK-RESUME-BETA-CI": "作業復元プリフライト：βコードと合成CI",
+    "INSTALLER-153-RELEASE": "共通インストーラー1.5.3：配布・実ダウンロード",
 }
 
 
