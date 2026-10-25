@@ -50,6 +50,8 @@ NAMES = {
     "INSTALLER-153-RELEASE": "共通インストーラー1.5.3：配布・実ダウンロード",
     "TASK-PERSISTENCE-DISPLAY": "未完了タスク表示：Issue自動同期・読戻し",
     "TASK-HANDOFF-RECEIPT": "中断タスク引継ぎ：秘書・別AIの実受信",
+    "RUNBOOK-ASSET-RULE": "Runbook素材・画像・ツールの単一入口（規則保存）",
+    "RUNBOOK-ASSET-COLDSTART": "Runbook素材の独立Q2/Q3実検査",
 }
 
 
