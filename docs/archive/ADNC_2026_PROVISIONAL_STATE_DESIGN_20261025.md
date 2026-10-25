@@ -121,6 +121,7 @@ AD&CをOSや分散DBへ作り替えない。「**固定した識別子と採用�
 
 - 各担当からの研究報告：受領済み。公式資料の個別確認は各担当による報告。上記Google Driveのメタデータ・files.updateの公開仕様はリーダーも再確認した
 - 2026年暫定結論・採否理由の記録：**PASS（GitHub保存・読戻し後）**
+- PR #32の旧形式`meta.revision`対応・合成KB単体検査：**GitHub Actionsで12/12 PASS**（[実行ログ](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/actions/runs/40181681562)）。これは検査器の一部構文・構造検査のPASSであり、別アカウント実KBへの適合や意味的再開・競合阻止の証明ではない
 - 実Driveでの競合排除、複数ファイルの原子性：**NOT_RUN／未保証**
 - 合成データによる競合故障注入、索引の仮生成、異種AIでの再開成功：**NOT_RUN**
 - 公開配布物や個人KBへの反映：**NOT_RUN（本決定では実施しない）**
