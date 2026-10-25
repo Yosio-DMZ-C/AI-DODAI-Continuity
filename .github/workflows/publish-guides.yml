@@ -1,11 +1,10 @@
-name: Publish AgentOS-C downloadable guides
+name: Publish AD&C unified guide (legacy preserved)
 
 on:
   push:
     branches: [main]
     paths:
       - 'docs/AgentOS-C_設計・構築運用指示書_一般配布版.md'
-      - 'docs/AgentOS-C_設計・構築運用指示書_AI無課金ユーザー版.md'
       - '.github/workflows/publish-guides.yml'
   workflow_dispatch:
 
@@ -32,13 +31,12 @@ jobs:
           set -euo pipefail
           mkdir -p dist
           cp 'docs/AgentOS-C_設計・構築運用指示書_一般配布版.md' 'dist/AgentOS-C_Guide.md'
-          cp 'docs/AgentOS-C_設計・構築運用指示書_AI無課金ユーザー版.md' 'dist/AgentOS-C_Free_Guide.md'
           test -s 'dist/AgentOS-C_Guide.md'
-          test -s 'dist/AgentOS-C_Free_Guide.md'
           grep -q '^# AD&C' 'dist/AgentOS-C_Guide.md'
-          grep -q '^# AgentOS-C' 'dist/AgentOS-C_Free_Guide.md'
+          grep -Eq '^- 配布版：[0-9]+\.[0-9]+\.[0-9]+' 'dist/AgentOS-C_Guide.md'
+          grep -Fq 'https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/UPDATE.md' 'dist/AgentOS-C_Guide.md'
 
-      - name: Publish or update stable download release
+      - name: Publish current guide without altering legacy free asset
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -46,11 +44,41 @@ jobs:
         run: |
           set -euo pipefail
           tag='guides-current'
-          if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" dist/AgentOS-C_Guide.md dist/AgentOS-C_Free_Guide.md --clobber
-          else
-            gh release create "$tag" dist/AgentOS-C_Guide.md dist/AgentOS-C_Free_Guide.md \
-              --title 'AgentOS-C 設計・構築運用指示書（最新版）' \
-              --notes '一般配布版とAI無課金ユーザー版のMarkdown配布リンクです。文書の変更時に同じファイル名で差し替えます。' \
-              --target main
+          artifact='AgentOS-C_Guide.md'
+          legacy='AgentOS-C_Free_Guide.md'
+          expected_legacy='056bc3fea84faadf1311317a7b026ae8ff649b26c2316175cd0c9cb4cbcb56fd'
+
+          # Verify the actual legacy download before any Release mutation.
+          gh release view "$tag" >/dev/null
+          mkdir -p saved-release
+          gh release download "$tag" --pattern "$legacy" --dir saved-release --clobber
+          old_free_sha="$(sha256sum "saved-release/$legacy" | awk '{print $1}')"
+          echo "Legacy downloaded bytes: $(wc -c < "saved-release/$legacy"), SHA-256: $old_free_sha"
+          echo "Legacy expected SHA-256: $expected_legacy"
+          if [ "$old_free_sha" != "$expected_legacy" ]; then
+            echo "::error::Legacy free download differs from archived SHA; refusing publish"
+            exit 1
           fi
+
+          # Publish only the ONE unified installer under its stable old URL.
+          local_sha="$(sha256sum "dist/$artifact" | awk '{print $1}')"
+          gh release upload "$tag" "dist/$artifact" --clobber
+          gh release edit "$tag" \
+            --title 'AD&C 設計・構築運用指示書（共通インストーラー最新版）' \
+            --notes '推奨：AgentOS-C_Guide.md（現在のAD&C共通インストーラー。従来URLとの互換のため旧ファイル名を維持）。AgentOS-C_Free_Guide.mdは旧v1.2.1の履歴・互換資産であり、新規導入には使わない。配布元はmain、旧配布原本のSHA一致記録はdocs/archive/RELEASE_GUIDES_20261014.mdを参照。'
+
+          # Read back both real release assets, not just API metadata.
+          mkdir -p published-release
+          gh release download "$tag" --pattern "$artifact" --dir published-release --clobber
+          gh release download "$tag" --pattern "$legacy" --dir published-release --clobber
+          published_sha="$(sha256sum "published-release/$artifact" | awk '{print $1}')"
+          legacy_sha="$(sha256sum "published-release/$legacy" | awk '{print $1}')"
+          if [ "$published_sha" != "$local_sha" ]; then
+            echo "::error::Primary release download SHA mismatch"
+            exit 1
+          fi
+          if [ "$legacy_sha" != "$expected_legacy" ]; then
+            echo "::error::Legacy download SHA changed after publish"
+            exit 1
+          fi
+          echo "PASS: unified guide deployed and retrieved; legacy free download unchanged"
