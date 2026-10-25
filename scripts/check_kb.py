@@ -61,6 +61,16 @@ def run(root):
             if not isinstance(entry, dict):
                 malformed_path += 1
                 continue
+            # Older KBs place record revision under meta.revision.
+            # A disagreement between flat and nested forms is itself a defect.
+            nested = entry.get("meta")
+            nested_revision = nested.get("revision") if isinstance(nested, dict) else None
+            flat_revision = entry.get("revision")
+            if (flat_revision is not None and nested_revision is not None
+                    and str(flat_revision) != str(nested_revision)):
+                rev_bad += 1
+            expected_revision = (flat_revision if flat_revision is not None
+                                 else nested_revision)
             identifier = entry.get("id")
             if identifier:
                 if identifier in seen_ids:
@@ -113,9 +123,9 @@ def run(root):
                     continue
                 if any(k not in meta for k in META_FIELDS):
                     fields_missing += 1
-                if entry.get("revision") is not None and meta.get("revision") is not None:
+                if expected_revision is not None and meta.get("revision") is not None:
                     revision_checked += 1
-                    if str(entry["revision"]) != str(meta["revision"]):
+                    if str(expected_revision) != str(meta["revision"]):
                         rev_bad += 1
         violations = duplicates + malformed_path + malformed_meta + bad_hash + rev_bad
         record("registry:" + group_name, "FAIL" if violations else "PASS",
