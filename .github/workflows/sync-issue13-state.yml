@@ -3,6 +3,8 @@ name: AD&C Issue 13 current-state sync
 on:
   issue_comment:
     types: [created]
+  issues:
+    types: [edited]
   workflow_dispatch:
 
 permissions:
@@ -17,6 +19,7 @@ jobs:
   sync:
     if: >-
       github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' && github.event.issue.number == 13) ||
       (github.event.issue.number == 13 &&
        github.event.comment.user.login == 'Yosio-DMZ-C' &&
        startsWith(github.event.comment.body, 'ADNC-STATE-V1'))
