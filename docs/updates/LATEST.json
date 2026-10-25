@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.3",
+  "latest_version": "1.5.4",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -133,6 +133,30 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.2-to-1.5.3.md"
+    },
+    {
+      "from_version": "1.5.3",
+      "to_version": "1.5.4",
+      "title": "動画制作希望者へのPPTシリーズ設定の任意導入",
+      "summary": "採用済みPPT・色・素材を既存のArea/Project Contextへ保持。無希望の人には動画用ファイルを作らず、初期起動と契約・公開承認条件を変更しない。",
+      "changes": [
+        {
+          "target": "初期設定",
+          "kind": "条件付き追加",
+          "detail": "動画制作を希望した場合だけ実体を探して採用色と素材を記録"
+        },
+        {
+          "target": "既存Context・START_HERE・registry",
+          "kind": "局所差分",
+          "detail": "新管理DBを作らずシリーズAreaと案件Projectの参照を保存・照合"
+        },
+        {
+          "target": "既存のKB・音声・秘書設定",
+          "kind": "保全",
+          "detail": "一般の音声既定、NodeID、fileId、既存個人情報、公開・課金承認を維持"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.3-to-1.5.4.md"
     }
   ]
 }
