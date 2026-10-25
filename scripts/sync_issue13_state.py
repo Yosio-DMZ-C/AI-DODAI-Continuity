@@ -48,6 +48,8 @@ NAMES = {
     "KB-PROBE-BETA-CI": "KB整合検査器：読取専用βと合成CI",
     "WORK-RESUME-BETA-CI": "作業復元プリフライト：βコードと合成CI",
     "INSTALLER-153-RELEASE": "共通インストーラー1.5.3：配布・実ダウンロード",
+    "TASK-PERSISTENCE-DISPLAY": "未完了タスク表示：Issue自動同期・読戻し",
+    "TASK-HANDOFF-RECEIPT": "中断タスク引継ぎ：秘書・別AIの実受信",
 }
 
 
