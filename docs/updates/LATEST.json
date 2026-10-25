@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "product": "AD&C",
+  "track": "installer",
+  "latest_version": "1.4.0",
+  "releases": [
+    {
+      "from_version": "1.3.10",
+      "to_version": "1.4.0",
+      "title": "既存KBの手動承認型アップデート導線",
+      "summary": "既存データを作り直さず、START_HEREに導入版と固定更新入口を追記。以後「アップデートして」でGitHubを照合し、差分表の承認後にだけ局所更新する。",
+      "changes": [
+        {
+          "target": "START_HERE.md",
+          "kind": "追加",
+          "detail": "現行AD&Cインストーラー版の1行と更新確認入口"
+        },
+        {
+          "target": "registry.json",
+          "kind": "整合確認",
+          "detail": "START_HEREが登録済みの場合のみ、同一IDのrevision/hash等を同期"
+        },
+        {
+          "target": "既存データ全体",
+          "kind": "保持",
+          "detail": "Knowledge、Context、履歴、ACL、NodeID、Drive fileIdを維持"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.3.10-to-1.4.0.md"
+    }
+  ]
+}
