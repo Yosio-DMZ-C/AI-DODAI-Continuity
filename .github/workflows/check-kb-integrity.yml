@@ -4,6 +4,8 @@ on:
     paths:
       - 'scripts/check_kb.py'
       - 'scripts/test_check_kb.py'
+      - 'scripts/check_video_asset_refs.py'
+      - 'scripts/test_video_asset_refs.py'
       - '.github/workflows/check-kb-integrity.yml'
   workflow_dispatch:
 
@@ -20,4 +22,6 @@ jobs:
         with:
           python-version: '3.11'
       - name: Verify read-only KB probe on synthetic data
-        run: python -m unittest discover -s scripts -p 'test_check_kb.py' -v
+        run: |
+          python -m unittest discover -s scripts -p 'test_check_kb.py' -v
+          python -m unittest discover -s scripts -p 'test_video_asset_refs.py' -v
