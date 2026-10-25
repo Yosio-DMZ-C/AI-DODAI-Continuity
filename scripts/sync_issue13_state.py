@@ -17,6 +17,13 @@ ISSUE_NO = 13
 MARKER = "ADNC-STATE-V1"
 BEGIN = "<!-- ADNC-CURRENT-STATE-BEGIN -->"
 END = "<!-- ADNC-CURRENT-STATE-END -->"
+OPEN_BEGIN = "<!-- ADNC-OPEN-WORK-BEGIN -->"
+OPEN_END = "<!-- ADNC-OPEN-WORK-END -->"
+TASK_HEADER = "## 今のタスク表"
+# DONE requires actual task completion; a PR merge/close or design adoption alone cannot close larger work.
+TERMINAL = {"DONE", "DROPPED"}
+TASK_ID = re.compile(r"^ADNC-T[0-9]{3,}$")
+
 KEY_PATTERN = re.compile(r"^[A-Z][A-Z0-9-]{2,48}$")
 STATES = {"PASS", "FAIL", "NOT_RUN", "IN_PROGRESS", "BLOCKED", "DONE"}
 BASES = {
@@ -121,6 +128,78 @@ def replace_block(body, states):
     return first_line + "\n\n" + new + "\n" + (rest if sep else "")
 
 
+def pending_tasks(body):
+    """Derive open items from the existing Issue #13 task table; never infer new tasks."""
+    section = body.find(TASK_HEADER)
+    if section < 0:
+        raise RuntimeError("Issue task list missing; refuse to publish empty open queue")
+    rows = []
+    began = False
+    ids = set()
+    for line in body[section:].splitlines()[1:]:
+        if line.startswith("## "):
+            break
+        if not line.startswith("|"):
+            if began and rows:
+                break
+            continue
+        fields = [x.strip() for x in line.strip().strip("|").split("|")]
+        if len(fields) != 6:
+            continue
+        if fields[0] == "ID" or fields[0].startswith("---"):
+            began = True
+            continue
+        if not TASK_ID.fullmatch(fields[0]):
+            continue
+        began = True
+        if fields[0] in ids:
+            raise RuntimeError("Duplicate task ID in Issue; refusing an ambiguous current state")
+        ids.add(fields[0])
+        status = re.match(r"([A-Z_]+)", fields[4])
+        state = status.group(1) if status else "UNKNOWN"
+        if state not in TERMINAL:
+            rows.append((fields[0], fields[1], fields[2], fields[3], state))
+    if not began or not ids:
+        raise RuntimeError("No parseable task entries; refusing empty success")
+    return rows
+
+
+def render_pending_block(body):
+    pending = pending_tasks(body)
+    out = [OPEN_BEGIN, "## 未完了・要追跡（自動抽出）", "",
+           "> **DONEまたは理由付きDROPPEDになるまで追跡フラグが残ります。**",
+           "> BLOCKED・REVIEW_PENDING・WAITING・PROPOSEDも隠しません。",
+           "> これは既存タスク表の表示用派生物。根拠・担当・完了判定は下の各タスク行が正本。",
+           "> PRのClosed/Mergedや部分PASSをタスク全体のDONEに自動変換しません。",
+           "",
+           f"**未完了：{len(pending)} 件**", "",
+           "| ID | 優先 | 現在状態 | 担当 | 続ける仕事（タスク表参照） |",
+           "|---|---|---|---|---|"]
+    for ident, priority, next_work, assignee, status in pending:
+        brief = re.sub(r"\s+", " ", next_work).replace("|", "／")
+        # Task text comes from the existing public issue; truncate, don't duplicate private metadata.
+        if len(brief) > 85:
+            brief = brief[:82] + "…"
+        brief_owner = re.sub(r"\s+", " ", assignee).replace("|", "／")
+        if len(brief_owner) > 48:
+            brief_owner = brief_owner[:45] + "…"
+        out.append(f"| {ident} | {priority} | **{status}** | {brief_owner} | {brief} |")
+    out.extend(["",
+                "**再開の入口**：下のタスク表の対象ID→既存PR/Issue/BUILD_PLANの現行状態→最終実取得→次の1工程。",
+                "資料・接続が欠ける場合はNOT_RUNのまま保全。作業が途中終了したら担当・失敗箇所・次の一手を対象行へ書き戻す。",
+                OPEN_END])
+    return "\n".join(out)
+
+
+def replace_pending_block(body):
+    new = render_pending_block(body)
+    pattern = re.compile(re.escape(OPEN_BEGIN) + r".*?" + re.escape(OPEN_END), re.S)
+    if pattern.search(body):
+        return pattern.sub(lambda _: new, body, count=1)
+    first_line, sep, rest = body.partition("\n")
+    return first_line + "\n\n" + new + "\n\n" + (rest if sep else "")
+
+
 def request(path, method="GET", data=None):
     base = os.environ.get("GITHUB_API_URL", "https://api.github.com").rstrip("/")
     url = base + path
@@ -176,7 +255,25 @@ def self_test():
     impostor = c(5, [{"key": "MUSE-NEW-INSTALL-1310", "state": "FAIL", "basis": "MUSE_REPORT"}])
     impostor["user"]["login"] = "other"
     assert not parse_comment(impostor)
-    print("SELF_TEST_PASS: latest-wins, distinct scopes, unchanged body, idempotent, reject invalid")
+    synthetic = ("# Test\n\n## 今のタスク表\n\n"
+                 "| ID | 優先 | 次にすること | 担当チャット | 状態 | 依存・根拠 |\n"
+                 "|---|---|---|---|---|---|\n"
+                 "| ADNC-T001 | P0 | 仕様案の実装 | AI | DONE（実体確認済） | evidence |\n"
+                 "| ADNC-T002 | P0 | PR失敗後の復旧 | AI | BLOCKED（CI異常） | PR |\n"
+                 "| ADNC-T003 | P1 | レビュー待ち | AI | REVIEW_PENDING | source |\n"
+                 "| ADNC-T004 | P2 | 却下済み | AI | DROPPED（承認済） | source |\n")
+    pending = pending_tasks(synthetic)
+    assert [x[0] for x in pending] == ["ADNC-T002", "ADNC-T003"]
+    highlighted = replace_pending_block(synthetic)
+    assert "未完了：2 件" in highlighted
+    assert replace_pending_block(highlighted) == highlighted
+    assert "ADNC-T001 |" not in highlighted.split(OPEN_END)[0]
+    try:
+        pending_tasks("# No task list")
+        raise AssertionError("Missing task list must not be silently successful")
+    except RuntimeError:
+        pass
+    print("SELF_TEST_PASS: latest-wins, idempotent, authenticated events, pending-work flags, refusal on missing list")
 
 
 def main():
@@ -195,7 +292,7 @@ def main():
         return
     issue, _ = request(f"/repos/{repo}/issues/{ISSUE_NO}")
     before = issue["body"] or ""
-    after = replace_block(before, state)
+    after = replace_pending_block(replace_block(before, state))
     if after == before:
         print(f"NO_CHANGE: {len(state)} current states")
         return
