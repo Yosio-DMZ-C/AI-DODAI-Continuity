@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.0",
+  "latest_version": "1.5.1",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -56,6 +56,30 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.4.0-to-1.5.0.md"
+    },
+    {
+      "from_version": "1.5.0",
+      "to_version": "1.5.1",
+      "title": "アップデート手順書を分離しFROM→TO品質ゲートを先頭に固定",
+      "summary": "導入版と数値で確定した最新版を専用UPDATE.mdで比較、欠けた差分区間は実行せず停止。秘書の日次確認は専用DAILY_CHECK.mdへ分離。既存利用者データは保持。",
+      "changes": [
+        {
+          "target": "START_HERE.md",
+          "kind": "入口整理",
+          "detail": "ADNC_UPDATE_RUNBOOKを追加し、検収PASS後に導入版を1.5.1へ。既存のID・manifest参照を保持"
+        },
+        {
+          "target": "更新手順",
+          "kind": "品質ゲート",
+          "detail": "開始版・目標版の数値照合、全差分経路・区間別検収、本人承認を必須化"
+        },
+        {
+          "target": "秘書日々の確認・既存データ",
+          "kind": "保持",
+          "detail": "現行動作・日記・既存予定・タスクを保持。新しい定期処理は作らない"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.0-to-1.5.1.md"
     }
   ]
 }
