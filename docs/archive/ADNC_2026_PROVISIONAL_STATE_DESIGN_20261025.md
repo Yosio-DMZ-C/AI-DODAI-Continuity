@@ -117,6 +117,27 @@ AD&CをOSや分散DBへ作り替えない。「**固定した識別子と採用�
 - Google Drive API：<https://developers.google.com/workspace/drive/api/reference/rest/v3/files/update> ／ <https://developers.google.com/workspace/drive/api/reference/rest/v3/files>
 - Git update-ref：<https://git-scm.com/docs/git-update-ref> ／ Google Cloud Storage conditional requests：<https://cloud.google.com/storage/docs/request-preconditions>
 
+## 2026-10-25の実装照合・終了条件（追加判断に使う現行表）
+
+この表は前節の**採否・理由を残したまま**、実際の実装場所と証拠を示す。古いPRや会話中の「未実装」は履歴として尊重するが、**現在の判定より優先しない**。再議論は原則として「新しい反例・再現した失敗・本人による目的変更」が生じた場合のみ行い、同じ指摘だけで新たな規則を追加しない。
+
+| 採用・保留事項 | 2026-10-25時点の実装先 | 実行証拠・未完 |
+|---|---|---|
+| 案件固有の採用条件→一般標準の順序 | [共通実行標準](../PROJECT_EXECUTION_STANDARD.md)§6.3.2追加＋[配布版1.5.3](../AgentOS-C_設計・構築運用指示書_一般配布版.md) | GitHub実読戻しPASS、異種AIでの適用効果NOT_RUN |
+| 編集前基準→保存直前の競合検知→保存後読戻し | [共通実行標準](../PROJECT_EXECUTION_STANDARD.md)、[UPDATE.md](../updates/UPDATE.md)、[検査器](../../scripts/check_kb.py)の`--snapshot`／`--expect` | 合成ローカルKB **18/18 CI PASS**（[run](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/actions/runs/40186941339)）。実DriveでのCAS／真の競合排除は**NOT_RUN／保証なし** |
+| 旧KBと新KBの構造検査・nested revision | [検査器](../../scripts/check_kb.py)と[テスト](../../scripts/test_check_kb.py)をmainへ実配置 | 実保存・読戻しPASS、合成テスト18/18 PASS。Muse実KBでの全件実動作はNOT_RUN |
+| 採用成果物・素材ID・対象数の作業復元 | [作業プリフライト](../../scripts/adnc_resume_preflight.py)、[架空試験票](../volunteer-testing/ADC_WorkState_Resume_Beta_v0.1_DRAFT.md)、共通標準§6.3の局所採用 | 既存PR #31のCI **33件PASS**（[run](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/actions/runs/40041424962)）、同一コードをmainへ読戻しPASS。Muse A/Bの初見自動復元はNOT_RUN |
+| 初回導入後の新チャット引継ぎ | [QUICKSTART](../../QUICKSTART.md)§4＋[配布版1.5.3](../AgentOS-C_設計・構築運用指示書_一般配布版.md) Phase 6 | 手順保存PASS。AI製品が自動でKBを発見する効果はNOT_RUN／保証しない |
+| 導入済みKBの正式版の差分更新 | [LATEST.json](../updates/LATEST.json)、[1.5.2→1.5.3](../updates/upgrade-1.5.2-to-1.5.3.md)、[UPDATE.md](../updates/UPDATE.md) | FROM→TO連続経路と読戻しPASS。Muse A/Bの実KB適用はNOT_RUN |
+| 単一の正式配布版と旧無料版保全 | [安定配布Release](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/releases/tag/guides-current) | v1.5.3配布Actions[実ダウンロード・SHA照合](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/actions/runs/40187722315) PASS。旧無料資産の実バイトは不変更 |
+| 派生索引の自動生成 | **未採用**。既存索引に台帳外の手書き注記がないか実比較が先 | 実索引1件の仮生成・差分3分類はNOT_RUN。情報欠落を許す自動上書きは実装しない |
+| 対象の毎回検査と全件定期検査の分離 | [共通実行標準](../PROJECT_EXECUTION_STANDARD.md)、[配布版1.5.3](../AgentOS-C_設計・構築運用指示書_一般配布版.md) | 適用規則は実装、利用者KB全141件検査／定期実行主体はNOT_RUN |
+| 複数AI本番確定書込みの1担当集約 | [共通実行標準](../PROJECT_EXECUTION_STANDARD.md)、[UPDATE.md](../updates/UPDATE.md) | 暫定の運用契約を実装。Driveの排他サービスやCASは実装なし・保証なし |
+| 旧KB互換レイヤーと正式導入版の分離 | [ADOPT_LEGACY](../updates/ADOPT_LEGACY.md)維持 | Muse Aの互換導入実読戻しPASS。旧KBに1.5.3を偽装しない |
+| 保護対象の全自動再生成、WAL、独自ロック、3層物理再構築 | **不採用（上記の棄却理由を維持）** | 意図的に未実装。再発要求時は前節理由と新しい反例を比較する |
+
+**ここでいう「実装PASS」＝公開コード・手順のGitHub現物が存在し読み戻せた範囲。** Muse A/Bの私的KBで機能が使えたか、初見AIが守るか、コンテンツの意味的正確性は別の実検証であり、CIや文書保存で代用しない。
+
 ## 判断・検証状態
 
 - 各担当からの研究報告：受領済み。公式資料の個別確認は各担当による報告。上記Google Driveのメタデータ・files.updateの公開仕様はリーダーも再確認した
