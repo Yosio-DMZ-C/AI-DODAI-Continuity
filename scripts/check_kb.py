@@ -159,11 +159,93 @@ def run(root):
     return checks
 
 
+def _target_bytes(root, name):
+    """Never follow references outside a caller-supplied local KB."""
+    relative = PurePosixPath(name.replace("\\", "/"))
+    if (not name or relative.is_absolute() or ".." in relative.parts
+            or "\x00" in name or relative.as_posix() == "."):
+        return "FAIL", None
+    target = (root / str(relative)).resolve()
+    if not target.is_relative_to(root):
+        return "FAIL", None
+    try:
+        return ("PASS", target.read_bytes()) if target.is_file() else ("NOT_RUN", None)
+    except OSError:
+        return "NOT_RUN", None
+
+
+def capture_baseline(root, names):
+    """Emit a local pre-edit snapshot; no write or cloud operation."""
+    root = Path(root).resolve()
+    files, issues = [], []
+    for name in names:
+        status, data = _target_bytes(root, name)
+        if status != "PASS":
+            issues.append({"path": name, "status": status})
+        else:
+            files.append({"path": name, "sha256": hashlib.sha256(data).hexdigest(),
+                          "size": len(data)})
+    return {"format": "ADNC-BASELINE-1", "files": files, "issues": issues,
+            "status": ("FAIL" if any(x["status"] == "FAIL" for x in issues)
+                       else "NOT_RUN" if issues else "PASS")}
+
+
+def verify_baseline(root, baseline):
+    """Check previously observed bytes against current local bytes.
+
+    Detects drift only when rechecked. It is NOT a server-side CAS/atomic lock.
+    """
+    root = Path(root).resolve()
+    checks = []
+    if (not isinstance(baseline, dict) or baseline.get("format") != "ADNC-BASELINE-1"
+            or baseline.get("status") != "PASS" or not isinstance(baseline.get("files"), list)
+            or not baseline["files"] or baseline.get("issues")):
+        return [{"check": "prewrite", "status": "FAIL", "detail": "無効または部分的な取得基準"}]
+    seen = set()
+    for item in baseline["files"]:
+        if not isinstance(item, dict) or not isinstance(item.get("path"), str):
+            return [{"check": "prewrite", "status": "FAIL", "detail": "不正な基準レコード"}]
+        name = item["path"]
+        if name in seen:
+            return [{"check": "prewrite", "status": "FAIL", "detail": "基準内に重複パス"}]
+        seen.add(name)
+        expected = item.get("sha256")
+        size = item.get("size")
+        if (not isinstance(expected, str) or not re.fullmatch("[0-9a-f]{64}", expected)
+                or type(size) is not int or size < 0):
+            return [{"check": "prewrite", "status": "FAIL", "detail": "SHAまたはサイズが不正"}]
+        status, data = _target_bytes(root, name)
+        if status == "PASS":
+            status = ("PASS" if len(data) == size and
+                      hashlib.sha256(data).hexdigest() == expected else "FAIL")
+        checks.append({"check": "prewrite:" + name, "status": status,
+                       "detail": {"PASS": "基準と同一", "FAIL": "基準から変更・パス不正",
+                                  "NOT_RUN": "対象の実バイトを取得できない"}[status]})
+    return checks
+
+
 def main():
     ap = argparse.ArgumentParser(description="Read-only AD&C KB consistency probe")
     ap.add_argument("root", help="ローカルに取得済みのKBルート（クラウドへ直接接続しません）")
+    ap.add_argument("--snapshot", nargs="+", metavar="REL_PATH",
+                    help="変更前の対象ファイルSHA・サイズを標準出力へ表示（非書込）")
+    ap.add_argument("--expect", metavar="BASELINE_JSON",
+                    help="書込直前の取得バイトを基準JSONと比較（サーバー排他ではない）")
     args = ap.parse_args()
-    checks = run(args.root)
+    if args.snapshot and args.expect:
+        ap.error("--snapshot と --expect は同時に使用できません")
+    if args.snapshot:
+        snapshot = capture_baseline(args.root, args.snapshot)
+        print(json.dumps(snapshot, ensure_ascii=False, indent=2))
+        raise SystemExit({"PASS": 0, "FAIL": 1, "NOT_RUN": 2}[snapshot["status"]])
+    if args.expect:
+        try:
+            baseline = json.loads(Path(args.expect).read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            baseline = None
+        checks = verify_baseline(args.root, baseline)
+    else:
+        checks = run(args.root)
     outcome = "FAIL" if any(x["status"] == "FAIL" for x in checks) else (
         "NOT_RUN" if any(x["status"] == "NOT_RUN" for x in checks) else "PASS")
     print(json.dumps({"overall": outcome, "checks": checks}, ensure_ascii=False, indent=2))
