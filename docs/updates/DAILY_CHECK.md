@@ -13,7 +13,7 @@
 4. **日次状態の保存先を1つ決める**。Aでは既存の日付別日記に`ADNC_UPDATE_CHECK`の行があり読戻し可能ならそこを使用。Bでは既存の`ADNC_UPDATE_STATUS.md`の`ADNC_LAST_CHECK_DAY`と`ADNC_LAST_NOTIFIED_MINOR`を使用。**日記フォルダがなければ作成せず、Bの小メモを優先**。いずれも保存・読戻し不可なら「重複抑止未確認」とし、同一チャットで確認できた範囲だけ重複を避ける。
 5. 当日に**保存済みのPASS**があるなら外部再取得を省略（通常の秘書業務は続行）。なければ公開 [LATEST.json](LATEST.json) を実取得し、`product=AD&C`、`track=installer`、`latest_version` が正しいか検証する。X.Y.Zを3整数で比較。
 6. **XまたはYの上昇があり**、過去に実通知した同じ`X.Y`が状態に記録されていないときだけ、秘書の本来の報告の末尾に**1文**知らせる。Aでは「AD&Cに更新があります（導入版→公開最新版）。内容を確認しますか？」。Bでは「AD&Cの更新候補があります（互換機能の版→公開最新版）。旧KBへの適用可否も確認しますか？」と区別する。Zのみの差分、同じX.Yの再通知、GitHubのPR/Issue/CIは通知しない。
-7. 既存の保存が**本人に承認済み**のときだけ、状態記録を差分更新して実読戻し。Aでは日付別日記に`<!-- ADNC_UPDATE_CHECK day=YYYY-MM-DD status=PASS installed=X.Y.Z latest=X.Y.Z notified_minor=X.Y|none -->`を同日1行だけ記録。Bでは小メモの`ADNC_LAST_CHECK_DAY`を当日の日付に、`ADNC_LAST_NOTIFIED_MINOR`を最後に**実際に通知したX.Y**に更新する（通知がない場合は既存値維持）。**状態保存できない場合、読取PASSと永続保存NOT_RUNを区別**。再通知防止を保証しない。
+7. 既存の保存が**本人に承認済み**のときだけ、状態記録を差分更新して実読戻し。Aでは日付別日記に`<!-- ADNC_UPDATE_CHECK day=YYYY-MM-DD status=PASS installed=X.Y.Z latest=X.Y.Z notified_minor=X.Y|none -->`を同日1行だけ記録。Bでは小メモの`ADNC_LAST_CHECK_DAY`を当日の日付に、`ADNC_LAST_NOTIFIED_MINOR`を最後に**実際に通知したX.Y**に更新する（通知がない場合は既存値維持）。**Bの小メモはregistryでSHA-256管理されている場合、同一fileId更新後に当該registryレコードのハッシュ等を同期し、メモと台帳の双方を再取得して一致を検証する。更新前原本は既存のDrive版履歴等で保全し、新たな日記・履歴フォルダを作らない。registry同時整合ができない場合は小メモの永続更新を行わず、読取PASS・永続記録NOT_RUNと区別する。** Aの日記もregistry管理なら同様に扱う。状態保存できなければ日付を越えた再通知防止を保証しない。
 8. 公開版と導入／互換版の大小が矛盾、数値不正、接続不可、状態競合のときは、無理に更新・通知しない。別アカウント、外部予定、原本データ、共有設定に触れない。
 
 人間から「アップデートして」と言われた場合だけ[UPDATE.md](UPDATE.md)を**最初の品質ゲートから実取得**。Bでは旧KBの正確なインストーラー版を推測しないため、互換機能の導入を正式版の差分更新成功と扱わない。
