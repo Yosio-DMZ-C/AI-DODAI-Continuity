@@ -4,7 +4,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from check_kb import META_FIELDS, run
+from check_kb import META_FIELDS, run, capture_baseline, verify_baseline
 
 
 class KBProbeTests(unittest.TestCase):
@@ -89,6 +89,41 @@ class KBProbeTests(unittest.TestCase):
         self.entry["path"] = "../../outside.md"
         self.save_registry()
         self.assertEqual(self.states()["registry:records"], "FAIL")
+
+
+    def test_prewrite_unchanged(self):
+        baseline = capture_baseline(self.root, ["record.md", "00_system/registry.json"])
+        self.assertEqual(baseline["status"], "PASS")
+        self.assertEqual([x["status"] for x in verify_baseline(self.root, baseline)],
+                         ["PASS", "PASS"])
+
+    def test_prewrite_changed_after_read(self):
+        baseline = capture_baseline(self.root, ["record.md"])
+        self.doc.write_text("another AI edited the file")
+        self.assertEqual(verify_baseline(self.root, baseline)[0]["status"], "FAIL")
+
+    def test_prewrite_missing_is_not_run(self):
+        baseline = capture_baseline(self.root, ["record.md"])
+        self.doc.unlink()
+        self.assertEqual(verify_baseline(self.root, baseline)[0]["status"], "NOT_RUN")
+
+    def test_prewrite_partial_baseline_rejected(self):
+        baseline = capture_baseline(self.root, ["record.md", "not-fetched.md"])
+        self.assertEqual(baseline["status"], "NOT_RUN")
+        self.assertEqual(verify_baseline(self.root, baseline)[0]["status"], "FAIL")
+
+    def test_prewrite_path_escape_rejected(self):
+        baseline = capture_baseline(self.root, ["../outside.md"])
+        self.assertEqual(baseline["status"], "FAIL")
+
+    def test_prewrite_not_auto_merged(self):
+        baseline = capture_baseline(self.root, ["record.md"])
+        before = baseline["files"][0]["sha256"]
+        self.doc.write_text("B has an overlapping change")
+        checks = verify_baseline(self.root, baseline)
+        self.assertEqual(checks[0]["status"], "FAIL")
+        self.assertNotEqual(hashlib.sha256(self.doc.read_bytes()).hexdigest(), before)
+        self.assertEqual(self.doc.read_text(), "B has an overlapping change")
 
 
 if __name__ == "__main__":
