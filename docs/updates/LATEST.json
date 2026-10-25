@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.4",
+  "latest_version": "1.5.5",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -157,6 +157,35 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.3-to-1.5.4.md"
+    },
+    {
+      "from_version": "1.5.4",
+      "to_version": "1.5.5",
+      "title": "動画・PPT希望者向け制作素材の一般仕様A〜Dを導入フローへ接続",
+      "summary": "ロゴ・人物・図解・アイコンの一般仕様を独立資料に保存。任意の動画制作設定時だけ、Runbookの素材固定入口と原本ID・件数・視覚一覧の検収へ接続する。非希望者のKBには動画用の資産やタスクを作らない。",
+      "changes": [
+        {
+          "target": "インストーラー§10.2",
+          "kind": "任意参照",
+          "detail": "制作素材一般仕様A〜Dに案内し、今回の作品に必要な種類だけ選定"
+        },
+        {
+          "target": "既存Area/Project/Runbook",
+          "kind": "希望者のみの局所更新",
+          "detail": "既存の正式素材ID・版・権利・原本所在、Runbook冒頭素材欄、複数画像の一覧を関連付け"
+        },
+        {
+          "target": "START_HERE/registry",
+          "kind": "導入版の安全更新",
+          "detail": "1.5.4からの差分更新を実検収した場合のみ1.5.5へ。固定IDと未変更原本は維持"
+        },
+        {
+          "target": "非動画KBと本人素材",
+          "kind": "無変更",
+          "detail": "無希望なら制作資料を生成しない。AD&C提出時の素材状態は対象KBの採用実績とみなさない"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.4-to-1.5.5.md"
     }
   ]
 }
