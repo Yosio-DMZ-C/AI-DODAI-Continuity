@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.5",
+  "latest_version": "1.5.6",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -186,6 +186,35 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.4-to-1.5.5.md"
+    },
+    {
+      "from_version": "1.5.5",
+      "to_version": "1.5.6",
+      "title": "制作素材仕様の共有KB正本化と自動生成しない境界の明確化",
+      "summary": "制作素材A〜Dは共有KBの動画制作Draft Skill配下の一つの正本で管理。本体は任意制作希望者への導線のみ。KB導入ではロゴ・人物・アイコン等を自動制作しない。",
+      "changes": [
+        {
+          "target": "共有KB動画制作Draft Skill",
+          "kind": "正本参照",
+          "detail": "一般制作素材表A〜Dを共有KBの単一編集正本として参照。Activeには昇格しない"
+        },
+        {
+          "target": "既存KBの制作Area／Runbook",
+          "kind": "必要時だけ参照差替え",
+          "detail": "旧素材表URLが既に存在し、動画制作を希望する場合だけ該当参照を局所差替え"
+        },
+        {
+          "target": "START_HERE／registry",
+          "kind": "安全な導入版更新",
+          "detail": "既存データ保全・読戻しPASS後に1.5.6へ。fileIdとNodeIDを維持"
+        },
+        {
+          "target": "ロゴ・人物・SVG等の素材",
+          "kind": "非作成",
+          "detail": "KB導入による新規生成・自動配布なし。本人の制作依頼と採用承認は別工程"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.5-to-1.5.6.md"
     }
   ]
 }
