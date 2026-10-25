@@ -51,6 +51,24 @@ class KBProbeTests(unittest.TestCase):
         self.save_registry()
         self.assertEqual(self.states()["registry:records"], "FAIL")
 
+    def test_nested_meta_revision_match(self):
+        self.entry.pop("revision")
+        self.entry["meta"] = {"revision": 1}
+        self.save_registry()
+        self.assertEqual(self.states()["registry:records"], "PASS")
+        self.assertEqual(self.states().get("revision_compare:records"), None)
+
+    def test_nested_meta_revision_mismatch(self):
+        self.entry.pop("revision")
+        self.entry["meta"] = {"revision": 9}
+        self.save_registry()
+        self.assertEqual(self.states()["registry:records"], "FAIL")
+
+    def test_flat_nested_revision_conflict(self):
+        self.entry["meta"] = {"revision": 7}
+        self.save_registry()
+        self.assertEqual(self.states()["registry:records"], "FAIL")
+
     def test_unavailable_partial_export(self):
         self.doc.unlink()
         self.assertEqual(self.states()["files_unavailable:records"], "NOT_RUN")
