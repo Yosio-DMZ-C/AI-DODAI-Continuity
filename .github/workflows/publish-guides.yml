@@ -46,7 +46,7 @@ jobs:
           tag='guides-current'
           artifact='AgentOS-C_Guide.md'
           legacy='AgentOS-C_Free_Guide.md'
-          expected_legacy='056bc3fea84faadf1311317a7b026ae8ff649b26c2316175cd0c9cb4cb56fd'
+          expected_legacy='056bc3fea84faadf1311317a7b026ae8ff649b26c2316175cd0c9cb4cbcb56fd'
 
           # Verify the actual legacy download before any Release mutation.
           gh release view "$tag" >/dev/null
