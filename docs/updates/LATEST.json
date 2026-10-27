@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.6",
+  "latest_version": "1.5.7",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -215,6 +215,30 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.5-to-1.5.6.md"
+    },
+    {
+      "from_version": "1.5.6",
+      "to_version": "1.5.7",
+      "title": "AIサービスの制限機能点検と未活用機能1件の紹介を既存の振り返りへ統合",
+      "summary": "既存の秘書振り返りにAIサービス固有の利用枠や実測使用量の確認、上限対策最大2件、未活用機能の役立つ紹介1件（候補なしは0）を加える。半月次化は本人承認のもと既存ジョブを調整し、新規ジョブを強制しない。",
+      "changes": [
+        {
+          "target": "既存の秘書振り返りの指示",
+          "kind": "局所追記",
+          "detail": "AIサービスの公式情報・利用枠を確認し、実測と未確認を区別。改善案最大2件と未活用機能1件を既存報告に統合"
+        },
+        {
+          "target": "既存の振り返り予定",
+          "kind": "希望者のみの変更",
+          "detail": "本人が希望した場合だけ毎月1・15日等へ頻度調整。実登録を読戻し確認、新ジョブ増設や自動変更はしない"
+        },
+        {
+          "target": "個人KB・認証・履歴・権限",
+          "kind": "保持",
+          "detail": "既存fileId・NodeID・履歴・アクセス権・保存先を維持。外部利用・課金・公開や開発タスク自動追加は対象外"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.6-to-1.5.7.md"
     }
   ]
 }
