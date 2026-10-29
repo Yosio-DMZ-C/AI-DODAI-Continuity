@@ -7,7 +7,7 @@
 - **困りごと**：別チャットで前提が失われる／以前の決定や「やらないこと」が伝わらない／特定サービスの記憶に依存する。
 - **始め方**：[単一のインストーラー](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md)を普段のAIに渡して `実行` → 保存先を選択 → 確認して `進めて`。[詳しい3ステップ](QUICKSTART.md)
 - **AIインターフェースの設計思想（検証中）**：「文脈ゲート」で本人の条件・採用済み決定を確認し、「道具棚」で既存の手順と実体を見つけ、「完了ゲート」で正本への反映・実行・検収を区別します。[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)
-- **公開共有知・実行型Skillの入口（試験中）**：[共有KBの質問別入口](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md)から、依頼に該当する既存手順を先に探します。例：山歩き・登山・自然散策 → [山歩きプレイブック（Draft）](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/hiking-route-search/SKILL.md)。**リンクは自動起動ではなく、正式カタログ配布・AIによる自発的選択は未検証**。
+- **自然な相談から既存Skillを選ぶ入口（試験中）**：このAD&C入口を取得したAIは、依頼の目的を[共有KBの質問別ルーティング表](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md)に照合し、該当する**現行SKILL.mdの本文を実取得してから**実行します。例：「週末どんづるぼうの散策コース」「キャンプ場から登れる山」→ [山歩きプレイブック v0.3.9（利用者採用Active）](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/hiking-route-search/SKILL.md)。関係のない依頼には適用しません。**READMEのリンク追加だけでは新規チャットでの自動読込・自動起動を保証せず、正式配布カタログは未登録**です。
 - **現在地：β版**。初期KB構築と保存・読戻しを限定的に確認しています。異なるAIでの無条件な継続、自動実装や効果は保証しません。[検証結果](docs/wiki/Verified-Results.md)／[現行インストーラー版（唯一の版数正本）](docs/updates/LATEST.json)
 
 **In English:** AD&C is an open-source conversational installer and operating pattern to keep personal knowledge, decisions, and work state in Markdown files you control, so you can resume work with different AI assistants. It is **not** a new LLM or agent runtime. **Beta:** initial setup and save/read-back have limited verification; reliable cross-AI continuity remains under testing. [Quick Start](QUICKSTART.md)
