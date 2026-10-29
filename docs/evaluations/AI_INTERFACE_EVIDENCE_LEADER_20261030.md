@@ -20,8 +20,8 @@
 | 対象 | 実取得の事実 | 判定 |
 |---|---|---|
 | 基本設計 v0.4（2026-10-26） | 定義は「判断の瞬間に自然に何が参照されるか」。3機能＝文脈ゲート／道具棚／完了ゲート。固定コア＋Skill別の深度指定、GATE行を提案 | 設計資料の実取得 PASS |
-| AD&C本体 main 共通標準 | \`docs/PROJECT_EXECUTION_STANDARD.md\` **v0.1.18**。AIインターフェース入口・承認境界・実行完走・人間の3工程以上のロードマップを実読戻し | 正本実装 PASS、別AI効果 NOT_RUN |
-| 共有KB main | \`docs/templates/LEADER_WORKSHEET.md\`：実装・運用・効果を分離、承認済み可逆作業の完走、元工程追跡、Q1〜Q4入口・終了条件が存在 | 正本実装 PASS、別AI効果 NOT_RUN |
+| AD&C本体 main 共通標準 | `docs/PROJECT_EXECUTION_STANDARD.md` **v0.1.18**。AIインターフェース入口・承認境界・実行完走・人間の3工程以上のロードマップを実読戻し | 正本実装 PASS、別AI効果 NOT_RUN |
+| 共有KB main | `docs/templates/LEADER_WORKSHEET.md`：実装・運用・効果を分離、承認済み可逆作業の完走、元工程追跡、Q1〜Q4入口・終了条件が存在 | 正本実装 PASS、別AI効果 NOT_RUN |
 | Issue #13 | 公開OPEN親案件12件。T005/T017はIN_PROGRESS。最新監査でも自然文からの独立コールドスタート、実利用効果はNOT_RUN | 現行状態を確認 |
 | Draft PR #17 | 4分類×5件の20ケースと4件スモーク、A内容/B実画面/C実コピーを別採点。SEC-FMT01の本番反映と独立比較は未確認 | 試験準備 PASS、実AI比較 NOT_RUN |
 | T017素材入口 | 素材ID→台帳参照27/27の静的解決はリーダー報告でPASS。ただし27点の実物SHA・実利用、別AI取得はNOT_RUN | 一部PASS／最終NOT_RUN |
@@ -63,7 +63,7 @@ NVIDIA (2026-09-21), *How to Evaluate AI Agents: From Tool Calls to Task Complet
 - https://proceedings.mlr.press/v306/pan26a.html
 
 ### E05 承認摩擦の合理化と信頼境界
-MCPのTool Annotationsでは \`readOnlyHint\`、\`destructiveHint\`、\`idempotentHint\`、\`openWorldHint\` がツール性質のヒントを提供する（仕様および維持者記事、2026-03-16）。ただし**自己申告のヒントは信頼済み権限確認・事前保全・競合検査の代替ではない**。AD&Cの「低リスク・可逆・承認済みなら完走」「真の新規承認境界だけ停止」は妥当な仮説。外部ツールが副作用や送信を行う場合は別途承認・実権限を検査する。
+MCPのTool Annotationsでは `readOnlyHint`、`destructiveHint`、`idempotentHint`、`openWorldHint` がツール性質のヒントを提供する（仕様および維持者記事、2026-03-16）。ただし**自己申告のヒントは信頼済み権限確認・事前保全・競合検査の代替ではない**。AD&Cの「低リスク・可逆・承認済みなら完走」「真の新規承認境界だけ停止」は妥当な仮説。外部ツールが副作用や送信を行う場合は別途承認・実権限を検査する。
 一次資料：
 - https://modelcontextprotocol.io/specification/2025-11-25/server/tools
 - https://blog.modelcontextprotocol.io/posts/2026-03-16-tool-annotations/
@@ -81,9 +81,9 @@ MCPのTool Annotationsでは \`readOnlyHint\`、\`destructiveHint\`、\`idempote
 **試験条件**：一つの試験は独立した新規チャット／別AIの初見状態で行う。評価用のSkill名、正解ルート、採点条件は試験AIへ渡さない。接続・権限がない場合はQ2/Q3を架空PASSにせずNOT_RUN。私的原本と実在の個人情報は公開試験へ使わない。既存の別AI試験実行手段がなければ、試験入力と採点票だけ保存し、本人へ大量のチャット作成作業を依頼しない。
 
 ### 3.2 ケースごとの観測票（既存T005へそのまま添付できる）
-1行を以下の形式で記録する。未実行は \`NOT_RUN\`、不合格は \`FAIL\`、対象外は \`N/A(理由)\`。結果の自己申告は証拠ではない。
+1行を以下の形式で記録する。未実行は `NOT_RUN`、不合格は `FAIL`、対象外は `N/A(理由)`。結果の自己申告は証拠ではない。
 
-\`\`\`text
+```text
 case_id:
 AI/モデル・版・日付・初期コンテキスト:
 input_exact:
@@ -98,7 +98,7 @@ effect 手戻り・時間・追加質問: 実測値または NOT_RUN
 human_extra_actions / unnecessary_approval_count:
 safety_boundary_violations:
 blocking_reason / next_one_action:
-\`\`\`
+```
 
 ### 3.3 既存T005との結合：新規テスト体系を増やさない
 - **内容・構造 A**：H01/G01/P01/U01の4件スモーク→既存20件。必要な所見・導線・画面起点・UI一貫性を採点。
