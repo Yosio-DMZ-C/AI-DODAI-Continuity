@@ -3,12 +3,12 @@
 - 日付：2026-10-14
 - 状態：**試験運用採用（利用者承認：2026-10-14）**。役割分担の運用を承認済み。独立レビュー・Active認定・自動連携の実装を意味しない。
 - 適用先：[開発・調査支援の共通標準](PROJECT_EXECUTION_STANDARD.md)
-- 共有知：[AgentOS-C Shared Knowledge](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge)
+- 共有知：[AgentOS-C Shared Knowledge](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge)
 
 ## 承認と次工程
 
 - 2026-10-14：利用者が役割分担を確認し、**試験運用として採用**。Google Driveの共有変更は本件の対象外とする。
-- 次工程：新しい調査案件1件で[引継ぎテンプレート](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge/blob/main/templates/DEVELOPMENT_RESEARCH_HANDOFF_TEMPLATE.md)を使用し、リーダーが受理・採否・未検証を記録する。運用の手間と情報不足を評価し、必要な場合だけテンプレートを修正する。
+- 次工程：新しい調査案件1件で[引継ぎテンプレート](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/templates/DEVELOPMENT_RESEARCH_HANDOFF_TEMPLATE.md)を使用し、リーダーが受理・採否・未検証を記録する。運用の手間と情報不足を評価し、必要な場合だけテンプレートを修正する。
 - 品質ゲート：試験運用の承認はPASS。実案件での引継ぎ効果、独立レビュー、Active化はNOT_RUN。
 
 ## 目的
@@ -43,7 +43,7 @@
 
 ## 最小の引継ぎ
 
-[共有KBの引継ぎテンプレート](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge/blob/main/templates/DEVELOPMENT_RESEARCH_HANDOFF_TEMPLATE.md)を使用。調査対象、結論、事実、未検証、既存ルールとの差分、出典・検査結果を記録する。簡単な案件は各項目1～2行でよく、詳細報告は必要な場合だけ添付する。
+[共有KBの引継ぎテンプレート](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/templates/DEVELOPMENT_RESEARCH_HANDOFF_TEMPLATE.md)を使用。調査対象、結論、事実、未検証、既存ルールとの差分、出典・検査結果を記録する。簡単な案件は各項目1～2行でよく、詳細報告は必要な場合だけ添付する。
 
 ## 改善の判定
 
@@ -54,7 +54,7 @@
 
 ## 初回事例と外部連携の注意
 
-[WorkのGoogle認証・接続失敗](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge/blob/main/docs/cases/WORK_GOOGLE_AUTH_FAILURE_20261014.md)を初回調査事例とする。接続ツールの能力とユーザー権限、API認証とWorkブラウザのセッション、5xxと権限拒否を区別する。同じ条件で安全な自動再試行は原則1回まで。新情報が得られない再試行を続けず、人間UI等の代替へ切り替える。外部共有・公開変更は個別承認が必要。
+[WorkのGoogle認証・接続失敗](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/docs/cases/WORK_GOOGLE_AUTH_FAILURE_20261014.md)を初回調査事例とする。接続ツールの能力とユーザー権限、API認証とWorkブラウザのセッション、5xxと権限拒否を区別する。同じ条件で安全な自動再試行は原則1回まで。新情報が得られない再試行を続けず、人間UI等の代替へ切り替える。外部共有・公開変更は個別承認が必要。
 
 ## 品質と運用上の限界
 
