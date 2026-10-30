@@ -2,6 +2,16 @@
 
 > **AIを替えても、冒険は続く。**
 
+**AIを替えるたびに、仕事の続きを説明し直していませんか？** AD&Cは、知識・判断理由・作業状態を自分のMarkdownファイルに置き、ChatGPT・Claude・Geminiなど既存のAIで**続きを再開しやすくする**ための対話型インストーラーと運用の型です。新しいLLMや自律エージェントの実行環境ではありません。
+
+- **困りごと**：別チャットで前提が失われる／以前の決定や「やらないこと」が伝わらない／特定サービスの記憶に依存する。
+- **始め方**：[単一のインストーラー](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md)を普段のAIに渡して `実行` → 保存先を選択 → 確認して `進めて`。[詳しい3ステップ](QUICKSTART.md)
+- **AIインターフェースの設計思想（検証中）**：「文脈ゲート」で本人の条件・採用済み決定を確認し、「道具棚」で既存の手順と実体を見つけ、「完了ゲート」で正本への反映・実行・検収を区別します。[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)
+- **自然な相談から既存Skillを選ぶ入口（試験中）**：このAD&C入口を取得したAIは、依頼の目的を[共有KBの質問別ルーティング表](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md)に照合し、該当する**現行SKILL.mdの本文を実取得してから**実行します。例：「週末どんづるぼうの散策コース」「キャンプ場から登れる山」→ [山歩きプレイブック v0.3.9（利用者採用Active）](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/hiking-route-search/SKILL.md)。関係のない依頼には適用しません。**READMEのリンク追加だけでは新規チャットでの自動読込・自動起動を保証せず、正式配布カタログは未登録**です。
+- **現在地：β版**。初期KB構築と保存・読戻しを限定的に確認しています。異なるAIでの無条件な継続、自動実装や効果は保証しません。[検証結果](docs/wiki/Verified-Results.md)／[現行インストーラー版（唯一の版数正本）](docs/updates/LATEST.json)
+
+**In English:** AD&C is an open-source conversational installer and operating pattern to keep personal knowledge, decisions, and work state in Markdown files you control, so you can resume work with different AI assistants. It is **not** a new LLM or agent runtime. **Beta:** initial setup and save/read-back have limited verification; reliable cross-AI continuity remains under testing. [Quick Start](QUICKSTART.md)
+
 **開発状態：AD&C全体がβ版（2026-10-23）。** 小さく試す→実物を検査する→失敗した対象だけ元に戻す→学んで続ける、を開発の基本とします。未完成の機能は明示し、他のAI・導入済みKBで自動的に動くとは主張しません。[共通β開発・失敗復旧の契約](docs/PROJECT_EXECUTION_STANDARD.md)と[利用停止・復帰仕様](docs/USER_LIFECYCLE_AND_ROLLBACK.md)を参照。Git履歴やKBの変更前版で戻せる範囲と、公開・送信など元に戻せない操作は区別します。
 
 **AD&C（旧名称：AgentOS-C）**は、**既存のAIをオペレーターとして、知識・判断・作業状態を自分が管理するファイルに残して活用するための「対話型インストーラー＋運用の型」**です。新しいLLMやエージェント実行環境を作るものではありません。
@@ -36,7 +46,7 @@
 
 [**はじめての方へ**](docs/wiki/Home.md) ／ [**Quick Start**](QUICKSTART.md) ／ [**導入済みKBの更新入口**](docs/updates/UPDATE.md)
 
-**2026-10-26取得の現行共通インストーラー：v1.5.6。** 導入済みKBは再インストールせず、上記の更新入口で今回のFROMからの連続差分を確認してください。更新の実検収は個々のKBごとに別判定です。Grok・Muse A/B・調査担当等の監査で**採用した設計判断と、実装先・棄却理由・未実験の区別**は[2026年暫定アーキテクチャ決定／実装照合表](docs/archive/ADNC_2026_PROVISIONAL_STATE_DESIGN_20261025.md)に保存しました。繰り返し同じ設計を提案する前に、現行の表と新しい反例を照合します。
+**現行共通インストーラーの版数は[`LATEST.json`](docs/updates/LATEST.json)を正本として確認してください。** 導入済みKBは再インストールせず、上記の更新入口で今回のFROMからの連続差分を確認してください。更新の実検収は個々のKBごとに別判定です。Grok・Muse A/B・調査担当等の監査で**採用した設計判断と、実装先・棄却理由・未実験の区別**は[2026年暫定アーキテクチャ決定／実装照合表](docs/archive/ADNC_2026_PROVISIONAL_STATE_DESIGN_20261025.md)に保存しました。繰り返し同じ設計を提案する前に、現行の表と新しい反例を照合します。
 
 
 ## 検証に協力してくださる方へ（任意）
@@ -87,7 +97,7 @@ AD&Cでは、主に次のようなファイルを使います。
 
 ## 開発調査から始め、知識の共有へ広げる
 
-**先行利用できる例（Draft）：** [開発調査・技術選定Skill v0.1.0-preview](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)。課題の整理 → 公式仕様の確認 → 現実的な1案 → 未知の操作だけ検証 → 判断理由の記録、という手順をAIへ渡せます。限定的な接続検証例がありますが、**正式Active版ではなく、省力化の効果も未計測**です。
+**先行利用できる例（Draft）：** [開発調査・技術選定Skill v0.1.1-preview](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)。課題の整理 → 公式仕様の確認 → 現実的な1案 → 未知の操作だけ検証 → 判断理由の記録、という手順をAIへ渡せます。限定的な接続検証例がありますが、**正式Active版ではなく、省力化の効果も未計測**です。
 
 この先は、以下を検証・整備する構想です。
 
@@ -105,8 +115,8 @@ AD&Cでは、主に次のようなファイルを使います。
 - [対応状況・技術的な検証記録](docs/COMPATIBILITY_STATUS.md)
 - [開発・調査支援の共通標準](docs/PROJECT_EXECUTION_STANDARD.md)
 - [APIキーの保存方式・初回登録・自動再利用ガイド](docs/API_SECRET_HANDLING.md)
-- [先行開発調査Skill（Draft）](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)
-- [共有知プロジェクト](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge)
+- [先行開発調査Skill（Draft）](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)
+- [共有知プロジェクト](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge)
 - [Core Life Skillsのロードマップ](docs/CORE_LIFE_SKILLS.md)
 - [紹介スライド v1.3](https://docs.google.com/presentation/d/1oOroO3_Ry_AyJMZlITOoG5Lpg6AH83t8/edit?usp=sharing)
 
@@ -114,4 +124,4 @@ AD&Cでは、主に次のようなファイルを使います。
 
 AD&Cは、実際に使える仕組みから試しながら開発しています。[AD&Cインストーラーを使う](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md)。
 
-本体は[MIT License](LICENSE)で公開しています。共有知は[別リポジトリ](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge)をご覧ください。
+本体は[MIT License](LICENSE)で公開しています。共有知は[別リポジトリ](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge)をご覧ください。
