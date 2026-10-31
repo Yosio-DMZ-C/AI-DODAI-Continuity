@@ -97,7 +97,7 @@ AD&Cでは、主に次のようなファイルを使います。
 
 ## 開発調査から始め、知識の共有へ広げる
 
-**先行利用できる例（Draft）：** [開発調査・技術選定Skill v0.1.1-preview](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)。課題の整理 → 公式仕様の確認 → 現実的な1案 → 未知の操作だけ検証 → 判断理由の記録、という手順をAIへ渡せます。限定的な接続検証例がありますが、**正式Active版ではなく、省力化の効果も未計測**です。
+**先行利用できる例（Draft）：** [開発調査・技術選定Skill v0.1.2-preview](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)。課題の整理 → 公式仕様の確認 → 現実的な1案 → 未知の操作だけ検証 → 判断理由の記録、という手順をAIへ渡せます。限定的な接続検証例がありますが、**正式Active版ではなく、省力化の効果も未計測**です。
 
 この先は、以下を検証・整備する構想です。
 
