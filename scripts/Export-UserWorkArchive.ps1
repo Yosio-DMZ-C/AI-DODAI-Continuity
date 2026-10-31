@@ -6,6 +6,8 @@
   Transparent, user-initiated archival. Never executes source files, reads nothing
   outside SourceDirectory, uses no network, encryption or security-control bypass.
   Hidden/system items and reparse points are excluded. Existing ZIPs are not replaced.
+  Preview is the default; writing a ZIP requires explicit -CreateArchive.
+  Default scope is 200 files or 100 MB; no recursion unless requested.
   Output must be in an existing directory outside the source tree.
 .EXAMPLE
   .\Export-UserWorkArchive.ps1 -SourceDirectory 'C:\Work\ProjectA' -DestinationZip 'C:\Backups\ProjectA.zip' -Recurse -DryRun
@@ -22,15 +24,19 @@ param(
 
     [switch]$Recurse,
     [switch]$DryRun,
+    [switch]$CreateArchive,
 
     [ValidateRange(1,5000)]
-    [int]$MaxFiles = 1000,
+    [int]$MaxFiles = 200,
 
     [ValidateRange(1,10240)]
-    [int]$MaxTotalMB = 512
+    [int]$MaxTotalMB = 100
 )
 
 $ErrorActionPreference = 'Stop'
+if ($DryRun -and $CreateArchive) {
+    throw 'Specify -DryRun (preview) or -CreateArchive (write), not both.'
+}
 $allowedExtensions = @(
     '.bat','.cmd','.ps1','.txt','.md','.csv','.rtf',
     '.doc','.docx','.xls','.xlsx','.ppt','.pptx','.odt','.ods','.odp'
@@ -118,9 +124,12 @@ $report = [pscustomobject]@{
     ArchivePath     = $destination
     FileCount       = $selected.Count
     TotalBytes      = $bytes
-    DryRun          = [bool]$DryRun
+    SelectedFiles   = @($selected | Sort-Object FullName | ForEach-Object {
+        $_.FullName.Substring($source.Length).TrimStart([char[]]@('\','/')).Replace('\','/')
+    })
+    DryRun          = -not [bool]$CreateArchive
 }
-if ($DryRun) {
+if (-not $CreateArchive) {
     return $report
 }
 
@@ -133,7 +142,7 @@ try {
     foreach ($file in ($selected | Sort-Object FullName)) {
         $relativeName = $file.FullName.Substring($source.Length).TrimStart([char[]]@('\','/')).Replace('\','/')
         $null = [IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
-            $archive, $file.FullName, $relativeName, [IO.Compression.CompressionLevel]::Optimal)
+            $archive, $file.FullName, $relativeName, [IO.Compression.CompressionLevel]::NoCompression)
     }
     $archive.Dispose()
     $archive = $null
