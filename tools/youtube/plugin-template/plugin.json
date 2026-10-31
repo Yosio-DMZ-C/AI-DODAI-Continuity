@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "adnc-youtube-private",
+  "version": "0.1.0",
+  "description": "AD&CのDrive動画をYouTubeへ非公開アップロードし、動画一覧を取得するプライベート連携。公開操作は行いません。",
+  "author": {"name":"AD&C"},
+  "skills":"./skills",
+  "mcpServers":"./.mcp.json",
+  "extensions":{"com.openai":{"interface":{"displayName":"AD&C YouTube","developerName":"AD&C","shortDescription":"YouTubeへ非公開登録","longDescription":"所有者認証を経由してGoogle Driveの動画を非公開で登録します。限定公開／公開は管理画面から人間が操作します。","defaultPrompt":"AD&Cの動画をYouTubeに非公開でアップロードしてください。","category":"Productivity","capabilities":[]}}}
+}

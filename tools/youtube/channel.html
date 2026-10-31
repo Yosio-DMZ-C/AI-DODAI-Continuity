@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#15233c">
+<title>AD&C｜YouTubeチャンネル開設・公開ナビ</title>
+<link rel="stylesheet" href="./shared.css">
+</head>
+<body>
+<header><div class="head"><div class="eyebrow">AD&C / SIMPLE NAVI v0.2</div><h1>YouTube チャンネル開設・公開ナビ</h1><p>iPhoneで開き、次の操作とコピーする文章を1か所に集約。YouTubeへのログインは公式サイトで行います。</p><div class="topNote">1ファイル・追加アプリ不要・APIキー不要・外部送信なし</div></div><nav class="navbar" aria-label="AD&C YouTubeツール"><a href="./channel.html" aria-current="page">チャンネル開設</a><a href="./videos.html">動画アップロード・管理 ↗</a></nav></header>
+<main>
+<section class="nextpanel activeNext" id="next"><p class="kicker">次の一手</p><h2 id="nextTitle">チャンネル情報を登録する</h2><p class="sub" id="nextDetail">チャンネルは作成済みとして、プロフィール設定から進めます。</p><div class="actions"><a id="nextLink" class="btn primary" href="https://studio.youtube.com/" target="_blank" rel="noopener">公式画面を開く ↗</a><button id="jumpNext" class="secondary">このツールの工程を見る ↓</button></div><p class="small">画面遷移・ログイン後の操作はYouTube公式サイト上で行います。</p></section>
+<section><div class="layout"><h2 style="margin:0">工程表</h2><span class="badge" id="progressText">1 / 6</span></div><progress id="progress" value="1" max="6"></progress><div id="checklist" style="margin-top:7px">
+<label class="check"><input type="checkbox" id="done-create" data-step="create" checked>① チャンネル作成</label>
+<label class="check"><input type="checkbox" id="done-profile" data-step="profile">② 名前・アイコン・説明・リンク設定</label>
+<label class="check"><input type="checkbox" id="done-upload" data-step="upload">③ 非公開アップロード → 動画管理</label>
+<label class="check"><input type="checkbox" id="done-review" data-step="review">④ スマホ再生と権利・内容確認</label>
+<label class="check"><input type="checkbox" id="done-publish" data-step="publish">⑤ 限定公開・一般公開（本人判断）</label>
+<label class="check"><input type="checkbox" id="done-log" data-step="log">⑥ URL・成果物・改善点の保存</label></div><p class="small">チェックはこの端末・ブラウザで保存を試みます。別端末への自動同期はありません。</p></section>
+<section id="step-create"><div class="step-head"><span class="stepnum">01</span><h2>チャンネルを作成</h2></div><p class="sub">既に作成済みならこの工程は飛ばしてください。新規作成時だけ以下を使います。</p><div class="links"><a class="btn primary" href="https://www.youtube.com/channel_switcher" target="_blank" rel="noopener">公式チャンネル一覧 ↗</a><a class="btn secondary" href="https://www.youtube.com/account" target="_blank" rel="noopener">アカウント管理 ↗</a><button class="mini" data-copy-url="https://www.youtube.com/channel_switcher">URLをコピー</button></div>
+<div class="callout"><b>iPhoneのSafariでPC表示が必要な場合：</b>Safariで開いたYouTube画面のアドレスバー付近の<b>ページメニュー</b>から「デスクトップ用Webサイトを表示」を選択。表示メニューはiOSの版で異なる場合があります。<br>このHTMLからSafariの表示モードを強制変更することはできません。</div>
+<p class="small">YouTubeアプリに飛んでしまう場合は「URLをコピー」→Safariのアドレス欄に貼り付けて移動。公式画面でアカウント確認→「新しいチャンネルを作成」を選択してください。</p>
+<p class="hint">うまく作れないときは、最初に名前を短くして試します。以前の環境では <code>|</code> を含む名前が失敗要因の候補でしたが、YouTubeの一律禁止文字とは確認されていません。</p>
+<details><summary>それでも失敗する場合の切り分け</summary><p class="small">①アカウントが目的のGoogleアカウントか確認 → ②名前を英数字だけの仮名に → ③Safariのプライベートブラウズで再試行 → ④PCブラウザで作成。既存チャンネルは削除しないでください。</p></details>
+<label class="check"><input type="checkbox" class="mirror" data-target="done-create">チャンネルを作成できた</label></section>
+<section id="step-profile"><div class="step-head"><span class="stepnum">02</span><h2>チャンネル情報をまとめて設定</h2></div><p class="sub">下の文章はここで編集できます。各「コピー」を押して、YouTube Studioの該当欄に貼り付けます。</p><div class="links"><a class="btn primary" href="https://studio.youtube.com/" target="_blank" rel="noopener">YouTube Studio ↗</a><a class="btn secondary" href="https://support.google.com/youtube/answer/3027950?hl=ja" target="_blank" rel="noopener">公式設定手順 ↗</a></div><p class="hint">YouTube Studio → カスタマイズ → プロフィール。スマホアプリで編集できる項目はアプリ側で設定しても構いません。</p>
+<div class="field"><label for="channelName">チャンネル名</label><div class="inputrow"><input type="text" id="channelName" data-save="1" value="AD&C - AI-DODAI & Continuity"><button class="mini" data-copy="channelName">コピー</button></div><div class="small warn" id="nameWarn" hidden>入力名に | を含みます。以前の作成失敗例があるため、登録できない場合は外して再試行してください。</div></div>
+<div class="field"><label for="handle">ハンドル候補（空き状況はYouTubeで確認）</label><div class="inputrow"><input type="text" id="handle" data-save="1" value="@AIDODAI"><button class="mini" data-copy="handle">コピー</button></div></div>
+<div class="field"><label for="channelDesc">チャンネル説明文</label><div class="inputrow"><textarea id="channelDesc" rows="9" data-save="1">AIを替えても、冒険は続く。
+
+AD&C（AI-DODAI & Continuity）は、AIを乗り換えても、知識・判断・作業の続きを引き継げる環境を目指すオープンなプロジェクトです。
+
+AIそのものではなく、AIを使い続けるための「土台」を作っています。
+
+「どんな玄人も、専門外では素人だ。」
+玄人の当たり前はAIが案内し、人間はその先の判断に集中する。
+
+このチャンネルでは、AD&Cの開発過程や実験、成功・失敗、AI活用の工夫を紹介します。現在は開発・検証段階です。
+
+▼ 設計書・GitHub
+https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity</textarea><button class="mini" data-copy="channelDesc">コピー</button></div></div>
+<div class="field"><label for="repoLink">リンク（公式GitHub）</label><div class="inputrow"><input type="url" id="repoLink" data-save="1" value="https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity"><button class="mini" data-copy="repoLink">コピー</button></div></div>
+<p class="hint"><b>アイコン：</b>コンパス単体エンブレム。<a href="https://drive.google.com/file/d/1JhogMmLaI_HmVvPJImsCWtPphjDD1Yco/view" target="_blank" rel="noopener">画像を開く ↗</a><br><b>バナー：</b>「AIを替えても、冒険は続く。」「知識と作業を、次のAIへ。」を推奨。画像は別途用意します。</p><label class="check"><input type="checkbox" class="mirror" data-target="done-profile">プロフィールを設定できた</label></section>
+<section id="step-upload"><div class="step-head"><span class="stepnum">03</span><h2>動画をアップロード（非公開を既定）</h2></div><p class="sub">完成MP4とサムネイルは保管済み。以下をコピーして登録します。</p><div class="links"><a class="btn primary" href="./videos.html">AD&C 動画管理ページを開く ↗</a><a class="btn secondary" href="https://studio.youtube.com/" target="_blank" rel="noopener">YouTube Studio（代替） ↗</a><a class="btn secondary" href="https://drive.google.com/file/d/1I9K3RXlusrMKqE4KardaX0821FwCqkwB/view" target="_blank" rel="noopener">完成動画を開く ↗</a><a class="btn secondary" href="https://drive.google.com/file/d/1y_trxNAxxJDGt46jHDDe6TY-qF1lRXMU/view" target="_blank" rel="noopener">サムネイル ↗</a></div>
+<div class="field"><label for="videoTitle">動画タイトル</label><div class="inputrow"><textarea id="videoTitle" rows="2" data-save="1">AIを替えても、冒険は続く。｜AD&Cが目指す「AIの土台」を紹介</textarea><button class="mini" data-copy="videoTitle">コピー</button></div></div>
+<div class="field"><label for="videoDesc">概要欄</label><div class="inputrow"><textarea id="videoDesc" rows="12" data-save="1">AIを替えても、冒険は続く。
+
+ChatGPT、Claude、GeminiなどのAIを使い続けると、チャットの履歴、資料、判断の経緯、作業の続きがバラバラになりがちです。
+
+AD&C（AI-DODAI & Continuity）は、AIの外側に知識・手順・記録を置いて、AIを替えても続きを始めやすくする「土台」を目指して開発している実験的なプロジェクトです。
+
+この動画では、開発の動機、TRPGから得た着想、知識ベースの考え方、導入像、利用例、今後の構想を紹介します。
+
+現在は開発・検証段階です。KBの初期構築や保存・読戻しには限定的な実施例がありますが、異なるAI間での継続運用や省力化の効果を一般的に実証したわけではありません。
+
+▼ AD&Cの設計書・公開リポジトリ
+https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity
+
+感想や改善提案も歓迎します。
+
+※前半のナレーションは、本人の声をもとにElevenLabsで生成したAI音声です。エンディングは本人の肉声を使用しています。
+
+#ADnC #生成AI #ナレッジベース</textarea><button class="mini" data-copy="videoDesc">コピー</button></div></div>
+<div class="field"><label for="pinnedComment">固定コメント（投稿後、YouTube画面で固定）</label><div class="inputrow"><textarea id="pinnedComment" rows="6" data-save="1">AD&Cはまだ開発途中です（笑）。
+
+「ここが分かりにくい」「無料環境でも試せた／試せなかった」など、率直な感想を歓迎します。
+
+設計書・公開リポジトリ：
+https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity</textarea><button class="mini" data-copy="pinnedComment">コピー</button></div></div>
+<p class="hint">YouTubeの年齢制限・権利申告・AI関連の質問は画面に従って回答してください。公開範囲は非公開で開始し、所有者が確認後に限定公開や一般公開を選びます。</p><label class="check"><input type="checkbox" class="mirror" data-target="done-upload">動画を非公開でアップロードした</label></section>
+<section id="step-review"><div class="step-head"><span class="stepnum">04</span><h2>アップロード後の視聴確認</h2></div><label class="check"><input type="checkbox" id="qc-video">動画の先頭・途中・エンディングを再生した</label><label class="check"><input type="checkbox" id="qc-cover">サムネイルとタイトルを確認した</label><label class="check"><input type="checkbox" id="qc-rights">説明・権利・公開範囲を確認した</label><label class="check"><input type="checkbox" class="mirror" data-target="done-review">公開前確認が終わった</label></section>
+<section id="step-publish"><div class="step-head"><span class="stepnum">05</span><h2>本人判断で公開範囲を変更</h2></div><p class="sub">ここだけは明示的に判断します。ツールは勝手に一般公開しません。</p><div class="links"><a class="btn primary" href="https://studio.youtube.com/" target="_blank" rel="noopener">公開設定を確認 ↗</a></div><label class="check"><input type="checkbox" class="mirror" data-target="done-publish">自分で公開範囲を選んだ</label></section>
+<section id="step-log"><div class="step-head"><span class="stepnum">06</span><h2>公開URLと記録を残す</h2></div><div class="field"><label for="publishedUrl">公開した動画のURL（任意）</label><div class="inputrow"><input type="url" id="publishedUrl" data-save="1" placeholder="https://www.youtube.com/watch?v=..."><button class="mini" data-copy="publishedUrl">コピー</button></div></div><div class="field"><label for="notes">実際に困ったこと・次回改善（任意）</label><textarea id="notes" rows="3" data-save="1" placeholder="例：チャンネル名の記号、PC表示への切替など"></textarea></div><div class="actions"><button id="export" class="secondary">進行ログをコピー</button><button id="reset" class="mini">チェックだけリセット</button></div><p class="small">ログは手動でDriveやAD&C KBへ保存してください。自動アップロードしません。</p><label class="check"><input type="checkbox" class="mirror" data-target="done-log">進行ログを保存した</label></section>
+<div id="toast" class="sr" role="status" aria-live="polite"></div>
+<footer>AD&C｜工程表は同じ。操作は使える環境に合わせる。<br>このツールはYouTube / Google の非公式ナビで、認証情報を収集しません。<br>公式参照：<a href="https://support.google.com/youtube/answer/1646861?hl=ja" target="_blank" rel="noopener">チャンネル作成</a> ／ <a href="https://support.google.com/youtube/answer/3027950?hl=ja" target="_blank" rel="noopener">チャンネルのカスタマイズ</a> ／ <a href="https://support.apple.com/ja-jp/guide/iphone/iphb3100d149/26/ios/26" target="_blank" rel="noopener">Safari PC表示</a></footer>
+</main>
+<script>
+(function(){'use strict';
+const key='adnc-youtube-navi-v01';const steps=['create','profile','upload','review','publish','log'];
+const titles=['チャンネルを作成する','チャンネルの設定をまとめて登録する','動画管理ページで非公開アップロードする','非公開の動画を所有者として確認する','公開するか判断する','公開URLと改善点を残す','公開作業は完了です'];
+const descriptions=['Safariで公式のチャンネル一覧を開きます。','YouTube Studioで名前・ハンドル・アイコン・説明・リンクをまとめて設定します。','準備済みのMP4・サムネイル・文案を使います。','スマホで最初・途中・最後を再生してください。','公開範囲は動画管理ページまたは公式Studioで本人が変更します。','今回の結果を次の作業へ引き継ぎます。','ログを保存して終了できます。'];
+const urls=['https://www.youtube.com/channel_switcher','https://studio.youtube.com/','./videos.html','#step-review','https://studio.youtube.com/','#step-log','#step-log'];
+const ids=Array.from(document.querySelectorAll('[data-save="1"]')).map(x=>x.id);let initial={};ids.forEach(id=>{initial[id]=document.getElementById(id).value;});
+function getStored(){try{return JSON.parse(localStorage.getItem(key)||'{}')}catch{return {}}}
+function save(){const item={};ids.forEach(id=>item[id]=document.getElementById(id).value);steps.forEach(s=>item['done-'+s]=document.getElementById('done-'+s).checked);['qc-video','qc-cover','qc-rights'].forEach(id=>item[id]=document.getElementById(id).checked);try{localStorage.setItem(key,JSON.stringify(item))}catch(e){}render()}
+function render(){const active=steps.findIndex(s=>!document.getElementById('done-'+s).checked),ix=active===-1?6:active;const count=steps.filter(s=>document.getElementById('done-'+s).checked).length;document.getElementById('progress').value=count;document.getElementById('progressText').textContent=count+' / 6';document.getElementById('nextTitle').textContent=titles[ix];document.getElementById('nextDetail').textContent=descriptions[ix];const a=document.getElementById('nextLink');a.href=urls[ix];a.textContent=ix===0?'チャンネル一覧を開く ↗':ix===6?'記録の工程を見る ↓':ix===3?'このツールの確認工程を見る ↓':'公式画面を開く ↗';if(ix===3||ix===5||ix===6)a.textContent='このツールの工程を見る ↓';const name=document.getElementById('channelName').value;document.getElementById('nameWarn').hidden=!name.includes('|');document.querySelectorAll('.mirror').forEach(el=>{el.checked=document.getElementById(el.dataset.target).checked;});}
+function toast(message){let el=document.getElementById('toast');el.textContent=message;el.className='hint';setTimeout(()=>{el.className='sr'},2200)}
+async function copyText(value){try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(value);toast('コピーしました');return;}}catch(e){}
+const t=document.createElement('textarea');t.value=value;t.style.cssText='position:fixed;left:0;top:-1000px';document.body.appendChild(t);t.focus();t.select();try{if(document.execCommand('copy')){toast('コピーしました');t.remove();return;}}catch(e){}t.remove();window.prompt('この文章を長押ししてコピーしてください',value);}
+function jump(){const ix=steps.findIndex(s=>!document.getElementById('done-'+s).checked);document.getElementById('step-'+(steps[ix===-1?5:ix])).scrollIntoView({behavior:'smooth',block:'start'})}
+let saved=getStored();ids.forEach(id=>{if(typeof saved[id]==='string')document.getElementById(id).value=saved[id];});steps.forEach(s=>{if(typeof saved['done-'+s]==='boolean')document.getElementById('done-'+s).checked=saved['done-'+s];});['qc-video','qc-cover','qc-rights'].forEach(id=>{if(typeof saved[id]==='boolean')document.getElementById(id).checked=saved[id];});
+document.querySelectorAll('input[data-step],input[id^="done-"],input[id^="qc-"]').forEach(el=>el.addEventListener('change',save));
+document.querySelectorAll('.mirror').forEach(el=>el.addEventListener('change',()=>{document.getElementById(el.dataset.target).checked=el.checked;save()}));
+ids.forEach(id=>{document.getElementById(id).addEventListener('input',save)});
+document.querySelectorAll('[data-copy]').forEach(el=>el.addEventListener('click',()=>copyText(document.getElementById(el.dataset.copy).value)));
+document.querySelectorAll('[data-copy-url]').forEach(el=>el.addEventListener('click',()=>copyText(el.dataset.copyUrl)));
+document.getElementById('jumpNext').addEventListener('click',jump);
+document.getElementById('nextLink').addEventListener('click',function(e){const ix=steps.findIndex(s=>!document.getElementById('done-'+s).checked);if(ix===3||ix===5||ix===-1){e.preventDefault();jump()}});
+document.getElementById('export').addEventListener('click',()=>{const done=steps.map((s,i)=>(document.getElementById('done-'+s).checked?'PASS':'NOT_RUN')+' | '+(i+1)+' '+titles[i]).join('\n');copyText('AD&C YouTube進行記録\n\n'+done+'\n\nチャンネル名: '+document.getElementById('channelName').value+'\nハンドル候補: '+document.getElementById('handle').value+'\n動画URL: '+document.getElementById('publishedUrl').value+'\n改善点: '+document.getElementById('notes').value+'\n※本人の確認がない項目はPASSと扱わない。');});
+document.getElementById('reset').addEventListener('click',()=>{if(!confirm('工程のチェックだけ初期化します。本文は残します。よろしいですか？'))return;steps.forEach(s=>document.getElementById('done-'+s).checked=(s==='create'));['qc-video','qc-cover','qc-rights'].forEach(id=>document.getElementById(id).checked=false);save();toast('チェックを初期化しました')});render();
+})();
+</script>
+</body></html>
