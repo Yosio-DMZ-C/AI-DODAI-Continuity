@@ -22,12 +22,31 @@ Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
         (Test-Path -LiteralPath $script:destination) | Should -BeFalse
     }
 
+    It 'defaults to preview and reports precisely which files would be included' {
+        Set-Content -LiteralPath (Join-Path $script:source 'owner.bat') -Value 'echo synthetic'
+        Set-Content -LiteralPath (Join-Path $script:source 'note.md') -Value 'synthetic'
+        Set-Content -LiteralPath (Join-Path $script:source 'ignore.exe') -Value 'not included'
+        $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination
+        $result.DryRun | Should -BeTrue
+        $result.FileCount | Should -Be 2
+        $result.SelectedFiles | Should -Contain 'owner.bat'
+        $result.SelectedFiles | Should -Contain 'note.md'
+        $result.SelectedFiles | Should -Not -Contain 'ignore.exe'
+        (Test-Path -LiteralPath $script:destination) | Should -BeFalse
+    }
+
+    It 'rejects contradictory preview and write flags' {
+        Set-Content -LiteralPath (Join-Path $script:source 'owner.md') -Value 'synthetic'
+        { & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -DryRun -CreateArchive } | Should -Throw
+        (Test-Path -LiteralPath $script:destination) | Should -BeFalse
+    }
+
     It 'stores allowed script, text and Office extensions but excludes executables' {
         Set-Content -LiteralPath (Join-Path $script:source 'command.bat') -Value 'echo synthetic'
         Set-Content -LiteralPath (Join-Path $script:source 'readme.txt') -Value 'synthetic'
         Set-Content -LiteralPath (Join-Path $script:source 'document.docx') -Value 'dummy Office fixture'
         Set-Content -LiteralPath (Join-Path $script:source 'skip.exe') -Value 'not an executable'
-        $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination
+        $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -CreateArchive
         $result.FileCount | Should -Be 3
         $zip = [IO.Compression.ZipFile]::OpenRead($script:destination)
         try {
@@ -44,7 +63,7 @@ Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
         $path = Join-Path $script:source 'owner.txt'
         [IO.File]::WriteAllText($path,'unchanged test content')
         $before = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
-        $null = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination
+        $null = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -CreateArchive
         (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash | Should -Be $before
     }
 
@@ -53,7 +72,7 @@ Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
         $nested = Join-Path $script:source 'nested'
         $null = New-Item -Path $nested -ItemType Directory
         Set-Content -LiteralPath (Join-Path $nested 'inner.xlsx') -Value 'synthetic'
-        $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination
+        $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -CreateArchive
         $result.FileCount | Should -Be 1
     }
 
@@ -61,7 +80,7 @@ Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
         $nested = Join-Path $script:source 'nested'
         $null = New-Item -Path $nested -ItemType Directory
         Set-Content -LiteralPath (Join-Path $nested 'inner.xlsx') -Value 'synthetic'
-        $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -Recurse
+        $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -Recurse -CreateArchive
         $result.FileCount | Should -Be 1
         $zip = [IO.Compression.ZipFile]::OpenRead($script:destination)
         try {
@@ -81,39 +100,39 @@ Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
     It 'does not replace a pre-existing destination' {
         Set-Content -LiteralPath (Join-Path $script:source 'file.txt') -Value 'source'
         Set-Content -LiteralPath $script:destination -Value 'existing backup'
-        { & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination } | Should -Throw
+        { & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -CreateArchive } | Should -Throw
         (Get-Content -LiteralPath $script:destination -Raw) | Should -Match 'existing backup'
     }
 
     It 'rejects writing the output into the source folder' {
         Set-Content -LiteralPath (Join-Path $script:source 'file.txt') -Value 'source'
         $bad = Join-Path $script:source 'inside.zip'
-        { & $script:archiver -SourceDirectory $script:source -DestinationZip $bad } | Should -Throw
+        { & $script:archiver -SourceDirectory $script:source -DestinationZip $bad -CreateArchive } | Should -Throw
         (Test-Path -LiteralPath $bad) | Should -BeFalse
     }
 
     It 'rejects missing source folders' {
         $missing = Join-Path $TestDrive 'not-present'
-        { & $script:archiver -SourceDirectory $missing -DestinationZip $script:destination } | Should -Throw
+        { & $script:archiver -SourceDirectory $missing -DestinationZip $script:destination -CreateArchive } | Should -Throw
     }
 
     It 'rejects an empty set of eligible files' {
         Set-Content -LiteralPath (Join-Path $script:source 'binary.exe') -Value 'not selected'
-        { & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination } | Should -Throw
+        { & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -CreateArchive } | Should -Throw
         (Test-Path -LiteralPath $script:destination) | Should -BeFalse
     }
 
     It 'enforces a maximum number of files' {
         Set-Content -LiteralPath (Join-Path $script:source 'a.txt') -Value 'a'
         Set-Content -LiteralPath (Join-Path $script:source 'b.txt') -Value 'b'
-        { & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -MaxFiles 1 } | Should -Throw
+        { & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -MaxFiles 1 -CreateArchive } | Should -Throw
         (Test-Path -LiteralPath $script:destination) | Should -BeFalse
     }
 
     It 'enforces a total size limit before archiving' {
         $large = Join-Path $script:source 'large.txt'
         [IO.File]::WriteAllBytes($large, (New-Object byte[] (1048577)))
-        { & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -MaxTotalMB 1 } | Should -Throw
+        { & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -MaxTotalMB 1 -CreateArchive } | Should -Throw
         (Test-Path -LiteralPath $script:destination) | Should -BeFalse
     }
 
