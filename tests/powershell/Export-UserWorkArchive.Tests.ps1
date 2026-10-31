@@ -6,9 +6,12 @@ BeforeAll {
 }
 Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
     BeforeEach {
-        $script:source = Join-Path $TestDrive 'source'
-        $script:destination = Join-Path $TestDrive 'backup.zip'
-        $null = New-Item -Path $script:source -ItemType Directory -Force
+        # Pester's TestDrive is shared within Describe; use a fresh case folder.
+        $caseRoot = Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        $null = New-Item -Path $caseRoot -ItemType Directory
+        $script:source = Join-Path $caseRoot 'source'
+        $script:destination = Join-Path $caseRoot 'backup.zip'
+        $null = New-Item -Path $script:source -ItemType Directory
     }
 
     It 'supports preview mode without creating a ZIP' {
