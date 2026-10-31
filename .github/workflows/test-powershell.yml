@@ -12,21 +12,10 @@ permissions:
   contents: read
 
 jobs:
-  pester:
-    name: ${{ matrix.name }}
+  powershell-51:
+    name: PowerShell-5.1
     runs-on: windows-2025
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: PowerShell-5.1
-            shell: powershell
-            major: 5
-          - name: PowerShell-7
-            shell: pwsh
-            major: 7
-
     steps:
       - name: Check out the source (read-only token)
         uses: actions/checkout@v4
@@ -34,7 +23,7 @@ jobs:
           persist-credentials: false
 
       - name: Install pinned Pester v5.7.1
-        shell: ${{ matrix.shell }}
+        shell: powershell
         run: |
           $ErrorActionPreference = 'Stop'
           Install-Module -Name Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -SkipPublisherCheck -ErrorAction Stop
@@ -44,15 +33,49 @@ jobs:
           }
 
       - name: Run Pester smoke and regression tests
-        shell: ${{ matrix.shell }}
+        shell: powershell
         run: |
-          & ./scripts/Invoke-ADnCPester.ps1 -ExpectedMajor ${{ matrix.major }} -ResultsDirectory './test-results'
+          & ./scripts/Invoke-ADnCPester.ps1 -ExpectedMajor 5 -ResultsDirectory './test-results'
 
       - name: Upload NUnit test report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pester-${{ matrix.name }}
+          name: pester-PowerShell-5.1
+          path: test-results/*.xml
+          if-no-files-found: warn
+          retention-days: 7
+
+  powershell-7:
+    name: PowerShell-7
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+      - name: Check out the source (read-only token)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install pinned Pester v5.7.1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Install-Module -Name Pester -RequiredVersion 5.7.1 -Scope CurrentUser -Force -SkipPublisherCheck -ErrorAction Stop
+          Import-Module Pester -RequiredVersion 5.7.1 -Force -ErrorAction Stop
+          if ((Get-Module Pester).Version.ToString() -ne '5.7.1') {
+            throw 'Expected Pester 5.7.1; module selection failed.'
+          }
+
+      - name: Run Pester smoke and regression tests
+        shell: pwsh
+        run: |
+          & ./scripts/Invoke-ADnCPester.ps1 -ExpectedMajor 7 -ResultsDirectory './test-results'
+
+      - name: Upload NUnit test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pester-PowerShell-7
           path: test-results/*.xml
           if-no-files-found: warn
           retention-days: 7
