@@ -39,4 +39,27 @@ pwsh.exe -NoProfile -File .\scripts\Invoke-ADnCPester.ps1 -ExpectedMajor 7
 
 **停止条件／再開**：Pester導入不能・PSメジャー版不一致・テスト0件・1件でもFAIL・XML未生成ならそのジョブはFAIL。環境にWindowsランナーがない、GitHub権限で実行できない、または実行が確認できない場合は `NOT_RUN`。失敗時はPRの該当ログを確認し、必要な1ファイルだけ直して再実行する。Gitの復元元はPR作成前のmainコミット。公開／mainマージは別判断。
 
+## ユーザー制作物ZIP化サンプル（小規模・透明なバックアップ）
+
+- 対象：`scripts/Export-UserWorkArchive.ps1`、テスト：`tests/powershell/Export-UserWorkArchive.Tests.ps1`。
+- 実行者が指定した**単一フォルダ**だけを見る。既定はサブフォルダをたどらない（必要な場合だけ `-Recurse`）。対象拡張子：bat、cmd、ps1、txt、md、csv、rtf、doc、docx、xls、xlsx、ppt、pptx、odt、ods、odp。
+- **既定はプレビュー（ZIPは作成しない）**：対象ファイル名、件数、元データの合計バイト数を返す。ZIP作成には `-CreateArchive` の明示指定が必要。
+- 既定上限は**200件・100MB**。必要な業務量に合わせた上限変更は明示指定。上限超過時はZIP作成前に終了。
+- ZIPは暗号化せず、`System.IO.Compression` を使い **NoCompression** で格納（テキスト類の再圧縮も行わない）。ネットワーク送信、セキュリティ製品の設定変更、ファイル実行、特権昇格、隠しファイル取り込みをしない。元ファイルは読み取りだけ。
+- フォルダ構造の相対パスを維持。既存ZIPは上書きしない。保存先は元フォルダの外、既存ローカルディレクトリであること。
+
+プレビュー：
+
+```powershell
+.\scripts\Export-UserWorkArchive.ps1 -SourceDirectory 'C:\Work\ProjectA' -DestinationZip 'C:\Backups\ProjectA.zip' -Recurse
+```
+
+作成：
+
+```powershell
+.\scripts\Export-UserWorkArchive.ps1 -SourceDirectory 'C:\Work\ProjectA' -DestinationZip 'C:\Backups\ProjectA.zip' -Recurse -CreateArchive
+```
+
+**位置づけ**：不用意な大量処理や大量ファイル更新をしない、業務説明可能なローカルアーカイブの設計。監視ソフトの検出可否・例外承認・社内規程への適合は実環境で別判定。監視回避や暗号化の隠蔽を目的とするものではない。
+
 **検収境界**：本キットの静的構造、Windows上のPester初期実動作、将来の業務スクリプトの動作はそれぞれ別ゲート。Windows実行ログとNUnit XMLの現物がない段階では実動作を `PASS` にしない。
