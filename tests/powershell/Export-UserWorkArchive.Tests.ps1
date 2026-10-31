@@ -8,7 +8,7 @@ Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
     BeforeEach {
         $script:source = Join-Path $TestDrive 'source'
         $script:destination = Join-Path $TestDrive 'backup.zip'
-        $null = New-Item -LiteralPath $script:source -ItemType Directory -Force
+        $null = New-Item -Path $script:source -ItemType Directory -Force
     }
 
     It 'supports preview mode without creating a ZIP' {
@@ -48,7 +48,7 @@ Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
     It 'does not descend into subdirectories unless Recurse is specified' {
         Set-Content -LiteralPath (Join-Path $script:source 'root.txt') -Value 'root'
         $nested = Join-Path $script:source 'nested'
-        $null = New-Item -LiteralPath $nested -ItemType Directory
+        $null = New-Item -Path $nested -ItemType Directory
         Set-Content -LiteralPath (Join-Path $nested 'inner.xlsx') -Value 'synthetic'
         $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination
         $result.FileCount | Should -Be 1
@@ -56,7 +56,7 @@ Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
 
     It 'preserves relative paths when recursion is enabled' {
         $nested = Join-Path $script:source 'nested'
-        $null = New-Item -LiteralPath $nested -ItemType Directory
+        $null = New-Item -Path $nested -ItemType Directory
         Set-Content -LiteralPath (Join-Path $nested 'inner.xlsx') -Value 'synthetic'
         $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -Recurse
         $result.FileCount | Should -Be 1
@@ -121,7 +121,7 @@ Describe 'Export-UserWorkArchive (local backup / no security bypass)' {
 
     It 'does not enter the excluded .git directory' {
         $gitDir = Join-Path $script:source '.git'
-        $null = New-Item -LiteralPath $gitDir -ItemType Directory
+        $null = New-Item -Path $gitDir -ItemType Directory
         Set-Content -LiteralPath (Join-Path $gitDir 'config.txt') -Value 'config'
         Set-Content -LiteralPath (Join-Path $script:source 'owner.md') -Value 'work'
         $result = & $script:archiver -SourceDirectory $script:source -DestinationZip $script:destination -Recurse -DryRun
