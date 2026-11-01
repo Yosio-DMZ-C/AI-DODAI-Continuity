@@ -1,6 +1,7 @@
 # AD&C（AI-DODAI & Continuity）設計・構築運用指示書 — 一般配布版
 
 - 配布版：1.5.6（2026-10-25：制作素材一般仕様の正本を共有KBへ統一し、初期導入が素材を自動生成しないことを明確化）
+- 訂正（2026-11-01）：第20章の初回 `ADNC_INSTALLER_VERSION` に残っていた旧値1.5.3を現行1.5.6に訂正。仕様追加・既存KBの無断更新なし。
 - 用途：個人・案件・チームで始め、必要に応じて共有へ接続するナレッジベースの構築
 - 本書の内容：構造、記録形式、購入・調査・在庫管理、品質管理、共有、AIへの実行指示
 - 本書に含めないもの：実在する利用者の記録、個人台帳、会話引用、保管先URL、ファイルID、既存環境の設定値
@@ -760,7 +761,7 @@ AIは、考察を広げず、次のような短い選択肢を提示する。
 #### 初回
 
 1. AIが正本構造、START_HERE、BUILD_PLAN、registry、必要なKnowledge / Context / Skill等を自動生成する。 
-   - START_HEREに導入版 `ADNC_INSTALLER_VERSION: 1.5.3`、`ADNC_EXECUTION_STANDARD`（[共通実行標準](PROJECT_EXECUTION_STANDARD.md)の個別URL）、公開の `ADNC_UPDATE_RUNBOOK`（上記UPDATE.mdの個別URL）、`ADNC_UPDATE_MANIFEST`（LATEST.jsonの個別URL）を短く記録する。導入版不明の旧KBでは新規導入済みと偽らず、専用の互換ガイドに従う。既存KBは作り直さず、既存のIDと記録を保護する。
+   - START_HEREに導入版 `ADNC_INSTALLER_VERSION: 1.5.6`（本書冒頭の配布版・`LATEST.json` と一致することを照合し、矛盾があれば保存を止める）、`ADNC_EXECUTION_STANDARD`（[共通実行標準](PROJECT_EXECUTION_STANDARD.md)の個別URL）、公開の `ADNC_UPDATE_RUNBOOK`（上記UPDATE.mdの個別URL）、`ADNC_UPDATE_MANIFEST`（LATEST.jsonの個別URL）を短く記録する。導入版不明の旧KBでは新規導入済みと偽らず、専用の互換ガイドに従う。既存KBは作り直さず、既存のIDと記録を保護する。
 2. 生成物の構造・ID・参照・表示をレビューする。
 3. 可能なら1つの `AgentOS-C_initial.zip` にまとめる。ZIPを扱えない環境では、相対パス・各ファイル全文・固定IDを含む単一Markdown/TXTにまとめる。
 4. 受渡し前に成果物を読戻し、件数、NodeID、本文欠落、参照、構造、文字化け、可能ならhashを検査する。内容を完全復元できない出力を「全件バックアップ」と表現しない。
