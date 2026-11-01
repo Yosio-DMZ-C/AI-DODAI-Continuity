@@ -52,7 +52,7 @@ CRC/JSON/相対パスの一致、識別子の新規性、レビュー完了、�
 | **ChatGPT Free** | Markdown・TXT・JSON等のファイルアップロードとデータ分析 | **公式機能として提供**。ファイルアップロードは公式記載で原則1日3件（変更・混雑時の制限あり） |
 | **ChatGPT Free** | ZIP生成・取得、既存ZIPの解凍・読取、Grokで作成したKBの移植 | **未検証**。ZIPは公式のデータ分析の主要な対応形式一覧に明記されていないため、必ず扱えると保証しない |
 | 個人用OneDrive | 人間がZIP等をバックアップ先に保存 | **手動保存は可能**。ChatGPTから直接読書きできるとは限らない |
-| Notion | Notion公式がChatGPT等とのMCP読書き接続を案内し、ChatGPT側でもNotionアプリが利用候補 | **接続候補**。この環境での認証・書込・再読込およびAgentOS-Cのフォルダ／固定ID／履歴をNotion形式で保持できるかは未検証 |
+| Notion | Notion公式がChatGPT等とのMCP読書き接続を案内し、ChatGPT側でもNotionアプリが利用候補 | **接続候補**。この環境での認証・書込・再読込およびAD&Cのフォルダ／固定ID／履歴をNotion形式で保持できるかは未検証 |
 
 - ChatGPTファイルアップロード（日本語公式）：<https://help.openai.com/ja-jp/articles/8555545-uploading-files-and-audio-to-chatgpt>
 - ChatGPTのデータ分析・対応ファイル（日本語公式）：<https://help.openai.com/ja-jp/articles/8437071-data-analysis-with-chatgpt>
