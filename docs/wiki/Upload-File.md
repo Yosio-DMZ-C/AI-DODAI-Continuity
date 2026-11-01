@@ -61,4 +61,4 @@ Safariなどで設計書をダウンロードしたら、通常は**「ファイ
 
 参考：[OpenAI公式：ファイルアップロード](https://help.openai.com/ja-jp/articles/8555545-uploading-files-and-audio-to-chatgpt)／[OpenAI Academy：ChatGPTでファイルを使う](https://openai.com/ja-JP/academy/working-with-files/)／[GitHub公式：Rawファイルのダウンロード](https://docs.github.com/en/repositories/working-with-files/using-files/viewing-and-understanding-files)
 
-> **公開状態・検証範囲（2026-10-20）**：このガイドはGitHub mainで公開済みです。操作説明は公式資料、動画は検索結果・掲載情報を参考に作成しました。**動画の全編再生、各端末での実ダウンロード／実添付／AIによる読取、画面の最新性はNOT_RUN**。特にiPhone動画は2024年の旧画面です。表示が違うときは利用者の現在の画面を優先します。
+> **検証範囲**：旧ファイル添付ガイドは2026-10-20時点で公開済みですが、端末別動画の全編再生・最新画面・実添付操作は未検証です。**2026-11-01追加のQR画像導線は新たな提案で、QR画像自体の生成・リンク解読と、他AIが本文を取得して導入を完走することは別判定です。** 画像送信・初回保存・別チャット再開の実機試験はNOT_RUN。画面表示が違う場合は利用者の現在の画面を優先してください。
