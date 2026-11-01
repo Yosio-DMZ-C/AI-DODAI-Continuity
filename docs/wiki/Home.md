@@ -12,13 +12,15 @@ DODAIは日本語の「土台」に由来します。TRPGのGMがルールブッ
 
 ## まず使ってみる
 
-1. **[AD&Cインストーラー（現行・単一版）](../AgentOS-C_設計・構築運用指示書_一般配布版.md)**を取得し、いつものAIに渡す。
-2. AIに `実行` と送り、保存先や構築案を確認する。
+[![AD&CインストーラーのQR画像](../../assets/adnc-installer-qr.png)](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)
+
+1. **[QR画像](../../assets/adnc-installer-qr.png)を保存し、いつものAIに写真として送る**。`これを実行して`と伝える。
+2. AIが[共通インストーラーMarkdown本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)を正式に取得したことを確かめ、保存先や構築案を確認する。QRで読めない場合は[Markdown添付](Upload-File.md)を使う。
 3. `進めて` と送り、作成された知識ベース（KB）を受け取って保存する。
 
 最初は、**知識ベースを作って、自分の手元やクラウドへ保管すること**から始めます。接続できるAI環境では、クラウド上に直接作る方法も選べます。
 
-[**AD&Cインストーラーを取得**](../AgentOS-C_設計・構築運用指示書_一般配布版.md) ／ [補足の導入ガイド](Getting-Started.md) ／ [Quick Start](../../QUICKSTART.md)
+[**QR画像を開く**](../../assets/adnc-installer-qr.png) ／ [共通インストーラーの本文](../AgentOS-C_設計・構築運用指示書_一般配布版.md) ／ [補足の導入ガイド](Getting-Started.md) ／ [Quick Start](../../QUICKSTART.md)
 
 ## 何に役立つ？
 
@@ -28,7 +30,7 @@ DODAIは日本語の「土台」に由来します。TRPGのGMがルールブッ
 
 ## どこまで動いている？
 
-**現在の実例：** 一部のAI環境で初回KB構築、ZIPの受渡し、外部保存・読戻しを確認しています。[開発調査Skill（Draft）](https://github.com/Yosio-DMZ-C/AgentOS-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)はAIに渡して試せますが、正式Active版ではありません。
+**現在の実例：** 一部のAI環境で初回KB構築、ZIPの受渡し、外部保存・読戻しを確認しています。[開発調査Skill（Draft）](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)はAIに渡して試せますが、正式Active版ではありません。
 
 **検証中：** 別チャット・別AIへの引き継ぎ、元の記録を保った安全な更新、失敗時の復元。AIの種類と接続権限によって成功範囲が違います。
 

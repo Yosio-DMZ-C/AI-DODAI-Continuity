@@ -1,5 +1,7 @@
 # AD&C（AI-DODAI & Continuity）名称移行計画 — 審査用
 
+> **歴史資料・互換性記録**：この文書は2026年10月の改名・配布資産保全の時点を記録しています。旧一般版／旧無課金版のファイル名・Release URL・SHAは後方互換のため保持し、現在の新規導入方式を二者択一で示すものではありません。**現行の新規導入正本は[単一インストーラー](AgentOS-C_設計・構築運用指示書_一般配布版.md)、入口は[QR画像からのQuick Start](../QUICKSTART.md)です。**
+
 ## 追記：本体リポジトリ改名の実施結果（2026-10-14）
 
 **現在の本体正本：** [Yosio-DMZ-C/AI-DODAI-Continuity](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity)。旧名称は `Yosio-DMZ-C/AgentOS-C`。利用者の明示承認により、GitHubの同一リポジトリを改名済み（repo ID `1409572106`）。PR #9はmainへマージ済み（`5cdd1056c9d74ae3dfcdd8403e6b71abd9d1eb64`）。

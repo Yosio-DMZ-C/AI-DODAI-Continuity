@@ -5,7 +5,7 @@
 **AIを替えるたびに、仕事の続きを説明し直していませんか？** AD&Cは、知識・判断理由・作業状態を自分のMarkdownファイルに置き、ChatGPT・Claude・Geminiなど既存のAIで**続きを再開しやすくする**ための対話型インストーラーと運用の型です。新しいLLMや自律エージェントの実行環境ではありません。
 
 - **困りごと**：別チャットで前提が失われる／以前の決定や「やらないこと」が伝わらない／特定サービスの記憶に依存する。
-- **始め方**：[単一のインストーラー](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md)を普段のAIに渡して `実行` → 保存先を選択 → 確認して `進めて`。[詳しい3ステップ](QUICKSTART.md)
+- **始め方**：まず[QR画像](assets/adnc-installer-qr.png)をAIに写真として送り、`これを実行して`。AIが[現行の単一インストーラー本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)を実取得できたら保存先を選択し、確認して`進めて`。[詳しい3ステップ](QUICKSTART.md)
 - **AIインターフェースの設計思想（検証中）**：「文脈ゲート」で本人の条件・採用済み決定を確認し、「道具棚」で既存の手順と実体を見つけ、「完了ゲート」で正本への反映・実行・検収を区別します。[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)
 - **自然な相談から既存Skillを選ぶ入口（試験中）**：このAD&C入口を取得したAIは、依頼の目的を[共有KBの質問別ルーティング表](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md)に照合し、該当する**現行SKILL.mdの本文を実取得してから**実行します。例：「週末どんづるぼうの散策コース」「キャンプ場から登れる山」→ [山歩きプレイブック v0.3.9（利用者採用Active）](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/hiking-route-search/SKILL.md)。関係のない依頼には適用しません。**READMEのリンク追加だけでは新規チャットでの自動読込・自動起動を保証せず、正式配布カタログは未登録**です。
 - **現在地：β版**。初期KB構築と保存・読戻しを限定的に確認しています。異なるAIでの無条件な継続、自動実装や効果は保証しません。[検証結果](docs/wiki/Verified-Results.md)／[現行インストーラー版（唯一の版数正本）](docs/updates/LATEST.json)
@@ -20,7 +20,7 @@
 
 **名称変更済み（2026-10-14）：** 本体リポジトリは [AI-DODAI-Continuity](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity) に改名しました（旧名：AgentOS-C）。配布タグ `guides-current` と既存の配布ファイル名は維持しています。2026-10-25に従来配布URLを使うGitHub Actionsで、現行共通ガイドの実ダウンロードとSHA-256一致、および旧無料版ファイルの保全を確認しました。[実行結果](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/actions/runs/40161518361)／[移行計画](docs/ADNC_NAME_MIGRATION_PLAN.md)を参照してください。
 
-入口はシンプルです。**[AD&Cインストーラー（現行の単一版）](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md)**を取得し、普段のAIに渡して `実行` → 保存先選択 → `進めて`。保存先への直接接続が使えるかどうかはAIが確認し、クラウド連携／ローカル手動保存へ分岐します。インストーラーはAIへ渡すMarkdownファイルであり、端末にインストールする実行アプリではありません。ファイル生成・外部保存・次回再開の対応範囲はAI環境によって異なります。
+入口はシンプルです。**[QR画像](assets/adnc-installer-qr.png)を写真としてAIへ送り、`これを実行して`**。QRから[現行の単一インストーラー本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)を取得できれば、保存先選択 → `進めて`。読み取れない場合はMarkdown添付に切り替えます。保存先への直接接続が使えるかどうかはAIが確認し、クラウド連携／ローカル手動保存へ分岐します。インストーラーはAIへ渡すMarkdownファイルであり、端末にインストールする実行アプリではありません。ファイル生成・外部保存・次回再開の対応範囲はAI環境によって異なります。
 
 ## AD&Cの基本理念
 
@@ -38,10 +38,20 @@
 
 **長期目標は、より良い人生の選択を支えること。** 医師・研究者・教育者などが、ITの利用障壁に足止めされず、自分の知見を実務や共有知に生かせるなら、社会全体の知的生産にもつながるはずです。これは目指す効果であり、実証済みの生産性向上ではありません。
 
+## 写真を送るだけで始める（QR画像・試験中）
+
+**最初に、このQR画像を保存して普段のAIのチャットに写真として送り、`これを実行して` と伝えてください。** AIがQRから**現行の単一Markdownインストーラー本文**を取得できた場合は、保存先選択から始まります。GitHubの操作・URL手入力は不要です。
+
+[![AD&C共通インストーラーのQR画像（写真として保存・共有できます）](assets/adnc-installer-qr.png)](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)
+
+[QR画像を開く](assets/adnc-installer-qr.png) ／ [QRのリンク先：共通インストーラー本文（Markdown直リンク）](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)
+
+**確認ポイント**：写真送信／QRのURL解読／正規MD本文・版の実取得／保存先選択／本人の`進めて`承認／実保存と読戻しは別工程です。QR画像を送れたことだけで導入完了としません。本文を取得できないAIでは、[Markdownをファイル添付する方法](docs/wiki/Upload-File.md)に切り替えます。2026-11-01のMuse試験ではGitHubリンクを404とする報告があり、代替文書へ誘導されたため、異なるAIでの同じ手順の再現性は**未検証**です。
+
 ## まず試す：3ステップ
 
-1. **[AD&Cインストーラーを取得する（単一版・Markdown）](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md)**。GitHubのファイル画面からダウンロードし、Claudeなど普段使うAIのチャットへ添付する。 [添付方法の案内](docs/wiki/Upload-File.md)
-2. チャットで `実行` と送り、保存先を選ぶ。AIが実際の読書き可否を確認し、作成案を提示する。
+1. **[QR画像を保存する](assets/adnc-installer-qr.png)**。普段使うAIに写真として送り、`これを実行して` と伝える。QRを読めないAIでは[現行Markdownを添付](docs/wiki/Upload-File.md)する。
+2. AIが**正式なMarkdown本文と配布版を取得できたこと**を確認し、保存先を選ぶ。AIが実際の読書き可否を確認し、作成案を提示する。
 3. 内容を確認して `進めて` と送る。生成されたKBを受け取り、保存できたことを確認する。
 
 [**はじめての方へ**](docs/wiki/Home.md) ／ [**Quick Start**](QUICKSTART.md) ／ [**導入済みKBの更新入口**](docs/updates/UPDATE.md)
@@ -78,7 +88,7 @@ AD&Cを初めて使う方に、**インストーラーの `実行` → 保存先
 - **クラウド連携モード：** AIから指定した保存先への直接読書きが実際に確認できた場合に利用します。
 - **ローカル手動保存モード：** 直接書き込めない場合は、生成したZIPまたは復元可能なMarkdown/TXTを本人が保存します。
 
-旧「AI無課金ユーザー版」は過去の検証・互換資料として残していますが、**新規導入の推奨入口ではありません**。固定配布Releaseは**一般版 `AgentOS-C_Guide.md` が現行共通インストーラー、旧 `AgentOS-C_Free_Guide.md` は非推奨の保全版**です。両方が最新版という意味ではありません。利用手順の詳細は[補足ガイド](docs/wiki/Getting-Started.md)を参照してください。
+旧「AI無課金ユーザー版」は**履歴・互換用の保全資料**であり、現在の新規導入には使いません。固定配布Releaseで旧ファイル名が残っていても、**新規導入は上記の共通インストーラー1本**です。配布ファイル名の互換性は維持し、保存先の接続可否によって動作を分岐します。利用手順の詳細は[補足ガイド](docs/wiki/Getting-Started.md)を参照してください。
 
 [実動作の検証結果](docs/wiki/Verified-Results.md)では、Claude・Gemini・Grokなどで試した内容を紹介しています。利用できる機能はAIサービスや接続環境によって異なります。
 
@@ -97,7 +107,7 @@ AD&Cでは、主に次のようなファイルを使います。
 
 ## 開発調査から始め、知識の共有へ広げる
 
-**先行利用できる例（Draft）：** [開発調査・技術選定Skill v0.1.1-preview](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)。課題の整理 → 公式仕様の確認 → 現実的な1案 → 未知の操作だけ検証 → 判断理由の記録、という手順をAIへ渡せます。限定的な接続検証例がありますが、**正式Active版ではなく、省力化の効果も未計測**です。
+**先行利用できる例（Draft）：** [開発調査・技術選定Skill v0.1.3-preview](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/development-research/SKILL.md)。課題の整理 → 公式仕様の確認 → 現実的な1案 → 未知の操作だけ検証 → 判断理由の記録、という手順をAIへ渡せます。限定的な接続検証例がありますが、**正式Active版ではなく、省力化の効果も未計測**です。
 
 この先は、以下を検証・整備する構想です。
 
