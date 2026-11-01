@@ -35,6 +35,21 @@ jobs:
           grep -q '^# AD&C' 'dist/AgentOS-C_Guide.md'
           grep -Eq '^- 配布版：[0-9]+\.[0-9]+\.[0-9]+' 'dist/AgentOS-C_Guide.md'
           grep -Fq 'https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/UPDATE.md' 'dist/AgentOS-C_Guide.md'
+          # Prevent a stale installer version in any executable setup instruction.
+          python3 - <<'PY'
+          import json
+          import pathlib
+          import re
+
+          guide = pathlib.Path("dist/AgentOS-C_Guide.md").read_text(encoding="utf-8")
+          manifest = json.loads(pathlib.Path("docs/updates/LATEST.json").read_text(encoding="utf-8"))
+          latest = manifest["latest_version"]
+          title = re.search(r"(?m)^- 配布版：(\d+\.\d+\.\d+)", guide)
+          setup_versions = re.findall(r"ADNC_INSTALLER_VERSION:\s*(\d+\.\d+\.\d+)", guide)
+          if not title or title.group(1) != latest or not setup_versions or any(v != latest for v in setup_versions):
+              raise SystemExit(f"FAIL: manifest={latest}, guide_title={title.group(1) if title else None}, setup_versions={setup_versions}")
+          print(f"PASS: manifest/header/setup versions match {latest}; setup entries={len(setup_versions)}")
+          PY
 
       - name: Publish current guide without altering legacy free asset
         env:
