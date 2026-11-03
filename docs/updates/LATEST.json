@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.6",
+  "latest_version": "1.5.7",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -215,6 +215,19 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.5-to-1.5.6.md"
+    },
+    {
+      "from_version": "1.5.6",
+      "to_version": "1.5.7",
+      "title": "共有Playbookの導入後発見と継続指示の検収ゲート",
+      "summary": "個人KB構築後に共有Skillを発見できず一般検索を先行させた事例への対策。共有README/試用カタログの参照、既存Skill索引の入口、本人許可のメモリ指示、独立した自然文テストを追加。既存KBのIDと内容を保全し、本人承認・SHA/逆参照検収を必須とする。",
+      "changes": [
+        {"target": "START_HERE.md／既存50_skills索引", "kind": "参照追加", "detail": "共有ルーティングと該当SkillへのURLを重複なく登録し、旧版表示を現行版と照合"},
+        {"target": "AIの継続指示・メモリ", "kind": "本人許可時のみ", "detail": "保存機能・許可・次チャット読取を別々に検収。保存不可はNOT_RUN"},
+        {"target": "registry／Context／BUILD_PLAN", "kind": "局所同期", "detail": "変更した実体だけ同一IDの実raw SHA・revision・逆参照を同期"},
+        {"target": "既存データ・正式配布状態", "kind": "保全", "detail": "個人情報・NodeID・fileId・権限を維持し、試用Skillを正式配布Activeへ昇格しない"}
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.6-to-1.5.7.md"
     }
   ]
 }
