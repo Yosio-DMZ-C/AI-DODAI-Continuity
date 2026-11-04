@@ -467,6 +467,26 @@ def self_test():
     print("SELF_TEST_PASS: latest-wins, idempotent, authenticated events, pending-work flags, annotated-row retention, fail-closed drift, refusal on missing list")
 
 
+def replay_issue_readonly(issue_body):
+    """Replay the pending display from a supplied real Issue body, without network or writes.
+
+    Caller supplies a previously fetched public Issue #13 body. Never run main(),
+    never fetch comments, and never PATCH the live Issue.
+    """
+    if not isinstance(issue_body, str) or TASK_HEADER not in issue_body:
+        raise RuntimeError("Missing real Issue task table")
+    rebuilt = replace_pending_block(issue_body)
+    if rebuilt != issue_body:
+        before = existing_pending_rows(issue_body)
+        after = existing_pending_rows(rebuilt)
+        changed = [ident for ident in sorted(set(before) | set(after))
+                   if before.get(ident) != after.get(ident)]
+        print("READ_ONLY_REPLAY_DIFF:", json.dumps(changed, ensure_ascii=False))
+        return False
+    print("READ_ONLY_REPLAY_PASS:", len(pending_tasks(issue_body)), "open tasks; byte-identical")
+    return True
+
+
 def main():
     global OWNER
     if "--self-test" in sys.argv:
