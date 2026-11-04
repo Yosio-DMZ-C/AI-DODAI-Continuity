@@ -414,7 +414,7 @@ def self_test():
     # This guards against a renderer that preserves annotations but freezes the queue.
     expanded = annotated.replace(
         "| ADNC-T003 | P1 | レビュー待ち | AI | REVIEW_PENDING | source |",
-        "| ADNC-T003 | P1 | レビュー待ち | AI | REVIEW_PENDING | source |\\n"
+        "| ADNC-T003 | P1 | レビュー待ち | AI | REVIEW_PENDING | source |\n"
         "| ADNC-T005 | P2 | 新規の安全な検査 | AI | IN_PROGRESS | new |",
     )
     assert expanded != annotated
