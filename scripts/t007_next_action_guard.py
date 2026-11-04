@@ -25,6 +25,8 @@ def candidates(body):
         # Only the live table has priority (P0/P1/P2) in column 2.
         if len(cells) < 4 or not re.match(r"^P[0-2](?:\b|（)", cells[0]):
             continue
+        if not re.match(r"^(?:IN_PROGRESS|BLOCKED|REVIEW_PENDING|PROPOSED|DONE|DROPPED)(?:$|[（( ])", cells[1]):
+            continue  # historical detail row, not a live status
         if task_id in found:
             raise ValueError(f"duplicate live task: {task_id}")
         status, owner, summary = cells[1:4]
