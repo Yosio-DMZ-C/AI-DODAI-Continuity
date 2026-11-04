@@ -1,0 +1,22 @@
+name: T015 PR60 isolated self-test
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/sync_issue13_state.py'
+      - '.github/workflows/t015-pr60-self-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  self-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python syntax check
+        run: python3 -m py_compile scripts/sync_issue13_state.py
+      - name: Existing full-source self-test (offline)
+        run: python3 scripts/sync_issue13_state.py --self-test
