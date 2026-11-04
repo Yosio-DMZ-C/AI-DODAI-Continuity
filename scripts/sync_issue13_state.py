@@ -410,6 +410,20 @@ def self_test():
     assert enriched2 in replace_pending_block(annotated)
     assert enriched3 in replace_pending_block(annotated)
 
+    # A newly registered task must appear without losing existing enriched rows.
+    # This guards against a renderer that preserves annotations but freezes the queue.
+    expanded = annotated.replace(
+        "| ADNC-T003 | P1 | レビュー待ち | AI | REVIEW_PENDING | source |",
+        "| ADNC-T003 | P1 | レビュー待ち | AI | REVIEW_PENDING | source |\\n"
+        "| ADNC-T005 | P2 | 新規の安全な検査 | AI | IN_PROGRESS | new |",
+    )
+    assert expanded != annotated
+    expanded_view = replace_pending_block(expanded)
+    assert enriched2 in expanded_view and enriched3 in expanded_view
+    assert "| ADNC-T005 | P2 | **IN_PROGRESS** | AI | 新規の安全な検査 |" in expanded_view
+    assert "未完了：3 件" in expanded_view
+    assert replace_pending_block(expanded_view) == expanded_view
+
     # Canonical DONE removes an active row; a new ordinary status can still be rendered.
     finished = annotated.replace("REVIEW_PENDING | source |", "DONE（実体確認済み） | source |")
     updated_finished = replace_pending_block(finished)
