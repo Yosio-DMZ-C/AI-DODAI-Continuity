@@ -20,7 +20,7 @@ def main(argv):
     if len(argv) != 5:
         print(__doc__.strip(), file=sys.stderr)
         return 2
-    registry = json.loads(pathlib.Path(argv[1]).read_text(encoding="utf-8"))
+    registry = json.loads(pathlib.Path(argv[1]).read_text(encoding="utf-8-sig"))
     records = registry.get("records", [])
     passed = True
     for asset_id, filename in zip(IDS, argv[2:]):
