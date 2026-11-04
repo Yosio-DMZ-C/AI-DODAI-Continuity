@@ -1,6 +1,6 @@
 # AD&C（AI-DODAI & Continuity）設計・構築運用指示書 — 一般配布版
 
-- 配布版：1.5.6（2026-10-25：制作素材一般仕様の正本を共有KBへ統一し、初期導入が素材を自動生成しないことを明確化）
+- 配布版：1.5.7（2026-11-03：導入後の共有Playbook発見・本人許可の継続指示・新チャット検収を追加。従来の初回フロー・安全境界は維持）
 - 訂正（2026-11-01）：第20章の初回 `ADNC_INSTALLER_VERSION` に残っていた旧値1.5.3を現行1.5.6に訂正。仕様追加・既存KBの無断更新なし。
 - 用途：個人・案件・チームで始め、必要に応じて共有へ接続するナレッジベースの構築
 - 本書の内容：構造、記録形式、購入・調査・在庫管理、品質管理、共有、AIへの実行指示
@@ -22,6 +22,22 @@
 保存先が決まり接続確認ができた後、既存KBがあれば入口と台帳を先に読む。既存のIDとファイルを維持し、別のKBを無断で作らない。新規KBのフォルダ名は `AI_KnowledgeBase` を推奨例とするが、既存名を変更する必要はない。**製品名はAD&C（AI-DODAI & Continuity）**。配布ファイル名・過去資料の `AgentOS-C` は旧称・互換表記であり、新規KBのフォルダ名や製品の正式名称として自動採用しない。ユーザーが既存名を指定した場合はその名前を保持する。
 
 この配布文書と、利用者が構築した実データは別物である。本書を配布しても、構築先の記録やストレージが公開されるわけではない。個人・顧客・社内情報を追加した後の文書は、配布用の原本とは分けて保管する。
+
+### 初期導入後の共有Playbook発見・継続指示（2026-11-03 改訂案）
+
+**初期フローの「保存先選択→接続確認→1案提示→本人の『進めて』→構築・検収」は変更しない。** 以下は構築・保存・読戻し後の追加検収であり、導入前の質問や無承認の書込みを増やさない。
+
+1. **共有入口の実取得**：公開の [AD&C共有KB README](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md) の自然文ルーティング表と [catalog.json](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/catalog.json) を実取得する。正式配布項目が0件でも、利用者採用の試用Playbookを「存在しない」と扱わない。
+2. **個人KBから参照できる状態にする**：新規の `50_skills` が空でも、共有Skillの入口URLを利用できる索引・継続指示へリンクとして登録する。登録先・書込権限・更新手順は構築した個人KBの現行規則に従う。本文の無断複製や共有側への個人情報送信をしない。保存・読戻しできない場合は未設定と報告する。
+3. **メモリの利用可能性を確認**：AIの永続メモリ／カスタム指示を使え、本人が保存を許可する場合のみ、下の短いルールを保存して実読戻しする。メモリ操作機能がなければコピー用指示を示す。保存不能を導入本体の失敗と混同せず、共有Skillの自発発見は `NOT_RUN` とする。
+4. **自然文テスト**：例「来週、大台ヶ原の景色の良い登山ルートを探して」で、通常Web検索より先に共有ルーティング→山歩き `SKILL.md` 全文・版→個人KB優先手順の順で取得できるか確認する。山歩きの最初の検索はYAMAP限定とし、route_qa.pyや安全ゲートを省略しない。検査できなければ原因と再試行条件を残す。
+5. **継続時の回復**：相談に合うPlaybookが見つからない、URLが失効した、旧版・手順不明で詰まったときは共有README・カタログの最新版を再取得する。共有の新版があるだけで個人の採用済み手順を自動上書きしない。更新は現行の更新入口・本人承認・読戻しを守る。
+
+**メモリ／カスタム指示用の短文（本人の保存許可がある場合のみ）**：
+
+> AD&Cを利用中。新しい相談では一般検索・回答より先に、共有KB https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge のREADMEの自然文ルーティング表を確認し、該当PlaybookがあればSKILL.md全文と版を取得して従う。個人KBの優先手順も確認する。手順やリンクで詰まったら共有KBの最新版を再取得し、解決不能なら原因と未実施工程を報告する。未取得のPlaybookを適用済みと称さない。
+
+**状態を分けて報告**：KB構築／共有入口取得／個人KBへの参照登録／メモリ保存／新チャットでの発見／実案件の適用は別のPASS/FAIL/NOT_RUN。公開ファイルの更新だけでMuse等の記憶・自動実行が変わったとは主張しない。
 
 ### 基本のふるまい：目的と背景を失わない（2026-10-31採用／全Playbook適用）
 
@@ -108,7 +124,7 @@
 
 ### 導入済みKBの更新入口（詳細は別ファイル）
 
-初回構築時、既存`START_HERE.md`の冒頭に**`ADNC_INSTALLER_VERSION: 1.5.6`**と、公開の固定入口`ADNC_UPDATE_RUNBOOK: https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/UPDATE.md`を記録する。`ADNC_UPDATE_MANIFEST`（[LATEST.json](updates/LATEST.json)）も併記する。KBの設計版・schema_version・各レコードrevisionとは混同しない。旧KB（導入版不明）にこの数値を後付けしてはならない。旧KBは[ADOPT_LEGACY.md](updates/ADOPT_LEGACY.md)の互換レイヤーだけを提案し、正式導入版の更新と区別する。
+初回構築時、既存`START_HERE.md`の冒頭に**`ADNC_INSTALLER_VERSION: 1.5.7`**と、公開の固定入口`ADNC_UPDATE_RUNBOOK: https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/UPDATE.md`を記録する。`ADNC_UPDATE_MANIFEST`（[LATEST.json](updates/LATEST.json)）も併記する。KBの設計版・schema_version・各レコードrevisionとは混同しない。旧KB（導入版不明）にこの数値を後付けしてはならない。旧KBは[ADOPT_LEGACY.md](updates/ADOPT_LEGACY.md)の互換レイヤーだけを提案し、正式導入版の更新と区別する。
 
 利用者が「アップデートして」と依頼した場合は、**更新専用実行正本[UPDATE.md](updates/UPDATE.md)を最初から実取得して実行**。この本文を更新手順書として代用しない。秘書の日次読取確認は[DAILY_CHECK.md](updates/DAILY_CHECK.md)を参照し、自動更新はしない。
 
@@ -761,7 +777,7 @@ AIは、考察を広げず、次のような短い選択肢を提示する。
 #### 初回
 
 1. AIが正本構造、START_HERE、BUILD_PLAN、registry、必要なKnowledge / Context / Skill等を自動生成する。 
-   - START_HEREに導入版 `ADNC_INSTALLER_VERSION: 1.5.6`（本書冒頭の配布版・`LATEST.json` と一致することを照合し、矛盾があれば保存を止める）、`ADNC_EXECUTION_STANDARD`（[共通実行標準](PROJECT_EXECUTION_STANDARD.md)の個別URL）、公開の `ADNC_UPDATE_RUNBOOK`（上記UPDATE.mdの個別URL）、`ADNC_UPDATE_MANIFEST`（LATEST.jsonの個別URL）を短く記録する。導入版不明の旧KBでは新規導入済みと偽らず、専用の互換ガイドに従う。既存KBは作り直さず、既存のIDと記録を保護する。
+   - START_HEREに導入版 `ADNC_INSTALLER_VERSION: 1.5.7`（本書冒頭の配布版・`LATEST.json` と一致することを照合し、矛盾があれば保存を止める）、`ADNC_EXECUTION_STANDARD`（[共通実行標準](PROJECT_EXECUTION_STANDARD.md)の個別URL）、公開の `ADNC_UPDATE_RUNBOOK`（上記UPDATE.mdの個別URL）、`ADNC_UPDATE_MANIFEST`（LATEST.jsonの個別URL）を短く記録する。導入版不明の旧KBでは新規導入済みと偽らず、専用の互換ガイドに従う。既存KBは作り直さず、既存のIDと記録を保護する。
 2. 生成物の構造・ID・参照・表示をレビューする。
 3. 可能なら1つの `AgentOS-C_initial.zip` にまとめる。ZIPを扱えない環境では、相対パス・各ファイル全文・固定IDを含む単一Markdown/TXTにまとめる。
 4. 受渡し前に成果物を読戻し、件数、NodeID、本文欠落、参照、構造、文字化け、可能ならhashを検査する。内容を完全復元できない出力を「全件バックアップ」と表現しない。
@@ -996,6 +1012,8 @@ PARA、Zettelkasten、Medallion等の考え方は第2章に示す役割へ限定
 
 
 ## 変更履歴
+
+- 1.5.7（共有Skillの発見と継続指示）：個人KB構築後に共有README・試用カタログを取得し、既存Skill索引に参照を登録。本人が許可した場合だけメモリ／継続指示を保存し、一般検索より先の自然文ルーティング・山歩きYAMAP先行を独立検収。既存KBへの適用は[1.5.6→1.5.7差分手順](updates/upgrade-1.5.6-to-1.5.7.md)と本人承認・保全・同一ID・SHA読戻しに従う。自動発見の効果は未実証。
 
 - 1.5.6（制作素材仕様の正本統一）：表A〜Dを共有KBの動画制作Draft Skill配下へ移し、インストーラーは直接の固定参照に変更。ロゴ・キャラクター・アイコン等のインストール時自動生成はしないと明記。個人の実素材・権利・採用判断は個人KBの正本を保つ。旧リンクは互換案内として残す。
 
