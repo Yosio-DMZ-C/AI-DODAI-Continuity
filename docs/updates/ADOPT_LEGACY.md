@@ -41,6 +41,27 @@ ADNC_UPDATE_STATUS_PATH: 00_system/ADNC_UPDATE_STATUS.md
 4. `START_HERE`を同一Drive fileIdで差分更新し、現在のregistryに登録済みなら該当するレコードを更新（新規のダミー登録はしない）。新しい更新管理メモは登録ルールに従って登録する場合のみ新規レコードを付け、既存IDを破壊しない。
 5. 書き換えたファイルを**実再取得**し、元のKB、fileId、NodeID、旧本文保持、更新管理メモの`ADNC_ORIGIN`と`ADNC_UPDATE_PROTOCOL_VERSION`、registry参照整合をすべて確認する。
 
+## 任意の観測基準版（旧KBの再インストールなし）
+
+旧KBに更新確認の互換レイヤーがある場合、本人の明示的な対象指定と承認、原本照合、保全・読戻しの後に、**独立した観測基準版**を付けてもよい。この節は既存の互換導入と分けて実施する。過去のインストーラー版が判明したと偽らない。
+
+初回の観測状態で、既存の`00_system/ADNC_UPDATE_STATUS.md`に以下のメタデータだけを最小追記する（例。実検査がPASSした範囲のみ記載）。
+
+```text
+ADNC_BASELINE_TRACK: legacy-observed
+ADNC_BASELINE_VERSION: 0.1.0
+ADNC_BASELINE_SCOPE: core-entry-registry-status-only
+ADNC_BASELINE_VERIFICATION: core-14-of-14
+ADNC_BASELINE_DATE: YYYY-MM-DD
+ADNC_BASELINE_INSTALLER_ORIGIN: unknown
+```
+
+**この0.1.0は観測した旧KB状態の管理版であり、正式インストーラーの配布／導入版ではない。** `ADNC_ORIGIN: legacy_unversioned` と `ADNC_UPDATE_PROTOCOL_VERSION` は維持し、`ADNC_INSTALLER_VERSION`を付与しない。スキーマ版、レコードrevision、更新管理機能版とも区別する。後の観測基準版改訂には検査範囲と差分・根拠・復旧経路を記録し、単なる日付更新で自動採番しない。
+
+必須ゲートは、`START_HERE`→`registry`→統合KB書込契約→現行`ADNC_UPDATE_STATUS`・`BUILD_PLAN`の実取得、既存NodeIDとfileIdの維持、対象原本のraw SHAと台帳値の整合、旧版バイト一致保全、競合確認、同一fileIdへの局所追記、registry該当レコードのSHA同期、双方の再取得とSHA再照合。台帳の不一致や未検証機能があれば理由を記録し、当該範囲をFAIL/NOT_RUNとして観測版の正式登録を停止する。検査済みの範囲だけを明記し、全機能がインストーラー最新版と一致すると主張しない。
+
+将来、旧KBを数値版インストーラーの更新経路へ移すときは、移行先の各要件と現行実装を機能別に照合し、未導入部分の差分手順・承認・実適用・復旧・読戻しまで独立検証する。**観測基準版0.1.0を`FROM=0.1.0`として通常のインストーラー版グラフへ渡してはならない。** 全要件の検収PASS後に、はじめて正式な到達インストーラー版を別途記録する。この互換案内だけではその移行を実施しない。
+
 ## 完了判定・秘書への接続
 
 - **互換導入 PASS**：上記の実保存と読戻しがそろった状態。`ADNC_INSTALLER_VERSION`は**引き続き未確認**。旧KBの全機能がv1.5.2になったとは報告しない。
