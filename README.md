@@ -2,7 +2,11 @@
 
 > **AIを替えても、冒険は続く。**
 
-**AD&Cの運用方針（2026-11-08更新案）**：AIは利用者の最終ゴールから逆算して、権限内・低リスク・可逆な仕事を実際に完了させます。未承認の公開・mainマージ等が最後の障壁なら、「あと何を承認すれば完了するか」を具体的に表示し、利用できるUIでは押せる承認ボタンを示します。提案、Draft PR、実操作、利用者に反映された完了は区別します。エラーは安全な最終形の実地試験で観測して修正し、必要なら復旧します。詳細は[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)と[標準コミュニケーション Playbook](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)。ボタン非対応なら「最終ゴールへの承認指示文」をコードブロックで表示し、「これをチャットに投入いただければ実施します。」と案内します。各専門Playbookは共通ルールへの短い参照で継承し、実行ごとの追加審査や無意味な再承認を増やしません。
+**共同開発者・AI向けの軽量入口（2026-11-10時点）**：依頼された目的に合う**現行Playbookを必要な1件だけ**取得して実行してください。すべての標準・ワークシート・理念・Designer’s Noteを毎回読み込む必要はありません。低リスクで権限内の仕事を実行 → 変更対象を読戻し → 実物・問題・次の一手を既存案件へ記録します。未実行を完了と呼ばず、問題があっても成功部分を保持します。公開・権限変更・削除・課金・秘密の送信は実際の権限と本人の指示に従います。
+
+- **使うとき**：[共有KBの目的別Playbook案内](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md#自然な依頼からのskill選択入口を取得できたai向け試験運用) → 該当する専門Playbook。通常の返答・次の一手は[標準コミュニケーション](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)。
+- **作る・改訂するときだけ**：[Playbook更新プラクティス](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/docs/DEVELOPMENT_WORKFLOW_PRACTICES.md)と、対象に既存のDesigner’s Noteがあればその内容を参照。一般実行へ事前審査を増やさない。
+- **本体を開発するとき**：必要な箇所だけ[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)。詳細と長期の設計理由は既存正本へリンクし、この入口には複製しません。WORK60等の特定環境向け運用は全利用者の標準ではありません。
 
 
 **AIを替えるたびに、仕事の続きを説明し直していませんか？** AD&Cは、知識・判断理由・作業状態を自分のMarkdownファイルに置き、ChatGPT・Claude・Geminiなど既存のAIで**続きを再開しやすくする**ための対話型インストーラーと運用の型です。新しいLLMや自律エージェントの実行環境ではありません。
@@ -14,7 +18,7 @@
 - **困りごと**：別チャットで前提が失われる／以前の決定や「やらないこと」が伝わらない／特定サービスの記憶に依存する。
 - **始め方**：まず[QR画像](assets/adnc-installer-qr.png)をAIに写真として送り、`これを実行して`。AIが[現行の単一インストーラー本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)を実取得できたら保存先を選択し、確認して`進めて`。[詳しい3ステップ](QUICKSTART.md)
 - **AIインターフェースの設計思想（検証中）**：「文脈ゲート」で本人の条件・採用済み決定を確認し、「道具棚」で既存の手順と実体を見つけ、「完了ゲート」で正本への反映・実行・検収を区別します。[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)
-- **自然な相談から既存Skillを選ぶ入口（試験中）**：このAD&C入口を取得したAIは、依頼の目的を[共有KBの質問別ルーティング表](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md)に照合し、該当する**現行SKILL.mdの本文を実取得してから**実行します。例：「週末どんづるぼうの散策コース」「キャンプ場から登れる山」→ [山歩きプレイブック v0.4.0（Python検収β）（利用者採用Active）](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/hiking-route-search/SKILL.md)。関係のない依頼には適用しません。**READMEのリンク追加だけでは新規チャットでの自動読込・自動起動を保証せず、正式配布カタログへの配布登録は未完了（試用枠と区別）**です。
+- **専門Playbookの自動発見は試験中**：[共有KBの目的別入口](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md#自然な依頼からのskill選択入口を取得できたai向け試験運用)から、該当する1件だけ実取得。例：[山歩きPlaybook](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/hiking-route-search/SKILL.md)。リンク公開だけで新チャットへの自動読込・正式Active配布が成立するわけではありません。
 - **現在地：β版**。初期KB構築と保存・読戻しを限定的に確認しています。異なるAIでの無条件な継続、自動実装や効果は保証しません。[検証結果](docs/wiki/Verified-Results.md)／[現行インストーラー版（唯一の版数正本）](docs/updates/LATEST.json)
 
 **In English:** AD&C is an open-source conversational installer and operating pattern to keep personal knowledge, decisions, and work state in Markdown files you control, so you can resume work with different AI assistants. It is **not** a new LLM or agent runtime. **Beta:** initial setup and save/read-back have limited verification; reliable cross-AI continuity remains under testing. [Quick Start](QUICKSTART.md)
