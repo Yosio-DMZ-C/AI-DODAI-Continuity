@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.6",
+  "latest_version": "1.5.7",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -215,6 +215,35 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.5-to-1.5.6.md"
+    },
+    {
+      "from_version": "1.5.6",
+      "to_version": "1.5.7",
+      "title": "利用者属性・課金区分による動作決め打ちを解消",
+      "summary": "「一般／専門」「無料／有料」を根拠に音声制作・保存・同期を固定せず、本人の採用条件と実機能で分岐。ローカル手動保存の継続を保ち、過去の無課金ユーザー版の履歴は保存する。既存KBの自動再導入・全件書換えは行わない。",
+      "changes": [
+        {
+          "target": "現行インストーラーの実行モード・音声制作・秘書・同期規則",
+          "kind": "判定条件整理",
+          "detail": "利用者ラベルや課金だけで固定せず、選択された保存先、検証済みの直接読書き・更新、本人が採用した制作方式を基準にする"
+        },
+        {
+          "target": "既存KBの利用方式",
+          "kind": "必要時の局所整合",
+          "detail": "旧区分で明示的に動作を固定している実在箇所があれば対象だけ確認し、既存の本人決定を保持して矛盾を局所修正。無該当ならデータ・設定の変更不要"
+        },
+        {
+          "target": "START_HERE／registry",
+          "kind": "安全な導入版更新",
+          "detail": "本人承認・更新対象実取得・保存後読戻しの上、導入版を1.5.7へ更新。既存のNodeID、fileId、履歴、他の版軸を維持"
+        },
+        {
+          "target": "旧AI無課金ユーザー版の変更履歴・既存ユーザーデータ",
+          "kind": "保全",
+          "detail": "履歴の文言は削除・書換えず保全。秘書タスク、保存先、日記、TASKS、採用音声方式を一括変更しない"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.6-to-1.5.7.md"
     }
   ]
 }
