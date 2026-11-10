@@ -8,8 +8,10 @@
 
 **期待値について：** AD&CはAIの回答を必ず正しくしたり、すべての仕事を自動で完成させたりするものではありません。手戻りを減らし、成功しやすい条件を積み重ねることを目指しますが、全体の成功率やQOL向上はまだ数値で実証していません。**実際にできたこと・失敗したこと・未検証のことを分けて示します。** [実例と検証状況](docs/wiki/Verified-Results.md) ／ [この考え方の背景](docs/wiki/Future-Vision.md)
 
+**インストール前に5操作だけ試す（無料・連携なし／任意）：** [スマホメモと無料AIで「保存→新チャット再開」を試す継続キット](docs/examples/free-portable-first-success.md)。架空の買い物リストを使い、メモ保存・開き直し・新チャットへの貼付・再開内容の確認を行います。GitHub連携・KB構築・有料契約は不要です。**実スマホと別チャットでの利用者検証は未実施**であり、保存や受信ができたと推測しません。正式なKB構築は下記のQR入口から進めます。
+
 - **困りごと**：別チャットで前提が失われる／以前の決定や「やらないこと」が伝わらない／特定サービスの記憶に依存する。
-- **始め方**：まず[QR画像](assets/adnc-installer-qr.png)をAIに写真として送り、`これを実行して`。AIが[現行の単一インストーラー本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)を実取得できたら保存先を選択し、確認して`進めて`。[詳しい3ステップ](QUICKSTART.md)
+- **KBを作る始め方**：まず[QR画像](assets/adnc-installer-qr.png)をAIに写真として送り、`これを実行して`。AIが[現行の単一インストーラー本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)を実取得できたら保存先を選択し、確認して`進めて`。[詳しい3ステップ](QUICKSTART.md)
 - **AIインターフェースの設計思想（検証中）**：「文脈ゲート」で本人の条件・採用済み決定を確認し、「道具棚」で既存の手順と実体を見つけ、「完了ゲート」で正本への反映・実行・検収を区別します。[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)
 - **自然な相談から既存Skillを選ぶ入口（試験中）**：このAD&C入口を取得したAIは、依頼の目的を[共有KBの質問別ルーティング表](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md)に照合し、該当する**現行SKILL.mdの本文を実取得してから**実行します。例：「週末どんづるぼうの散策コース」「キャンプ場から登れる山」→ [山歩きプレイブック v0.4.0（Python検収β）（利用者採用Active）](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/hiking-route-search/SKILL.md)。関係のない依頼には適用しません。**READMEのリンク追加だけでは新規チャットでの自動読込・自動起動を保証せず、正式配布カタログへの配布登録は未完了（試用枠と区別）**です。
 - **現在地：β版**。初期KB構築と保存・読戻しを限定的に確認しています。異なるAIでの無条件な継続、自動実装や効果は保証しません。[検証結果](docs/wiki/Verified-Results.md)／[現行インストーラー版（唯一の版数正本）](docs/updates/LATEST.json)
