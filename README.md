@@ -2,6 +2,8 @@
 
 > **AIを替えても、冒険は続く。**
 
+**コンセプト副題：AgentOS-C（AIをエージェントにするOS）**。かつての製品名を思想の呼称として残します。正式名称・インストーラー版・新規KBの表記は**AD&C**に統一し、実際のPC向けOSや別のAIエージェント実行基盤を意味しません。旧ファイル名・URL・歴史的資料は互換性のため維持します。
+
 **共同開発者・AI向けの軽量入口（2026-11-10時点）**：依頼された目的に合う**現行Playbookを必要な1件だけ**取得して実行してください。すべての標準・ワークシート・理念・Designer’s Noteを毎回読み込む必要はありません。低リスクで権限内の仕事を実行 → 変更対象を読戻し → 実物・問題・次の一手を既存案件へ記録します。未実行を完了と呼ばず、問題があっても成功部分を保持します。公開・権限変更・削除・課金・秘密の送信は実際の権限と本人の指示に従います。
 
 - **使うとき**：[共有KBの目的別Playbook案内](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md#自然な依頼からのskill選択入口を取得できたai向け試験運用) → 該当する専門Playbook。通常の返答・次の一手は[標準コミュニケーション](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)。
@@ -25,7 +27,7 @@
 
 **開発状態：AD&C全体がβ版（2026-10-23）。** 小さく試す→実物を検査する→失敗した対象だけ元に戻す→学んで続ける、を開発の基本とします。未完成の機能は明示し、他のAI・導入済みKBで自動的に動くとは主張しません。[共通β開発・失敗復旧の契約](docs/PROJECT_EXECUTION_STANDARD.md)と[利用停止・復帰仕様](docs/USER_LIFECYCLE_AND_ROLLBACK.md)を参照。Git履歴やKBの変更前版で戻せる範囲と、公開・送信など元に戻せない操作は区別します。
 
-**AD&C（旧名称：AgentOS-C）**は、**既存のAIをオペレーターとして、知識・判断・作業状態を自分が管理するファイルに残して活用するための「対話型インストーラー＋運用の型」**です。新しいLLMやエージェント実行環境を作るものではありません。
+**AD&C（旧製品名／コンセプト副題：AgentOS-C）**は、**既存のAIをオペレーターとして、知識・判断・作業状態を自分が管理するファイルに残して活用するための「対話型インストーラー＋運用の型」**です。新しいLLMやエージェント実行環境を作るものではありません。
 
 **AI-DODAI**の「DODAI」は日本語の「土台」。知識・判断履歴・作業状態を人間の管理するファイルに置き、各AIが共通ルールと記録を読みながら、その推論能力を使って進めるという考え方です。TRPGのルールブックと冒険の記録をGMが引き継ぐ、という比喩で説明できます。ただし、AIをまたぐ継続動作は現在も検証中です。
 
@@ -58,6 +60,12 @@
 [QR画像を開く](assets/adnc-installer-qr.png) ／ [QRのリンク先：共通インストーラー本文（Markdown直リンク）](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)
 
 **確認ポイント**：写真送信／QRのURL解読／正規MD本文・版の実取得／保存先選択／本人の`進めて`承認／実保存と読戻しは別工程です。QR画像を送れたことだけで導入完了としません。本文を取得できないAIでは、[Markdownをファイル添付する方法](docs/wiki/Upload-File.md)に切り替えます。2026-11-01のMuse試験ではGitHubリンクを404とする報告があり、代替文書へ誘導されたため、異なるAIでの同じ手順の再現性は**未検証**です。
+
+## 会社・制限環境：手動添付の一括キット
+
+GitHubのページは見えてもAIが外部Markdown本文を直接読めない場合は、**[制限環境向けオフライン導入ZIP](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/releases/download/guides-current/ADNC_Offline_Installer_Current.zip)** を人間がダウンロードして、組織のポリシーで許可された方法でAIに添付します。ZIPが読めないAIには **[単一Markdown代替](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/releases/download/guides-current/ADNC_Offline_Installer_Current.md)** を添付してください。ZIPに現行インストーラー・§6.3.2〜§6.3.3の共通標準・版マニフェスト・更新資料・初回案内を含み、各ファイルのSHA-256を検査します。
+
+これは**導入資料の搬送用スナップショット**であり、構築済みKBや外部共有KBの全内容ではありません。AIがZIP／Markdownの本文を読めたことと、指定された保存先へのKB構築・読戻し完了は別検査です。GitHubの最新mainとの一致も、外部接続できない環境では自動確認できません。[同梱物・手順・制限](docs/OFFLINE_INSTALLER.md)。
 
 ## まず試す：3ステップ
 
