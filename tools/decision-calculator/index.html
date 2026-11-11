@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgentOS-C 計算尺 v0.1 — 住宅購入資金の検算</title>
+<style>
+:root { color-scheme: light; font-family: system-ui, "Meiryo", sans-serif; }
+body { max-width: 850px; margin: 0 auto; padding: 20px; color: #182333; background: #f6f8fa; line-height: 1.6; }
+main { background: white; padding: 24px; border-radius: 12px; border: 1px solid #dae0e7; }
+h1 { font-size: 1.55rem; margin-top: 0; }
+p { margin: 0.7em 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 12px; }
+label { font-weight: 600; display: block; }
+input { display: block; box-sizing: border-box; width: 100%; padding: 9px; border: 1px solid #9aa7b6; border-radius: 5px; font-size: 1.05rem; }
+button { margin: 18px 0 6px; background: #174b82; color: white; border: 0; padding: 10px 25px; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+button:hover { background: #123964; }
+table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+th, td { border-bottom: 1px solid #dce2e9; padding: 9px 6px; text-align: left; }
+th { width: 55%; }
+.fail { color: #a62828; font-weight: 700; }
+.pass { color: #146b45; font-weight: 700; }
+small { color: #536273; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 380px; overflow: auto; background: #edf2f6; padding: 14px; border-radius: 6px; }
+#error { color: #a62828; font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+<h1>AgentOS-C 計算尺 v0.1</h1>
+<p>住宅購入時の<strong>現金不足と住宅ローン返済額</strong>を検算します。回答の良し悪しや購入の適否を判定するものではありません。</p>
+<p><small>ブラウザ内で計算します。入力値は外部送信されません。金利は利用者が入力する仮定値です。</small></p>
+<form id="calculator">
+  <div class="grid">
+    <label>物件価格（万円）<input name="purchase_price_man_yen" type="number" value="3800" min="0" max="1000000000" step="1" required></label>
+    <label>貯蓄額（万円）<input name="savings_man_yen" type="number" value="900" min="0" max="1000000000" step="1" required></label>
+    <label>頭金（万円）<input name="down_payment_man_yen" type="number" value="700" min="0" max="1000000000" step="1" required></label>
+    <label>諸費用（万円）<input name="closing_costs_man_yen" type="number" value="300" min="0" max="1000000000" step="1" required></label>
+    <label>残したい予備資金（万円）<input name="minimum_reserve_man_yen" type="number" value="300" min="0" max="1000000000" step="1" required></label>
+    <label>仮定金利（年率％）<input name="annual_interest_rate_percent" type="number" value="1.0" min="0" max="30" step="0.01" required></label>
+    <label>返済期間（年）<input name="loan_term_years" type="number" value="35" min="1" max="50" step="1" required></label>
+  </div>
+  <button type="submit">検算する</button>
+</form>
+<p id="error" role="alert"></p>
+<section aria-live="polite">
+  <h2>計算結果</h2>
+  <table><tbody id="results"></tbody></table>
+  <p id="conclusion"></p>
+</section>
+<details>
+  <summary>AIへ渡せる結果（JSON）</summary>
+  <pre id="json"></pre>
+</details>
+<p><small>元利均等・金利一定の概算。管理費・修繕積立金・税金・引越費用・生活費等の判断は別途必要です。法制度・融資審査・市場金利を自動確認しません。</small></p>
+</main>
+<script src="./calculator.js"></script>
+<script>
+'use strict';
+(function () {
+  var form = document.getElementById('calculator');
+  var results = document.getElementById('results');
+  var error = document.getElementById('error');
+  var conclusion = document.getElementById('conclusion');
+  var json = document.getElementById('json');
+  function text(v) { return v === null ? '算出不可' : Number(v).toLocaleString('ja-JP'); }
+  function addRow(label, value, ok) {
+    var row = document.createElement('tr');
+    var header = document.createElement('th');
+    var data = document.createElement('td');
+    header.textContent = label;
+    data.textContent = value;
+    if (ok === true) data.className = 'pass';
+    if (ok === false) data.className = 'fail';
+    row.appendChild(header);
+    row.appendChild(data);
+    results.appendChild(row);
+  }
+  function recalculate(event) {
+    if (event) event.preventDefault();
+    error.textContent = '';
+    results.textContent = '';
+    conclusion.textContent = '';
+    json.textContent = '';
+    try {
+      var keys = [
+        'purchase_price_man_yen', 'savings_man_yen', 'down_payment_man_yen',
+        'closing_costs_man_yen', 'minimum_reserve_man_yen',
+        'annual_interest_rate_percent', 'loan_term_years'
+      ];
+      var input = {};
+      keys.forEach(function (key) { input[key] = Number(form.elements.namedItem(key).value); });
+      var out = window.DecisionCalculator.calculate(input);
+      addRow('購入後の現金残高', text(out.cash.after_planned_purchase_man_yen) + ' 万円', out.checks.cash_to_pay_initial_costs);
+      addRow('購入時の現金不足', text(out.cash.shortfall_to_pay_initial_costs_man_yen) + ' 万円', out.checks.cash_to_pay_initial_costs);
+      addRow('予備資金を残すための不足額', text(out.cash.shortfall_to_keep_reserve_man_yen) + ' 万円', out.checks.reserve_preserved);
+      addRow('予備資金を確保できる頭金上限', text(out.cash.maximum_down_payment_keeping_reserve_man_yen) + ' 万円', out.checks.reserve_possible_without_extra_money);
+      addRow('予定の借入額', text(out.mortgage.planned_loan_man_yen) + ' 万円');
+      addRow('予定借入の月額返済（概算）', text(out.mortgage.planned_monthly_payment_yen) + ' 円');
+      addRow('予備資金を確保する場合の借入額', text(out.mortgage.reserve_preserving_loan_man_yen) + ' 万円');
+      addRow('同条件での月額返済（概算）', text(out.mortgage.reserve_preserving_monthly_payment_yen) + ' 円');
+      conclusion.textContent = out.checks.reserve_preserved
+        ? '入力値上、希望する予備資金を確保できます。ただし購入全体の安全性は未評価です。'
+        : out.checks.reserve_possible_without_extra_money
+          ? '現状の頭金では予備資金が不足します。頭金を減らすときの借入増加も比較してください。'
+          : '頭金をゼロにしても希望する予備資金を確保できません。別の資金計画が必要です。';
+      json.textContent = JSON.stringify(out, null, 2);
+    } catch (e) {
+      error.textContent = '計算できません: ' + e.message;
+    }
+  }
+  form.addEventListener('submit', recalculate);
+  recalculate();
+})();
+</script>
+</body>
+</html>
