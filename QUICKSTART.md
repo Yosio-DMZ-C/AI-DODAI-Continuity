@@ -1,6 +1,6 @@
-# AD&C Quick Start（旧名称：AgentOS-C）
+# AD&C Quick Start（コンセプト副題：AgentOS-C）
 
-**AD&C — AI-DODAI & Continuity**：AIの外に、自分の知識や作業履歴を残すための導入手順です。DODAIは日本語の「土台」に由来します。
+**AD&C — AI-DODAI & Continuity**：AIの外に、自分の知識や作業履歴を残すための導入手順です。DODAIは日本語の「土台」に由来します。**AgentOS-C（AIをエージェントにするOS）**は旧製品名を引き継いだ設計上の副題で、実際のOSではありません。
 
 **名称変更済み（2026-10-14）：** 本体リポジトリ名は `AI-DODAI-Continuity` になりました。既存配布ガイドのファイル名と、初期出力名 `AgentOS-C_initial.zip` は互換性のため変更していません。[移行計画](docs/ADNC_NAME_MIGRATION_PLAN.md)を参照してください。
 
@@ -17,6 +17,8 @@
 AIによるQR画像の認識と、**正式なインストーラー本文全文の取得**は別工程です。ファイル名と配布版を確認させてください。404等で取得できない場合は、[README](README.md)の正式入口を一度再確認し、名前の似た別文書を自動的に実行しないでください。
 
 QR画像を読めない、または本文取得ができないAIでは、[現行の単一Markdownファイル](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md)をダウンロードして添付し、`実行` と送ります。添付できなければ本文全文を貼り付けます。[ファイル添付の補足](docs/wiki/Upload-File.md)
+
+**社内Copilot等で外部Markdownにアクセスできない場合**は、[ZIP一括キット](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/releases/download/guides-current/ADNC_Offline_Installer_Current.zip)を人間が取得して添付します。ZIPを開けない環境なら[単一Markdown代替](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/releases/download/guides-current/ADNC_Offline_Installer_Current.md)を添付してください。いずれも初期KBそのものではなく導入資料です。社内の許可された経路で渡してください。
 
 正式本文を取得できたら、AIはまず保存先を尋ねます。接続・読書きの確認後、AIが作成案を提示します。問題がなければ次を送ります。
 
