@@ -51,7 +51,7 @@ jobs:
           print(f"PASS: manifest/header/setup versions match {latest}; setup entries={len(setup_versions)}")
           PY
 
-      - name: Publish current guide without altering legacy free asset
+      - name: Publish unified guide and replace obsolete free download with retirement notice
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -61,39 +61,29 @@ jobs:
           tag='guides-current'
           artifact='AgentOS-C_Guide.md'
           legacy='AgentOS-C_Free_Guide.md'
-          expected_legacy='056bc3fea84faadf1311317a7b026ae8ff649b26c2316175cd0c9cb4cbcb56fd'
+          mkdir -p dist
+          cp 'docs/AgentOS-C_設計・構築運用指示書_AI無課金ユーザー版.md' "dist/$legacy"
+          test -s "dist/$legacy"
+          grep -Fq 'ADNC:LEGACY_INSTALLER_RETIRED_20261111' "dist/$legacy"
+          grep -Fq '現行共通インストーラー' "dist/$legacy"
+          primary_sha="$(sha256sum "dist/$artifact" | awk '{print $1}')"
+          legacy_sha="$(sha256sum "dist/$legacy" | awk '{print $1}')"
 
-          # Verify the actual legacy download before any Release mutation.
+          # Old fixed download URL stays valid, but may no longer execute 1.2.1.
           gh release view "$tag" >/dev/null
-          mkdir -p saved-release
-          gh release download "$tag" --pattern "$legacy" --dir saved-release --clobber
-          old_free_sha="$(sha256sum "saved-release/$legacy" | awk '{print $1}')"
-          echo "Legacy downloaded bytes: $(wc -c < "saved-release/$legacy"), SHA-256: $old_free_sha"
-          echo "Legacy expected SHA-256: $expected_legacy"
-          if [ "$old_free_sha" != "$expected_legacy" ]; then
-            echo "::error::Legacy free download differs from archived SHA; refusing publish"
-            exit 1
-          fi
-
-          # Publish only the ONE unified installer under its stable old URL.
-          local_sha="$(sha256sum "dist/$artifact" | awk '{print $1}')"
-          gh release upload "$tag" "dist/$artifact" --clobber
+          gh release upload "$tag" "dist/$artifact" "dist/$legacy" --clobber
           gh release edit "$tag" \
             --title 'AD&C 設計・構築運用指示書（共通インストーラー最新版）' \
-            --notes '推奨：AgentOS-C_Guide.md（現在のAD&C共通インストーラー。従来URLとの互換のため旧ファイル名を維持）。AgentOS-C_Free_Guide.mdは旧v1.2.1の履歴・互換資産であり、新規導入には使わない。配布元はmain、旧配布原本のSHA一致記録はdocs/archive/RELEASE_GUIDES_20261014.mdを参照。'
+            --notes '新規導入：AgentOS-C_Guide.md（mainの現行共通インストーラー）。旧AgentOS-C_Free_Guide.mdは廃止案内へ置換済みで、インストーラーではありません。無料／有料で分岐しません。旧1.2.1の歴史的原文とSHAはGit履歴およびdocs/archive/RELEASE_GUIDES_20261014.mdを参照。'
 
-          # Read back both real release assets, not just API metadata.
+          # Independently download the actual Release assets after publishing.
           mkdir -p published-release
           gh release download "$tag" --pattern "$artifact" --dir published-release --clobber
           gh release download "$tag" --pattern "$legacy" --dir published-release --clobber
-          published_sha="$(sha256sum "published-release/$artifact" | awk '{print $1}')"
-          legacy_sha="$(sha256sum "published-release/$legacy" | awk '{print $1}')"
-          if [ "$published_sha" != "$local_sha" ]; then
-            echo "::error::Primary release download SHA mismatch"
+          primary_readback="$(sha256sum "published-release/$artifact" | awk '{print $1}')"
+          legacy_readback="$(sha256sum "published-release/$legacy" | awk '{print $1}')"
+          if [ "$primary_readback" != "$primary_sha" ] || [ "$legacy_readback" != "$legacy_sha" ]; then
+            echo '::error::Release byte-level readback SHA mismatch'
             exit 1
           fi
-          if [ "$legacy_sha" != "$expected_legacy" ]; then
-            echo "::error::Legacy download SHA changed after publish"
-            exit 1
-          fi
-          echo "PASS: unified guide deployed and retrieved; legacy free download unchanged"
+          echo 'PASS: unified guide published; obsolete free guide replaced with a non-executable retirement notice'
