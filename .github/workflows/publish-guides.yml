@@ -34,6 +34,14 @@ jobs:
           ref: main
           persist-credentials: false
 
+      - name: Check out public AD&C shared Playbooks for offline snapshot
+        uses: actions/checkout@v4
+        with:
+          repository: Yosio-DMZ-C/AD-C-Shared-Knowledge
+          ref: main
+          path: vendor/shared-kb
+          persist-credentials: false
+
       - name: Prepare Markdown downloads
         shell: bash
         run: |
@@ -64,6 +72,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test -s 'vendor/shared-kb/skills/communication-navigation/SKILL.md'
+          test -s 'vendor/shared-kb/skills/loop-development/SKILL.md'
           python3 scripts/build_offline_installer.py --outdir dist
           test -s 'dist/ADNC_Offline_Installer_Current.zip'
           test -s 'dist/ADNC_Offline_Installer_Current.md'
@@ -95,7 +105,7 @@ jobs:
           gh release upload "$tag" "dist/$artifact" "dist/$legacy" "dist/$offline_zip" "dist/$offline_md" --clobber
           gh release edit "$tag" \
             --title 'AD&C 設計・構築運用指示書（共通インストーラー最新版）' \
-            --notes '正式名称：AD&C。AgentOS-C（AIをエージェントにするOS）はコンセプト副題・歴史名称です。新規導入：AgentOS-C_Guide.md（mainの現行共通インストーラー）。社内等の外部Markdown取得制限向け：ADNC_Offline_Installer_Current.zip（導入資料と共通実行標準・版情報・更新手順の一括添付キット）／ADNC_Offline_Installer_Current.md（ZIP非対応AIの単一Markdown代替）。旧AgentOS-C_Free_Guide.mdは廃止案内でインストーラーではありません。ZIPは個人KBや外部共有KB全体ではありません。旧1.2.1原文とSHAはGit履歴およびdocs/archive/RELEASE_GUIDES_20261014.mdを参照。'
+            --notes '正式名称：AD&C。AgentOS-C（AIをエージェントにするOS）はコンセプト副題・歴史名称です。新規導入：AgentOS-C_Guide.md（mainの現行共通インストーラー）。社内等の外部Markdown取得制限向け：ADNC_Offline_Installer_Current.zip（導入資料・共通実行標準・標準コミュニケーション・改善ループ・版情報・更新手順の一括添付キット）／ADNC_Offline_Installer_Current.md（ZIP非対応AIの単一Markdown代替）。旧AgentOS-C_Free_Guide.mdは廃止案内でインストーラーではありません。ZIPは個人KBや外部共有KB全体ではありません。旧1.2.1原文とSHAはGit履歴およびdocs/archive/RELEASE_GUIDES_20261014.mdを参照。'
 
           # Independently download the actual Release assets after publishing.
           mkdir -p published-release
