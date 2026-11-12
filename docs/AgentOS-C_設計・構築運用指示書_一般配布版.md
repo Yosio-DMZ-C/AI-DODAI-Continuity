@@ -1,6 +1,6 @@
 # AD&C（AI-DODAI & Continuity）設計・構築運用指示書 — 一般配布版
 
-- 配布版：1.5.7（2026-11-11：利用者区分・課金プランによる機能と制作方式の決め打ちを解消。保存先・実機能・本人の採用条件で判定）
+- 配布版：1.5.8（2026-11-12：組織共有領域での正式標準優先と、組織への持込み・持出し境界の双方向条件確認を追加）
 - 訂正（2026-11-01）：第20章の初回 `ADNC_INSTALLER_VERSION` に残っていた旧値1.5.3を当時の配布版1.5.6に訂正。仕様追加・既存KBの無断更新なし。
 - コンセプト副題：AgentOS-C（AIをエージェントにするOS）。旧製品名を思想の呼称として残すが、現行正式名称・インストーラーの版管理はAD&C。PC向けの実OSや独立エージェント実行基盤ではない。既存ファイル名・URL・歴史的原文は変更しない。
 - 用途：個人・案件・チームで始め、必要に応じて共有へ接続するナレッジベースの構築
@@ -113,7 +113,7 @@
 
 ### 導入済みKBの更新入口（詳細は別ファイル）
 
-初回構築時、既存`START_HERE.md`の冒頭に**`ADNC_INSTALLER_VERSION: 1.5.7`**と、公開の固定入口`ADNC_UPDATE_RUNBOOK: https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/UPDATE.md`を記録する。`ADNC_UPDATE_MANIFEST`（[LATEST.json](updates/LATEST.json)）も併記する。KBの設計版・schema_version・各レコードrevisionとは混同しない。旧KB（導入版不明）にこの数値を後付けしてはならない。旧KBは[ADOPT_LEGACY.md](updates/ADOPT_LEGACY.md)の互換レイヤーだけを提案し、正式導入版の更新と区別する。
+初回構築時、既存`START_HERE.md`の冒頭に**`ADNC_INSTALLER_VERSION: 1.5.8`**と、公開の固定入口`ADNC_UPDATE_RUNBOOK: https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/UPDATE.md`を記録する。`ADNC_UPDATE_MANIFEST`（[LATEST.json](updates/LATEST.json)）も併記する。KBの設計版・schema_version・各レコードrevisionとは混同しない。旧KB（導入版不明）にこの数値を後付けしてはならない。旧KBは[ADOPT_LEGACY.md](updates/ADOPT_LEGACY.md)の互換レイヤーだけを提案し、正式導入版の更新と区別する。
 
 利用者が「アップデートして」と依頼した場合は、**更新専用実行正本[UPDATE.md](updates/UPDATE.md)を最初から実取得して実行**。この本文を更新手順書として代用しない。秘書の日次読取確認は[DAILY_CHECK.md](updates/DAILY_CHECK.md)を参照し、自動更新はしない。
 
@@ -783,7 +783,7 @@ AIは、考察を広げず、次のような短い選択肢を提示する。
 #### 初回
 
 1. AIが正本構造、START_HERE、BUILD_PLAN、registry、必要なKnowledge / Context / Skill等を自動生成する。 
-   - START_HEREに導入版 `ADNC_INSTALLER_VERSION: 1.5.7`（本書冒頭の配布版・`LATEST.json` と一致することを照合し、矛盾があれば保存を止める）、`ADNC_EXECUTION_STANDARD`（[共通実行標準](PROJECT_EXECUTION_STANDARD.md)の個別URL）、公開の `ADNC_UPDATE_RUNBOOK`（上記UPDATE.mdの個別URL）、`ADNC_UPDATE_MANIFEST`（LATEST.jsonの個別URL）を短く記録する。導入版不明の旧KBでは新規導入済みと偽らず、専用の互換ガイドに従う。既存KBは作り直さず、既存のIDと記録を保護する。
+   - START_HEREに導入版 `ADNC_INSTALLER_VERSION: 1.5.8`（本書冒頭の配布版・`LATEST.json` と一致することを照合し、矛盾があれば保存を止める）、`ADNC_EXECUTION_STANDARD`（[共通実行標準](PROJECT_EXECUTION_STANDARD.md)の個別URL）、公開の `ADNC_UPDATE_RUNBOOK`（上記UPDATE.mdの個別URL）、`ADNC_UPDATE_MANIFEST`（LATEST.jsonの個別URL）を短く記録する。導入版不明の旧KBでは新規導入済みと偽らず、専用の互換ガイドに従う。既存KBは作り直さず、既存のIDと記録を保護する。
 2. 生成物の構造・ID・参照・表示をレビューする。
 3. 可能なら1つの `AgentOS-C_initial.zip` にまとめる。ZIPを扱えない環境では、相対パス・各ファイル全文・固定IDを含む単一Markdown/TXTにまとめる。
 4. 受渡し前に成果物を読戻し、件数、NodeID、本文欠落、参照、構造、文字化け、可能ならhashを検査する。内容を完全復元できない出力を「全件バックアップ」と表現しない。
@@ -1018,6 +1018,8 @@ PARA、Zettelkasten、Medallion等の考え方は第2章に示す役割へ限定
 
 
 ## 変更履歴
+
+- 1.5.8（組織標準のスコープと情報境界）：組織の共有領域での業務は当該組織の正式標準・権限を優先し、複数組織に一律の序列を作らない。持込みは提供元と受入先、持出しは元組織と受入先の条件を確認し、外部AI・個人クラウドへの送信も対象にする。未確認時は対象の移動のみNOT_RUN、既存個人KBへの無断適用や全件再分類は行わない。
 
 - 1.5.7（利用者区分と実機能の切分け）：一般／専門、無料／有料の属性だけで音声制作・保存・ファイル同期・定期タスクを決めず、本人の採用方式と実際の入出力・更新能力で判断する。ローカル手動保存の継続経路は維持。旧「AI無課金ユーザー版」の変更履歴は開発史として保存。既存KBへの自動適用なし。
 
