@@ -6,6 +6,7 @@
 
 **共同開発者・AI向けの軽量入口（2026-11-10時点）**：依頼された目的に合う**現行Playbookを必要な1件だけ**取得して実行してください。すべての標準・ワークシート・理念・Designer’s Noteを毎回読み込む必要はありません。低リスクで権限内の仕事を実行 → 変更対象を読戻し → 実物・問題・次の一手を既存案件へ記録します。未実行を完了と呼ばず、問題があっても成功部分を保持します。公開・権限変更・削除・課金・秘密の送信は実際の権限と本人の指示に従います。
 
+- **組織標準の優先範囲**：組織が管理する共有領域の作業はその組織の正式標準を優先。組織へデータを入れるときは元データの提供条件と受入条件、出すときは元組織の持出条件と受入条件の双方を確認。複数組織の固定序列は作らず、具体的な範囲と例は[一般インストーラー §5.1](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md#51-組織の正式標準が優先する作業領域と持込み持出しの境界2026-11-12適用範囲設計)。
 - **使うとき**：[共有KBの目的別Playbook案内](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md#自然な依頼からのskill選択入口を取得できたai向け試験運用) → 該当する専門Playbook。通常の返答・次の一手は[標準コミュニケーション](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)。
 - **作る・改訂するときだけ**：[Playbook更新プラクティス](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/docs/DEVELOPMENT_WORKFLOW_PRACTICES.md)と、対象に既存のDesigner’s Noteがあればその内容を参照。一般実行へ事前審査を増やさない。
 - **本体を開発するとき**：必要な箇所だけ[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)。詳細と長期の設計理由は既存正本へリンクし、この入口には複製しません。WORK60等の特定環境向け運用は全利用者の標準ではありません。
