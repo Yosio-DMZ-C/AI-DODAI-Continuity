@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.7",
+  "latest_version": "1.5.8",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -244,6 +244,35 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.6-to-1.5.7.md"
+    },
+    {
+      "from_version": "1.5.7",
+      "to_version": "1.5.8",
+      "title": "組織の正式標準を共有領域に適用し、データ持込み・持出しを双方向に確認",
+      "summary": "複数組織に固定の上下関係を作らず、作業領域とデータ権利元を区別。組織内ではその正式標準を優先し、個人・組織間・外部AI／個人クラウドへの移動では提供元と受入先の条件を対象限定で照合する。既存KB・共有設定を無断変更しない。",
+      "changes": [
+        {
+          "target": "既存の個人／組織KBの適用優先規則",
+          "kind": "対象がある場合のみ局所整合",
+          "detail": "実在する組織作業と持込み・持出しの判断に当該組織の正式規則・情報区分・権限・受入条件を適用。未設定の組織標準を勝手に作成しない"
+        },
+        {
+          "target": "既存Context・レコードのメタデータ",
+          "kind": "既存項目を再利用",
+          "detail": "既存owner・scope・sensitivity・sharing_scope・sources・approval_state／reviewerと実ACLを利用。組織ごとの新DB・個別データの全件再分類・別ノード作成はしない"
+        },
+        {
+          "target": "START_HERE.md／registry.json",
+          "kind": "安全な版更新",
+          "detail": "1.5.7からの本人承認済み差分適用と必要な読戻しがPASSした場合のみ導入版を1.5.8にし、既存ID・fileId・履歴・他の版軸を保持"
+        },
+        {
+          "target": "実組織ポリシーと外部移動",
+          "kind": "自動実施しない",
+          "detail": "個別組織の現行正式標準・共有範囲・持出権限の取得は別途必要。未確認の外部送信／公開はNOT_RUN、承認済みの別作業は継続"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.7-to-1.5.8.md"
     }
   ]
 }
