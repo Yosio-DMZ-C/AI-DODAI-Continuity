@@ -14,9 +14,11 @@
 
 ## 対象範囲
 
-一括ZIPには、最初に読む案内、現行共通インストーラー本文、PROJECT_EXECUTION_STANDARD.md（§6.3.2〜§6.3.3）、LATEST.json、README／QUICKSTART、添付方法・初回導入の案内、現行の更新手順、LICENSE、SHA-256一覧のMANIFEST.json、および主要ファイルを結合したALL_IN_ONE.mdを収録します。
+一括ZIPには、最初に読む案内、現行共通インストーラー本文、PROJECT_EXECUTION_STANDARD.md（§6.3.2〜§6.3.3）、**共有KBの標準コミュニケーションPlaybookと改善ループPlaybook各1件の取得時点スナップショット**、LATEST.json、README／QUICKSTART、添付方法・初回導入の案内、更新手順、LICENSE、SHA-256一覧のMANIFEST.json、および主要ファイルを結合したALL_IN_ONE.mdを収録します。単一Markdown代替にもこの2 Playbookを含めます。共有KBの全資料を同梱するものではありません。
 
 これは**導入資料の搬送キット**であり、利用者の構築済みKB／バックアップ、共有KBの全Playbook／素材、任意の動画制作資材、社内の規定文書を含みません。インストール済みKBの再利用・同期・個人データ移行も自動的には実施しません。
+
+**同梱共有Playbookの状態**：ZIPと単一Markdownに含める2 Playbookの出典commitをMANIFEST.jsonに記録します。更新時に取得されたスナップショットであり、社内利用中に公開GitHubの最新版へ自動追随するわけではありません。
 
 **現行インストーラーの版**は同梱LATEST.jsonと、インストーラー先頭の配布版・ADNC_INSTALLER_VERSIONの一致で検査します。ファイルのSHA-256・ZIP CRC・展開内容をビルド時とReleaseアップロード後に照合します。外部接続不能な環境では、同梱スナップショットが公開mainの真の最新状態かどうかまでは保証できません。
 
