@@ -10,9 +10,7 @@
 - **作る・改訂するときだけ**：[Playbook更新プラクティス](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/docs/DEVELOPMENT_WORKFLOW_PRACTICES.md)と、対象に既存のDesigner’s Noteがあればその内容を参照。一般実行へ事前審査を増やさない。
 - **本体を開発するとき**：必要な箇所だけ[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)。詳細と長期の設計理由は既存正本へリンクし、この入口には複製しません。WORK60等の特定環境向け運用は全利用者の標準ではありません。
 - **自然な改善・障害解消依頼**：「直して／改善して／動かない」は明示の「ループで」がなくても[ループ方式Playbook](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/loop-development/SKILL.md)の**同一実行内の小さな内×閉**（観測→修正→実測→必要なら再修正）を原則使用。初回で直れば終了し、定期タスクや別AIを自動新設しません。
-- **全文指定と現行正本**：本人が「全文」「全部」「省略せず」と求めたら、リンク・コピー専用UIだけに逃さず完成本文を回答内に全表示する。AD&Cの現行仕様・進捗は実取得した案件KB／採用済み決定・専門Playbookをメモリ・過去要約より優先する。実際の衝突時に必要箇所だけ照合し、AI製品内部のメモリの自動書換えは保証しない。詳細は[標準コミュニケーション](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)。
-- **自然な回答の出口**：作業を進めた後、通常回答では[標準コミュニケーション](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)の**実動する次の一手0〜2件＋補助『もう一声』1件**を適用。専門Playbookの0件・入力待ち・専用UIを優先し、存在しない操作をボタン化しません。全文規則の常時再読込は不要です。
-
+- **完成本文の全文アクセスと現行正本**：文章・指示文・カスタム指示などを作成／改訂したときは、本人が「全文」と言わなくても完成本文を取得可能にする。短文は全文表示、長文は全文確認／全文コピーの実動UIを標準にし、分割表示を基本としない。AD&Cの現行仕様・進捗は実取得した案件KB／採用済み決定・専門Playbookをメモリ・過去要約より優先し、AI製品内部のメモリの自動書換えは保証しない。詳細は[標準コミュニケーション](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)。
 
 **AIを替えるたびに、仕事の続きを説明し直していませんか？** AD&Cは、知識・判断理由・作業状態を自分のMarkdownファイルに置き、ChatGPT・Claude・Geminiなど既存のAIで**続きを再開しやすくする**ための対話型インストーラーと運用の型です。新しいLLMや自律エージェントの実行環境ではありません。
 
