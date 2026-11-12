@@ -9,6 +9,8 @@
 - **使うとき**：[共有KBの目的別Playbook案内](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md#自然な依頼からのskill選択入口を取得できたai向け試験運用) → 該当する専門Playbook。通常の返答・次の一手は[標準コミュニケーション](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)。
 - **作る・改訂するときだけ**：[Playbook更新プラクティス](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/docs/DEVELOPMENT_WORKFLOW_PRACTICES.md)と、対象に既存のDesigner’s Noteがあればその内容を参照。一般実行へ事前審査を増やさない。
 - **本体を開発するとき**：必要な箇所だけ[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)。詳細と長期の設計理由は既存正本へリンクし、この入口には複製しません。WORK60等の特定環境向け運用は全利用者の標準ではありません。
+- **自然な改善・障害解消依頼**：「直して／改善して／動かない」は明示の「ループで」がなくても[ループ方式Playbook](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/loop-development/SKILL.md)の**同一実行内の小さな内×閉**（観測→修正→実測→必要なら再修正）を原則使用。初回で直れば終了し、定期タスクや別AIを自動新設しません。
+- **自然な回答の出口**：作業を進めた後、通常回答では[標準コミュニケーション](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)の**実動する次の一手0〜2件＋補助『もう一声』1件**を適用。専門Playbookの0件・入力待ち・専用UIを優先し、存在しない操作をボタン化しません。全文規則の常時再読込は不要です。
 
 
 **AIを替えるたびに、仕事の続きを説明し直していませんか？** AD&Cは、知識・判断理由・作業状態を自分のMarkdownファイルに置き、ChatGPT・Claude・Geminiなど既存のAIで**続きを再開しやすくする**ための対話型インストーラーと運用の型です。新しいLLMや自律エージェントの実行環境ではありません。
