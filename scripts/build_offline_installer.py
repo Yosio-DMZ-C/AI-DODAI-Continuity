@@ -45,6 +45,8 @@ def build(outdir: Path) -> None:
         "LICENSE": "LICENSE",
         "GETTING_STARTED.md": "docs/wiki/Getting-Started.md",
         "FILE_ATTACHMENT_GUIDE.md": "docs/wiki/Upload-File.md",
+        "COMMUNICATION_PLAYBOOK.md": "vendor/shared-kb/skills/communication-navigation/SKILL.md",
+        "LOOP_DEVELOPMENT_PLAYBOOK.md": "vendor/shared-kb/skills/loop-development/SKILL.md",
     }
     for source in sorted((ROOT / "docs/updates").glob("*.md")):
         sources[f"updates/{source.name}"] = source.relative_to(ROOT).as_posix()
@@ -65,6 +67,7 @@ def build(outdir: Path) -> None:
 3. AIは添付で実際に読めた文書を根拠にし、GitHub直接取得が失敗したことを**添付ファイルの失敗**へすり替えません。
 4. 新規KBの手順は¤実行¤ → 保存先選択 → 接続・読書き確認 → 推奨案1件 → ¤進めて¤ → 構築・保存・読戻し。本人の承認前には書き込みません。
 5. **既存KBには再インストールしません**。¤updates/UPDATE.md¤、既存版不明なら¤updates/ADOPT_LEGACY.md¤を参照します。
+6. 通常応答の実動UI・「全文」指定・メモリよりKBを優先する判断が必要な時は、同梱¤COMMUNICATION_PLAYBOOK.md¤を参照します。改善・トラブル解消時は同梱¤LOOP_DEVELOPMENT_PLAYBOOK.md¤を参照します。
 
 ## 判定
 
@@ -73,7 +76,7 @@ def build(outdir: Path) -> None:
 - ¤LATEST.json¤は**同梱スナップショットの版**です。公開mainとの同一性は、外部照合できなければ¤NOT_RUN¤と区別します。
 - ¤MANIFEST.json¤は各同梱ファイルのSHA-256を保持します。ZIP内を読めたことと、利用者KBの保存・読戻し成功は別判定です。
 - §6.3.3の手順書**新規作成／重要改訂**用の検査を、通常初期導入へ無条件に強制しません。
-- 共有KBのオプションSkill、動画素材、個人ファイルは同梱しません。未取得を取得済みとみなしません。
+- 共有KBの**標準コミュニケーションPlaybook／ループ方式Playbookの2本文だけ**を、取得時点のスナップショットとして同梱します。共有KB全体、他のオプションSkill、動画素材、個人ファイルは同梱しません。未取得を取得済みとみなしません。
 - 組織の権限・セキュリティポリシーを迂回せず、許可された添付・保存経路だけを使用します。
 
 ## 制限環境での確認
@@ -91,6 +94,7 @@ AgentOS-Cは旧名称の履歴と設計上の副題として残す呼称で、�
         "GitHubアクセスなしで読める添付資料です。\n\n"
     ]
     for name in ("00_READ_ME_FIRST.md", "INSTALLER.md", "PROJECT_EXECUTION_STANDARD.md",
+                 "COMMUNICATION_PLAYBOOK.md", "LOOP_DEVELOPMENT_PLAYBOOK.md",
                  "LATEST.json", "QUICKSTART.md"):
         parts += [f"\n\n===== BEGIN FILE: {name} =====\n\n",
                   payloads[name].decode("utf-8"),
@@ -102,7 +106,13 @@ AgentOS-Cは旧名称の履歴と設計上の副題として残す呼称で、�
         ["git", "rev-parse", "HEAD"], cwd=ROOT, check=True,
         capture_output=True, text=True
     ).stdout.strip()
+    shared_commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=ROOT / "vendor/shared-kb", check=True,
+        capture_output=True, text=True
+    ).stdout.strip()
     manifest = {
+        "shared_kb_source_repo": "Yosio-DMZ-C/AD-C-Shared-Knowledge",
+        "shared_kb_source_commit": shared_commit,
         "schema_version": "1.0", "product": "AD&C",
         "subtitle": "AgentOS-C（AIをエージェントにするOS）",
         "package_type": "public-offline-installer-transport",
