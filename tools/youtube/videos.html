@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#15233c"><title>AD&C｜YouTube動画アップロード・管理</title>
+<link rel="stylesheet" href="./shared.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<header><div class="head"><div class="eyebrow">AD&C / SIMPLE NAVI v0.2</div><h1>YouTube 動画アップロード・管理</h1><p>非公開で登録。公開範囲の変更とURL取得は、人間が一覧画面で決定します。</p><div class="topNote">Google公式OAuth / YouTube Data API / トークンはブラウザのメモリのみ</div></div>
+<nav class="navbar" aria-label="AD&C YouTubeツール"><a href="./channel.html">チャンネル開設 ↗</a><a href="./videos.html" aria-current="page">動画アップロード・管理</a></nav></header>
+<main>
+<section class="nextpanel activeNext"><p class="kicker">利用の流れ</p><h2>①投稿先チャンネル選択 → ②Google接続 → ③非公開アップロード → ④一覧で公開範囲を選択</h2><p class="sub">タイトル・動画ファイル・子ども向けかどうかを指定します。対象チャンネル名とIDを必ず確認してからアップロードしてください。</p><div class="actions"><a class="btn secondary" href="https://studio.youtube.com/" rel="noopener" target="_blank">YouTube Studio ↗</a><a class="btn secondary" href="./channel.html">チャンネル開設ナビ ↗</a></div></section>
+<section id="channel-selection-guide"><h2><span class="stepnum">事前</span>投稿先チャンネルを選択（ID確認より先）</h2>
+<p class="sub">普段使うチャンネルが表示されることがあります。<b>必ず投稿したいチャンネルへ切り替えてから</b>チャンネルIDを取得してください。</p>
+<ol><li><a href="https://www.youtube.com/" target="_blank" rel="noopener">YouTubeを開く</a> → 右上のプロフィール画像 → <b>「アカウントを切り替える」</b> → 投稿したいチャンネルを選択。</li>
+<li>右上のアイコン／チャンネル名を確認。一覧に出なければ <a href="https://studio.youtube.com/" target="_blank" rel="noopener">YouTube Studio</a> で切替を確認。</li>
+<li>切替後、<a href="https://www.youtube.com/account_advanced" target="_blank" rel="noopener">YouTube 詳細設定</a>を開き <b>チャンネルID</b>を確認（ユーザーIDではありません）。</li></ol>
+<p class="small">チャット自動投稿（MCP）では認証後のYouTube APIチャンネルIDを事前指定IDと照合し、不一致ならアップロードを停止します。ブラウザ画面から投稿する場合は、画面に表示されるチャンネル名・IDを利用者自身が確認してください。通常利用チャンネルの「デフォルト」設定は勝手に変更しません。</p></section>
+<section id="setup-guide"><h2><span class="stepnum">00</span>初回認証がまだの場合</h2>
+<p class="sub"><b>AD&Cからチャットで非公開投稿するには、初回だけGoogle Cloud・Cloudflareの接続設定が必要です。</b> 画面変更に備え、実施時にはAD&Cが公式資料を再検索して簡単な手順を案内します。</p>
+<details><summary><b>初回設定の短い手順を表示</b>（約6工程・認証情報の送信禁止）</summary>
+<ol>
+<li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a>でプロジェクトを選び、<a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">YouTube Data API v3</a> と <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com" target="_blank" rel="noopener">Google Drive API</a>を有効にします。</li>
+<li><a href="https://console.cloud.google.com/auth/overview" target="_blank" rel="noopener">Google Auth Platform</a>のブランディング・対象ユーザーを設定し、テスト状態なら自分のGoogleアカウントをテストユーザーへ追加します。</li>
+<li><a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noopener">Clients</a>から「デスクトップアプリ」のOAuthクライアントを作り、JSONをPCへダウンロードします。<b>セキュリティ上、ダウンロードしたOAuth JSONをチャットへ送信・添付してはいけません。認証情報を含む画面の共有も避けてください。</b></li>
+<li>権限（スコープ）を確認するときは、<a href="https://console.cloud.google.com/auth/scopes" target="_blank" rel="noopener">Google Auth Platform「データアクセス」</a>へ進みます。先に画面上部で正しいGoogle Cloudプロジェクトを選び、表示が不安定なら左メニューの「データアクセス」から開いてください。旧URL <code>/auth/data-access</code> は使いません。</li>
+<li><a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Cloudflare</a>でWorkerとKVを用意し、配布ZIPの<code>wrangler.toml.example</code>を<code>wrangler.toml</code>にコピー、期待するチャンネルID・KV IDを設定します。</li>
+<li>PCでZIPの<code>setup_once.py</code>を実行し、Googleの同意画面で承認します。接続先チャンネルを照合してから秘密情報をWorkerへ登録します。</li>
+<li>生成された個人用プラグインをChatGPTに接続し、<code>check_connection</code>で検査した後、非公開投稿を試します。</li>
+</ol>
+<p class="small">Google OAuthのテスト状態では更新トークンが約7日で期限切れになる場合があります。継続運用前に公開ステータスや審査要件を確認してください。</p>
+<p><b>わからないところは教えてください。現在の画面に合わせて案内します。</b></p>
+<p class="small">手順書：配布ZIP内<code>INITIAL_AUTH_GUIDE.md</code>。Webブラウザからの一時認証だけなら下の「01」で進められますが、チャット自動投稿には別途初回サーバー設定が必要です。</p>
+</details></section>
+<section id="auth-section"><h2><span class="stepnum">01</span>Googleに接続</h2>
+<p class="sub">初回のみGoogle Cloudで「YouTube Data API v3」を有効化し、Web OAuthクライアントIDと、このページの公開オリジンを登録する必要があります。<a href="./README.md" target="_blank" rel="noopener">設定手順（README）</a></p>
+<label for="clientId">Google OAuth WebクライアントID（秘密鍵ではありません）</label>
+<div class="inputrow"><input type="text" id="clientId" autocomplete="off" spellcheck="false" placeholder="xxxxxxxx.apps.googleusercontent.com"><button class="mini" id="saveClient">設定保存</button></div>
+<p class="small">クライアントIDのみ端末内に保存します。アクセス／リフレッシュトークンは保存しません。</p>
+<div class="actions"><button id="connect" class="primary">Googleで認証・チャンネル確認</button><button id="disconnect" class="secondary" disabled>接続解除</button></div>
+<p class="token-state" id="authState" role="status">未接続</p><div class="quiet hidden" id="channelBox"><b>接続先：</b><span id="channelName"></span><br><small class="monospace" id="channelId"></small></div>
+</section>
+<section><h2><span class="stepnum">02</span>動画を非公開でアップロード</h2>
+<div class="field"><label for="file">動画ファイル（MP4推奨）</label><input type="file" id="file" accept="video/*,.mp4,.mov,.m4v,.webm"></div>
+<div class="field"><label for="title">動画タイトル</label><input type="text" id="title" maxlength="100" placeholder="AD&C｜オープニング評価用45秒"></div>
+<div class="field"><label for="description">概要欄</label><textarea id="description" rows="4" maxlength="5000" placeholder="この動画はAD&Cのレビュー用です。"></textarea></div>
+<div class="field"><label for="audience">子ども向けの動画ですか？</label><select id="audience"><option value="">選択してください</option><option value="false">いいえ（子ども向けではない）</option><option value="true">はい（子ども向け）</option></select></div>
+<div class="quiet"><b>公開範囲：</b><span class="tag">非公開（固定）</span><p class="small compact">アップロード画面では限定公開・公開への変更はできません。アップロード後に一覧で明示的に選びます。</p></div>
+<div class="actions" style="margin-top:12px"><button id="upload" class="primary" disabled>非公開でアップロード</button><button id="resetForm" class="secondary">入力欄をクリア</button></div>
+<progress id="uploadProgress" class="upload-progress" max="100" value="0"></progress><p id="uploadState" class="small" role="status">未実行</p>
+<p id="uploadLink" class="hidden"></p>
+</section>
+<section id="video-manage"><div class="layout"><h2><span class="stepnum">03</span>動画一覧・公開範囲・URL</h2><button class="secondary mini" id="reload" disabled>一覧を更新</button></div>
+<p class="sub">Googleで接続したチャンネルの動画を取得します。非公開動画のURLは、所有者など許可された人にしか表示されません。レビュー共有には「限定公開」に変更してください。</p>
+<div id="videoList"><p class="small">Googleに接続すると一覧を表示します。</p></div>
+<div class="actions"><button id="more" class="mini hidden">次の50件を読み込む</button><button id="exportLog" class="secondary" disabled>一覧をCSV保存</button></div>
+<p class="small">「公開」「限定公開」は必ず確認ダイアログを表示し、Googleの更新応答と再読込で確定します。URLのコピーだけでは公開範囲は変わりません。</p>
+</section>
+<section><h2>AD&Cへの引き継ぎ</h2><p class="sub">動画の登録後は、以下の文面をチャットに送れば進行ログへ連携できます。</p><div class="actions"><button class="secondary" id="copyHandoff">結果をコピー</button><a class="btn" href="./channel.html">チャンネル開設へ ↗</a></div><p class="small">現バージョンはブラウザOAuth式。ChatGPTからの直接アップロードには別途、認証済みサーバー／MCP接続が必要です。接続できていない状態で自動アップロード完了とは扱いません。</p></section>
+<div id="toast" class="sr" role="status" aria-live="polite"></div>
+</main>
+<footer>AD&C｜非公開で自動登録。公開の判断は人間に残す。<br>このページはGoogle/YouTubeの公式サービスではありません。</footer>
+<script src="./videos.js"></script>
+</body></html>
