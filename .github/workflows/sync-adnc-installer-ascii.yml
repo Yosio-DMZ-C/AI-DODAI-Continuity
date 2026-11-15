@@ -25,6 +25,7 @@ jobs:
       - name: Install QR generator
         run: python -m pip install 'qrcode[pil]==8.2'
       - name: Sync ASCII installer and default QR
+        # Re-trigger QR regeneration and replacement of the legacy binary.
         shell: bash
         run: |
           set -euo pipefail
