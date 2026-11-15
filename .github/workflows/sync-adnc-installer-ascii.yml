@@ -1,0 +1,35 @@
+name: Sync AD&C installer ASCII URL alias
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/AgentOS-C_設計・構築運用指示書_一般配布版.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: adnc-installer-ascii-sync
+  cancel-in-progress: false
+
+jobs:
+  mirror-installer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Keep ASCII-path mirror identical to the canonical installer
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "docs/AgentOS-C_設計・構築運用指示書_一般配布版.md" "docs/ADNC_Installer_Current.md"
+          if git diff --quiet -- "docs/ADNC_Installer_Current.md"; then
+            echo "ASCII-path mirror already matches canonical installer."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "docs/ADNC_Installer_Current.md"
+          git commit -m "chore: sync ASCII installer URL alias"
+          git push
