@@ -1,10 +1,11 @@
-name: Sync AD&C installer ASCII URL alias
+name: Sync AD&C ASCII installer and default QR
 
 on:
   push:
     branches: [main]
     paths:
       - 'docs/AgentOS-C_設計・構築運用指示書_一般配布版.md'
+      - '.github/workflows/sync-adnc-installer-ascii.yml'
   workflow_dispatch:
 
 permissions:
@@ -15,21 +16,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  mirror-installer:
+  mirror-installer-and-qr:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Keep ASCII-path mirror identical to the canonical installer
+        with:
+          persist-credentials: true
+      - name: Install QR generator
+        run: python -m pip install 'qrcode[pil]==8.2'
+      - name: Sync ASCII installer and default QR
         shell: bash
         run: |
           set -euo pipefail
           cp "docs/AgentOS-C_設計・構築運用指示書_一般配布版.md" "docs/ADNC_Installer_Current.md"
-          if git diff --quiet -- "docs/ADNC_Installer_Current.md"; then
-            echo "ASCII-path mirror already matches canonical installer."
-            exit 0
-          fi
+          python - <<'PY'
+          import qrcode
+          url = "https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md"
+          qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=12, border=4)
+          qr.add_data(url)
+          qr.make(fit=True)
+          qr.make_image(fill_color="black", back_color="white").convert("RGB").save("assets/adnc-installer-qr.png", optimize=True)
+          print("Default QR target:", url)
+          PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "docs/ADNC_Installer_Current.md"
-          git commit -m "chore: sync ASCII installer URL alias"
+          git add "docs/ADNC_Installer_Current.md" "assets/adnc-installer-qr.png"
+          if git diff --cached --quiet; then
+            echo "Installer and QR already current."
+            exit 0
+          fi
+          git commit -m "chore: sync ASCII installer and default QR"
           git push
