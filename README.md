@@ -58,6 +58,8 @@
 
 ## 写真を送るだけで始める（QR画像・試験中）
 
+**URLに日本語を含めない代替入口：** [英数字のみのAD&CインストーラMarkdown直リンク](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)も利用できます。既存の日本語パスと**同じ本文・同じ版**を配布するミラーで、別仕様のインストーラーではありません。元の日本語URLと既存QRは維持します。元ファイルの更新時には[同期ワークフロー](.github/workflows/sync-adnc-installer-ascii.yml)でこの英数字パスも更新します。
+
 **最初に、このQR画像を保存して普段のAIのチャットに写真として送り、`これを実行して` と伝えてください。** AIがQRから**現行の単一Markdownインストーラー本文**を取得できた場合は、保存先選択から始まります。GitHubの操作・URL手入力は不要です。
 
 [![AD&C共通インストーラーのQR画像（写真として保存・共有できます）](assets/adnc-installer-qr.png)](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)
