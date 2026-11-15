@@ -48,3 +48,9 @@ ZIPが出力されない場合やファイルを受け取れない場合は、AI
 既存KBの版更新は再インストールせず、[更新専用入口](docs/updates/UPDATE.md)を使います。
 
 より詳しくは[導入ガイド](docs/wiki/Getting-Started.md)と[実動作の結果](docs/wiki/Verified-Results.md)を参照してください。
+
+## 付録：無課金で使う場合
+
+AD&Cを無課金で使う場合には、秘書AIの Muse をオススメしています（KOF2026の会場で配布した案内ハガキです）。
+
+![AD&Cを無課金で使う場合にはmuseをオススメしています（Muse案内ハガキ）](assets/muse-recommendation-postcard.jpg)
