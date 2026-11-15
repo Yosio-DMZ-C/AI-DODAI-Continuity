@@ -23,7 +23,7 @@
 **期待値について：** AD&CはAIの回答を必ず正しくしたり、すべての仕事を自動で完成させたりするものではありません。手戻りを減らし、成功しやすい条件を積み重ねることを目指しますが、全体の成功率やQOL向上はまだ数値で実証していません。**実際にできたこと・失敗したこと・未検証のことを分けて示します。** [実例と検証状況](docs/wiki/Verified-Results.md) ／ [この考え方の背景](docs/wiki/Future-Vision.md)
 
 - **困りごと**：別チャットで前提が失われる／以前の決定や「やらないこと」が伝わらない／特定サービスの記憶に依存する。
-- **始め方**：まず[QR画像](assets/adnc-installer-qr.png)をAIに写真として送り、`これを実行して`。AIが[現行の単一インストーラー本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)を実取得できたら保存先を選択し、確認して`進めて`。[詳しい3ステップ](QUICKSTART.md)
+- **始め方**：まず[QR画像](assets/adnc-installer-qr.png)をAIに写真として送り、`これを実行して`。AIが[現行の単一インストーラー本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)を実取得できたら保存先を選択し、確認して`進めて`。[詳しい3ステップ](QUICKSTART.md)
 - **AIインターフェースの設計思想（検証中）**：「文脈ゲート」で本人の条件・採用済み決定を確認し、「道具棚」で既存の手順と実体を見つけ、「完了ゲート」で正本への反映・実行・検収を区別します。[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)
 - **専門Playbookの自動発見は試験中**：[共有KBの目的別入口](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md#自然な依頼からのskill選択入口を取得できたai向け試験運用)から、該当する1件だけ実取得。例：[山歩きPlaybook](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/hiking-route-search/SKILL.md)。リンク公開だけで新チャットへの自動読込・正式Active配布が成立するわけではありません。
 - **現在地：β版**。初期KB構築と保存・読戻しを限定的に確認しています。異なるAIでの無条件な継続、自動実装や効果は保証しません。[検証結果](docs/wiki/Verified-Results.md)／[現行インストーラー版（唯一の版数正本）](docs/updates/LATEST.json)
@@ -38,7 +38,7 @@
 
 **名称変更済み（2026-10-14）：** 本体リポジトリは [AI-DODAI-Continuity](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity) に改名しました（旧名：AgentOS-C）。配布タグ `guides-current` と既存の配布ファイル名は維持しています。2026-10-25に従来配布URLを使うGitHub Actionsで、現行共通ガイドの実ダウンロードとSHA-256一致、および旧無料版ファイルの保全を確認しました。[実行結果](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/actions/runs/40161518361)／[移行計画](docs/ADNC_NAME_MIGRATION_PLAN.md)を参照してください。
 
-入口はシンプルです。**[QR画像](assets/adnc-installer-qr.png)を写真としてAIへ送り、`これを実行して`**。QRから[現行の単一インストーラー本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)を取得できれば、保存先選択 → `進めて`。読み取れない場合はMarkdown添付に切り替えます。保存先への直接接続が使えるかどうかはAIが確認し、クラウド連携／ローカル手動保存へ分岐します。インストーラーはAIへ渡すMarkdownファイルであり、端末にインストールする実行アプリではありません。ファイル生成・外部保存・次回再開の対応範囲はAI環境によって異なります。
+入口はシンプルです。**[QR画像](assets/adnc-installer-qr.png)を写真としてAIへ送り、`これを実行して`**。QRから[現行の単一インストーラー本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)を取得できれば、保存先選択 → `進めて`。読み取れない場合はMarkdown添付に切り替えます。保存先への直接接続が使えるかどうかはAIが確認し、クラウド連携／ローカル手動保存へ分岐します。インストーラーはAIへ渡すMarkdownファイルであり、端末にインストールする実行アプリではありません。ファイル生成・外部保存・次回再開の対応範囲はAI環境によって異なります。
 
 ## AD&Cの基本理念
 
@@ -58,13 +58,13 @@
 
 ## 写真を送るだけで始める（QR画像・試験中）
 
-**URLに日本語を含めない代替入口：** [英数字のみのAD&CインストーラMarkdown直リンク](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)も利用できます。既存の日本語パスと**同じ本文・同じ版**を配布するミラーで、別仕様のインストーラーではありません。元の日本語URLと既存QRは維持します。元ファイルの更新時には[同期ワークフロー](.github/workflows/sync-adnc-installer-ascii.yml)でこの英数字パスも更新します。
+**標準の配布入口（英数字URL）：** [英数字のみのAD&CインストーラMarkdown直リンク](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)を使用します。既存の日本語パスと**同じ本文・同じ版**を配布するミラーで、別仕様のインストーラーではありません。日本語パスは互換用に維持します。標準QRも英数字URLを指すよう更新します。元ファイルの更新時には[同期ワークフロー](.github/workflows/sync-adnc-installer-ascii.yml)で英数字パスと標準QRを同期します。
 
 **最初に、このQR画像を保存して普段のAIのチャットに写真として送り、`これを実行して` と伝えてください。** AIがQRから**現行の単一Markdownインストーラー本文**を取得できた場合は、保存先選択から始まります。GitHubの操作・URL手入力は不要です。
 
-[![AD&C共通インストーラーのQR画像（写真として保存・共有できます）](assets/adnc-installer-qr.png)](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)
+[![AD&C共通インストーラーのQR画像（写真として保存・共有できます）](assets/adnc-installer-qr.png)](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)
 
-[QR画像を開く](assets/adnc-installer-qr.png) ／ [QRのリンク先：共通インストーラー本文（Markdown直リンク）](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)
+[QR画像を開く](assets/adnc-installer-qr.png) ／ [QRのリンク先：共通インストーラー本文（Markdown直リンク）](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)
 
 **確認ポイント**：写真送信／QRのURL解読／正規MD本文・版の実取得／保存先選択／本人の`進めて`承認／実保存と読戻しは別工程です。QR画像を送れたことだけで導入完了としません。本文を取得できないAIでは、[Markdownをファイル添付する方法](docs/wiki/Upload-File.md)に切り替えます。2026-11-01のMuse試験ではGitHubリンクを404とする報告があり、代替文書へ誘導されたため、異なるAIでの同じ手順の再現性は**未検証**です。
 
