@@ -42,45 +42,6 @@ jobs:
           path: vendor/shared-kb
           persist-credentials: false
 
-      - name: Synchronize and verify ASCII-only raw installer URL
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          canonical='docs/AgentOS-C_設計・構築運用指示書_一般配布版.md'
-          mirror='docs/ADNC_Installer_Current.md'
-          if ! cmp -s "$canonical" "$mirror"; then
-            current_sha="$(gh api "repos/${GH_REPO}/contents/${mirror}" --jq '.sha')"
-            python3 - "$canonical" "$current_sha" <<'PY' > /tmp/adnc-ascii-installer-sync.json
-          import base64
-          import json
-          from pathlib import Path
-          import sys
-
-          data = Path(sys.argv[1]).read_bytes()
-          print(json.dumps({
-              "message": "chore: sync ASCII installer mirror from canonical guide",
-              "branch": "main",
-              "sha": sys.argv[2],
-              "content": base64.b64encode(data).decode("ascii"),
-          }))
-          PY
-            gh api --method PUT "repos/${GH_REPO}/contents/${mirror}" --input /tmp/adnc-ascii-installer-sync.json >/dev/null
-          fi
-          for attempt in 1 2 3; do
-            if gh api "repos/${GH_REPO}/contents/${mirror}" --jq '.content' | base64 --decode | cmp - "$canonical"; then
-              echo 'PASS: ASCII installer mirror equals canonical guide byte-for-byte'
-              break
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              echo '::error::ASCII installer mirror readback does not match canonical guide'
-              exit 1
-            fi
-            sleep 2
-          done
-
       - name: Prepare Markdown downloads
         shell: bash
         run: |
