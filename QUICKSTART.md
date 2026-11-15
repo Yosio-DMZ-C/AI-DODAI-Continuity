@@ -6,15 +6,15 @@
 
 ## 1. QR画像をAIに送る（初心者向けの第一入口）
 
-[![AD&C共通インストーラーQR](assets/adnc-installer-qr.png)](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)
+[![AD&C共通インストーラーQR](assets/adnc-installer-qr.png)](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)
 
-**[QR画像を開いて保存](assets/adnc-installer-qr.png)し、普段のAIへ写真として送って `これを実行して` と伝えます。** QRには[現行の単一インストーラーMarkdown本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)への直リンクが含まれています。GitHubの操作やURLの手入力は不要です。
+**[QR画像を開いて保存](assets/adnc-installer-qr.png)し、普段のAIへ写真として送って `これを実行して` と伝えます。** QRには[現行の単一インストーラーMarkdown本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)への直リンクが含まれています。GitHubの操作やURLの手入力は不要です。
 
 無料／有料・AIの種類によってインストーラーを選ぶ必要はありません。保存先への実際の読書き可否でクラウド連携／ローカル手動保存に分岐します。
 
 ## 2. 本文取得を確認して導入を進める
 
-**URLに日本語があると読み取りに失敗するAI向け：** [英数字のみのインストーラ直リンク](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)を使えます。既存の日本語名のファイルと同一内容で、独立した製品版ではありません。どちらでも本文を実取得したうえで導入してください。
+**標準の配布入口：** [英数字のみのインストーラ直リンク](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)を使用します。既存の日本語名のファイルは互換用に残します。標準QRも英数字URLを指すよう更新します。本文を実取得したうえで導入してください。
 
 AIによるQR画像の認識と、**正式なインストーラー本文全文の取得**は別工程です。ファイル名と配布版を確認させてください。404等で取得できない場合は、[README](README.md)の正式入口を一度再確認し、名前の似た別文書を自動的に実行しないでください。
 
