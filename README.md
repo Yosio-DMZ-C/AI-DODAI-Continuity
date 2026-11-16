@@ -1,5 +1,9 @@
 # AD&C — AI-DODAI & Continuity
 
+<!-- ADNC-AGILE-EXECUTION-20261116 -->
+**AD&Cはアジャイルで実施する。** Draftは試用や改善の途中状態であり、作業停止の理由ではない。本人の依頼・専門条件・権限内で小さく実装／試作→現物検証→局所修正→成果・残問題・次の一手を既存案件へ残す。公開・削除・課金・機密持出し・危険な不可逆変更は当該枝のみ必要な承認を守る。DraftをActiveや実測PASSへ自動昇格しない。専門Playbookは[共有KBの現行版](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge)を参照し、通常実行前の全件全文取得はしない。
+
+
 > **AIを替えても、冒険は続く。**
 
 **📝 開発の記録・実践ブログ：** [Campsite7｜AD&C開発の記事一覧](https://campsite7.jp/category/memorandum/adc%E9%96%8B%E7%99%BA/) — 開発日誌、試行錯誤、実例を公開しています。技術仕様・現行の採用済み手順は、このGitHubと各Playbookを正本としてください。
