@@ -14,15 +14,15 @@ DODAIは日本語の「土台」に由来します。TRPGのGMがルールブッ
 
 ## まず使ってみる
 
-[![AD&CインストーラーのQR画像](../../assets/adnc-installer-qr.png)](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)
+[![AD&CインストーラーのQR画像](../../assets/adnc-installer-qr.png)](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)
 
 1. **[QR画像](../../assets/adnc-installer-qr.png)を保存し、いつものAIに写真として送る**。`これを実行して`と伝える。
-2. AIが[共通インストーラーMarkdown本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/AgentOS-C_%E8%A8%AD%E8%A8%88%E3%83%BB%E6%A7%8B%E7%AF%89%E9%81%8B%E7%94%A8%E6%8C%87%E7%A4%BA%E6%9B%B8_%E4%B8%80%E8%88%AC%E9%85%8D%E5%B8%83%E7%89%88.md)を正式に取得したことを確かめ、保存先や構築案を確認する。QRで読めない場合は[Markdown添付](Upload-File.md)を使う。
+2. AIが[共通インストーラーMarkdown本文](https://raw.githubusercontent.com/Yosio-DMZ-C/AI-DODAI-Continuity/main/docs/ADNC_Installer_Current.md)を正式に取得したことを確かめ、保存先や構築案を確認する。QRで読めない場合は[Markdown添付](Upload-File.md)を使う。
 3. `進めて` と送り、作成された知識ベース（KB）を受け取って保存する。
 
 最初は、**知識ベースを作って、自分の手元やクラウドへ保管すること**から始めます。接続できるAI環境では、クラウド上に直接作る方法も選べます。
 
-[**QR画像を開く**](../../assets/adnc-installer-qr.png) ／ [共通インストーラーの本文](../AgentOS-C_設計・構築運用指示書_一般配布版.md) ／ [補足の導入ガイド](Getting-Started.md) ／ [Quick Start](../../QUICKSTART.md)
+[**QR画像を開く**](../../assets/adnc-installer-qr.png) ／ [共通インストーラーの本文](../ADNC_Installer_Current.md) ／ [補足の導入ガイド](Getting-Started.md) ／ [Quick Start](../../QUICKSTART.md)
 
 ## 何に役立つ？
 
