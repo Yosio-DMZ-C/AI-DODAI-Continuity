@@ -18,7 +18,7 @@
 
 AIによるQR画像の認識と、**正式なインストーラー本文全文の取得**は別工程です。ファイル名と配布版を確認させてください。404等で取得できない場合は、[README](README.md)の正式入口を一度再確認し、名前の似た別文書を自動的に実行しないでください。
 
-QR画像を読めない、または本文取得ができないAIでは、[現行の単一Markdownファイル](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md)をダウンロードして添付し、`実行` と送ります。添付できなければ本文全文を貼り付けます。[ファイル添付の補足](docs/wiki/Upload-File.md)
+QR画像を読めない、または本文取得ができないAIでは、[英数字URLの現行単一Markdownファイル](docs/ADNC_Installer_Current.md)をダウンロードして添付し、`実行` と送ります。添付できなければ本文全文を貼り付けます。[ファイル添付の補足](docs/wiki/Upload-File.md)
 
 **社内Copilot等で外部Markdownにアクセスできない場合**は、[ZIP一括キット](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/releases/download/guides-current/ADNC_Offline_Installer_Current.zip)を人間が取得して添付します。ZIPを開けない環境なら[単一Markdown代替](https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/releases/download/guides-current/ADNC_Offline_Installer_Current.md)を添付してください。いずれも初期KBそのものではなく導入資料です。社内の許可された経路で渡してください。
 
