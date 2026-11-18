@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "product": "AD&C",
   "track": "installer",
-  "latest_version": "1.5.8",
+  "latest_version": "1.6.0",
   "releases": [
     {
       "from_version": "1.3.10",
@@ -273,6 +273,30 @@
         }
       ],
       "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.7-to-1.5.8.md"
+    },
+    {
+      "from_version": "1.5.8",
+      "to_version": "1.6.0",
+      "title": "AI横断のメモリ・持続指示をPlaybook発見の補助経路として任意導入",
+      "summary": "AI製品のメモリ／プロフィール／カスタム指示には最小の発見用カプセルだけを置く。正本は既存KB。メモリのないAIには既存入口へフォールバックし、初回導入・保存先・ID・承認・復旧履歴は変更しない。",
+      "changes": [
+        {
+          "target": "共通インストーラー",
+          "kind": "互換な任意案内",
+          "detail": "短い共通カプセル・持続設定への任意登録・利用不可時の正本発見経路。本人希望がない場合は追加登録・質問を強制しない"
+        },
+        {
+          "target": "既存KB・個人メモリ",
+          "kind": "保持",
+          "detail": "START_HERE／BUILD_PLAN／registry／NodeID／fileId／個人の選好や履歴は無断変更なし。メモリ実設定は別判定"
+        },
+        {
+          "target": "START_HERE.md",
+          "kind": "検収後だけ版更新",
+          "detail": "本人が承認した版別更新後に実読戻ししADNC_INSTALLER_VERSIONを1.6.0へ。旧版不明なら推定しない"
+        }
+      ],
+      "instruction_url": "https://github.com/Yosio-DMZ-C/AI-DODAI-Continuity/blob/main/docs/updates/upgrade-1.5.8-to-1.6.0.md"
     }
   ]
 }
