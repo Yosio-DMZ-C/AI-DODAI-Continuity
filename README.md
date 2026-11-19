@@ -14,6 +14,7 @@
 
 - **組織標準の優先範囲**：組織が管理する共有領域の作業はその組織の正式標準を優先。組織へデータを入れるときは元データの提供条件と受入条件、出すときは元組織の持出条件と受入条件の双方を確認。複数組織の固定序列は作らず、具体的な範囲と例は[一般インストーラー §5.1](docs/AgentOS-C_設計・構築運用指示書_一般配布版.md#51-組織の正式標準が優先する作業領域と持込み持出しの境界2026-11-12適用範囲設計)。
 - **使うとき**：[共有KBの目的別Playbook案内](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md#自然な依頼からのskill選択入口を取得できたai向け試験運用) → 該当する専門Playbook。通常の返答・次の一手は[標準コミュニケーション](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/communication-navigation/SKILL.md)。
+- **実行先を一本にする（共有KBの既存入口へ接続）**：自然文の目的→[目的別索引と一本化手順](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/README.md#自然な依頼からのskill選択入口を取得できたai向け試験運用)→本人・組織・個人KBの優先条件に合う主Playbookを原則1本選択→その本文・ID・版を実取得→案件の主担当として固定→実行・検収。中断・AI交代の再開は、既存の`BUILD_PLAN`／Project・Area Contextに保存した主Playbook・既済成果・次の1工程を再取得して**同じ実行正本へ戻す**。補助ガイド・ループ方式は主担当から必要時だけ呼び、新Task・台帳・別Runbookを増やさない。実際に保存・読戻しできない環境では未実施と明記する。
 - **作る・改訂するときだけ**：[Playbook更新プラクティス](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/docs/DEVELOPMENT_WORKFLOW_PRACTICES.md)と、対象に既存のDesigner’s Noteがあればその内容を参照。一般実行へ事前審査を増やさない。
 - **本体を開発するとき**：必要な箇所だけ[共通実行標準](docs/PROJECT_EXECUTION_STANDARD.md)。詳細と長期の設計理由は既存正本へリンクし、この入口には複製しません。WORK60等の特定環境向け運用は全利用者の標準ではありません。
 - **自然な改善・障害解消依頼**：「直して／改善して／動かない」は明示の「ループで」がなくても[ループ方式Playbook](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/loop-development/SKILL.md)の**同一実行内の小さな内×閉**（観測→修正→実測→必要なら再修正）を原則使用。初回で直れば終了し、定期タスクや別AIを自動新設しません。
