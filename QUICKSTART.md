@@ -39,6 +39,8 @@ ZIPが出力されない場合やファイルを受け取れない場合は、AI
 
 **任意：動画をシリーズで制作したい場合**は、KB作成後に「動画の初期設定もしたい」と伝えると、採用見本PPTX・色・ロゴ・音声方式の参照を非公開KBへまとめる手順を利用できます（[公開Draft手順](https://github.com/Yosio-DMZ-C/AD-C-Shared-Knowledge/blob/main/skills/video-production-setup/SKILL.md)）。通常の導入には不要です。実PPTやロゴをGitHubへ公開する必要はありません。
 
+**Google連携する道具を使う場合（任意）：** OAuthの7日失効、本番化、Google確認、ドメインの費用と操作、週次再同意の選択肢を、[Google連携のOAuthトークン運用｜人間用ガイド](docs/GOOGLE_OAUTH_TOKEN_OPERATIONS_GUIDE.md)で確認できます。YouTube Posterへの適用例もあります。通常のAD&C導入には不要です。
+
 ## 4. 続きから使うには
 
 保存したファイルを次のチャットに渡すところから試せます。再読込や更新ができる範囲はAI環境によって異なるため、元のバックアップを残したまま試してください。
