@@ -3,6 +3,7 @@ import json
 import tempfile
 import unittest
 import sys
+from unittest.mock import patch
 from datetime import date
 from pathlib import Path
 
@@ -109,11 +110,35 @@ class DashboardTests(unittest.TestCase):
             (root / "html_to_pdf.py").write_text(
                 "import json; print(json.dumps({'status':'FAIL','reason':'synthetic converter failure'})); raise SystemExit(1)\n",
                 encoding="utf-8")
-            result = dashboard.generate(data, root / "out", script_dir=root, today="2026-11-23")
+            with patch.object(dashboard, "_write_reportlab_pdf", side_effect=RuntimeError("synthetic ReportLab failure")):
+                result = dashboard.generate(data, root / "out", script_dir=root, today="2026-11-23")
             self.assertTrue((root / "out" / "morning_report.txt").is_file())
             self.assertTrue((root / "out" / "secretary_dashboard.json").is_file())
             self.assertIn("FAIL", result["outputs"]["pdf"])
             self.assertEqual(result["outputs"]["text"], "PASS")
+
+    def test_reportlab_direct_pdf_from_dashboard_json_is_japanese_and_linked(self):
+        data = make_input()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            result = dashboard.generate(data, root / "out", script_dir=root, today="2026-11-23")
+            pdf = root / "out" / "secretary_dashboard.pdf"
+            self.assertEqual(result["outputs"]["pdf"], "PASS")
+            self.assertEqual(result["outputs"]["pdf_method"], "reportlab")
+            self.assertTrue(pdf.read_bytes().startswith(b"%PDF-"))
+            self.assertIn(b"/URI", pdf.read_bytes())
+            import subprocess
+            extracted = subprocess.run(["pdftotext", str(pdf), "-"], capture_output=True, text=True)
+            if extracted.returncode == 0:
+                self.assertIn("個人タスク", extracted.stdout)
+                self.assertIn("UNKNOWN", extracted.stdout)
+            try:
+                import fitz
+                with fitz.open(pdf) as document:
+                    links = [link.get("uri") for page in document for link in page.get_links()]
+                self.assertIn("https://example.invalid/task/1", links)
+            except ImportError:
+                pass
 
     def test_unwritable_destination_still_returns_morning_text_and_status(self):
         data = make_input()
