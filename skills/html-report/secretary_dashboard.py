@@ -12,6 +12,7 @@ import os
 import subprocess
 import sys
 import tempfile
+from html import escape
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -289,6 +290,73 @@ def _atomic_write(path: Path, content: str) -> None:
             pass
 
 
+def _write_reportlab_pdf(report: dict[str, Any], output: Path) -> None:
+    """Write a selectable Japanese PDF directly from the existing renderer JSON.
+
+    ReportLab's built-in Japanese CID font avoids Chromium and external font
+    downloads. This is intentionally a simple, single-column text report; HTML
+    remains the richer view and Chromium remains the fallback converter.
+    """
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_LEFT
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+    font_name = "HeiseiKakuGo-W5"
+    pdfmetrics.registerFont(UnicodeCIDFont(font_name))
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        "SecretaryTitle", parent=styles["Title"], fontName=font_name,
+        fontSize=17, leading=22, alignment=TA_LEFT, textColor=colors.HexColor("#17324d"),
+    )
+    body_style = ParagraphStyle(
+        "SecretaryBody", parent=styles["BodyText"], fontName=font_name,
+        fontSize=9, leading=13, spaceAfter=3,
+    )
+    heading_style = ParagraphStyle(
+        "SecretaryHeading", parent=body_style, fontSize=11, leading=15,
+        textColor=colors.HexColor("#164e63"), spaceBefore=6, spaceAfter=3,
+    )
+    story = [Paragraph(escape(str(report.get("title") or "秘書の日次ダッシュボード")), title_style), Spacer(1, 7)]
+    snapshot = report.get("snapshot_date")
+    if snapshot:
+        story.append(Paragraph("対象日：" + escape(str(snapshot)), body_style))
+    if report.get("source_checked_at"):
+        story.append(Paragraph("取得確認：" + escape(str(report["source_checked_at"])), body_style))
+    if report.get("summary"):
+        for line in str(report["summary"]).splitlines():
+            story.append(Paragraph(escape(line), body_style))
+    source_url = report.get("source_url")
+    if source_url:
+        url = escape(str(source_url), quote=True)
+        story.append(Paragraph(f'<link href="{url}" color="#1769aa">正本リンク</link>', body_style))
+    story.append(Spacer(1, 5))
+    for item in report.get("items", []):
+        if not isinstance(item, dict):
+            continue
+        label = " ".join(str(item.get(key) or "") for key in ("id", "title") if item.get(key))
+        story.append(Paragraph(escape(label or "項目（名称未確認）"), heading_style))
+        for key, label_text in (("status", "状態"), ("owner", "担当"), ("due", "期限"),
+                                ("evidence", "根拠"), ("next_action", "次の一手")):
+            value = item.get(key)
+            if value not in (None, ""):
+                story.append(Paragraph(f"{label_text}：{escape(str(value))}", body_style))
+        item_url = item.get("source_url")
+        if item_url:
+            url = escape(str(item_url), quote=True)
+            story.append(Paragraph(f'<link href="{url}" color="#1769aa">資料リンク</link>', body_style))
+        story.append(Spacer(1, 3))
+    output.parent.mkdir(parents=True, exist_ok=True)
+    doc = SimpleDocTemplate(str(output), pagesize=A4, rightMargin=36, leftMargin=36,
+                            topMargin=36, bottomMargin=36, title=str(report.get("title") or "Secretary dashboard"))
+    doc.build(story)
+    if not output.is_file() or output.stat().st_size < 500:
+        raise RuntimeError("ReportLab PDF output not generated")
+
+
 def generate(data: dict[str, Any], out_dir: Path, script_dir: Path | None = None,
              today: date | str | None = None, pdf_enabled: bool = True) -> dict[str, Any]:
     script_dir = script_dir or Path(__file__).resolve().parent
@@ -327,11 +395,24 @@ def generate(data: dict[str, Any], out_dir: Path, script_dir: Path | None = None
             events.append(f"SAVE_{name.upper()}={save[name]}")
 
     pdf_state = "NOT_RUN"
+    pdf_method = "NOT_RUN"
     if pdf_enabled and save.get("html") == "PASS":
         converter = script_dir / "html_to_pdf.py"
-        if not converter.is_file():
-            pdf_state = "NOT_RUN:converter_missing"
-        else:
+        try:
+            _write_reportlab_pdf(result["renderer_input"], paths["pdf"])
+            pdf_state = "PASS"
+            pdf_method = "reportlab"
+            events.append(f"PDF=PASS:reportlab:{paths['pdf'].stat().st_size}bytes")
+        except Exception as exc:
+            events.append(f"PDF_REPORTLAB=FAIL:{type(exc).__name__}:{exc}")
+            try:
+                paths["pdf"].unlink(missing_ok=True)
+            except OSError:
+                pass
+        if pdf_state != "PASS" and not converter.is_file():
+            pdf_state = "NOT_RUN:converter_missing_after_reportlab_failure"
+            pdf_method = "NOT_RUN"
+        elif pdf_state != "PASS":
             try:
                 proc = subprocess.run(
                     [sys.executable, str(converter), str(paths["html"]), "--output", str(paths["pdf"]), "--no-web-logo"],
@@ -344,12 +425,15 @@ def generate(data: dict[str, Any], out_dir: Path, script_dir: Path | None = None
                     parsed = {}
                 if proc.returncode == 0 and paths["pdf"].is_file():
                     pdf_state = "PASS"
+                    pdf_method = "chromium_fallback"
                     events.append(f"PDF=PASS:{parsed.get('bytes', paths['pdf'].stat().st_size)}bytes")
                 else:
                     pdf_state = f"FAIL:{parsed.get('reason') or detail or f'exit_{proc.returncode}'}"
+                    pdf_method = "FAIL"
                     events.append(f"PDF={pdf_state}")
             except Exception as exc:
                 pdf_state = f"FAIL:{type(exc).__name__}:{exc}"
+                pdf_method = "FAIL"
                 events.append(f"PDF={pdf_state}")
     elif pdf_enabled:
         pdf_state = "NOT_RUN:html_unavailable"
@@ -359,6 +443,7 @@ def generate(data: dict[str, Any], out_dir: Path, script_dir: Path | None = None
         "html": save.get("html", "NOT_RUN"),
         "text": save.get("text", "NOT_RUN"),
         "pdf": pdf_state,
+        "pdf_method": pdf_method,
         "json": "PENDING",
         "log": "PENDING",
         "paths": {key: str(value) for key, value in paths.items()},
