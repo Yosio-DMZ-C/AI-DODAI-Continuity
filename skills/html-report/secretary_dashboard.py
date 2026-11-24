@@ -227,7 +227,7 @@ def build_bundle(data: dict[str, Any], today: date | str | None = None) -> dict[
     dashboard_items.extend(case_items)
     report_data = {
         "kind": "secretary",
-        "title": _as_string(data.get("title")) or "😊 秘書の日次業務",
+        "title": _as_string(data.get("title")) or "秘書の日次業務",
         "snapshot_date": snapshot_date,
         "source_checked_at": checked,
         "source_label": source_label,
