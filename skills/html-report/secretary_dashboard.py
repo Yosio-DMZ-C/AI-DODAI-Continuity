@@ -227,17 +227,17 @@ def build_bundle(data: dict[str, Any], today: date | str | None = None) -> dict[
     dashboard_items.extend(case_items)
     report_data = {
         "kind": "secretary",
-        "title": _as_string(data.get("title")) or "秘書の日次ダッシュボード",
+        "title": _as_string(data.get("title")) or "😊 秘書の日次業務",
         "snapshot_date": snapshot_date,
         "source_checked_at": checked,
         "source_label": source_label,
         "source_url": source_url,
         "visibility": "private",
-        "summary": summary,
+        "summary": "おはようございます (^_^)\n" + summary,
         "handoff": _as_string(data.get("handoff")),
         "items": dashboard_items,
     }
-    morning_report = "\n".join([report_data["title"], *summary_lines])
+    morning_report = "\n".join([report_data["title"], "おはようございます (^_^)", *summary_lines])
     return {
         "schema": "ADNC_SECRETARY_DASHBOARD_V1",
         "snapshot_date": snapshot_date,
