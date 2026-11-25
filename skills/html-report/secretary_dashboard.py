@@ -460,8 +460,8 @@ def generate(data: dict[str, Any], out_dir: Path, script_dir: Path | None = None
     # JSON is last so it records conversion and log status. Failure cannot
     # suppress the already-built morning report emitted by main().
     try:
-        _atomic_write(paths["json"], json.dumps(result, ensure_ascii=False, indent=2) + "\n")
         result["outputs"]["json"] = "PASS"
+        _atomic_write(paths["json"], json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     except Exception as exc:
         result["outputs"]["json"] = f"FAIL:{type(exc).__name__}:{exc}"
         events.append(f"SAVE_JSON={result['outputs']['json']}")
