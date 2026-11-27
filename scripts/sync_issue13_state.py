@@ -246,8 +246,52 @@ def pending_tasks(body):
     return rows
 
 
+def existing_pending_rows(body):
+    """Read the displayed rows as-is; enriched rows are not safely reproducible."""
+    match = re.search(re.escape(OPEN_BEGIN) + r"(.*?)" + re.escape(OPEN_END), body, re.S)
+    if not match:
+        return {}
+    rows = {}
+    for line in match.group(1).splitlines():
+        if not line.startswith("|"):
+            continue
+        columns = [part.strip() for part in line.strip().strip("|").split("|")]
+        if not columns or not TASK_ID.fullmatch(columns[0]):
+            continue
+        if len(columns) < 5 or columns[0] in rows:
+            raise RuntimeError("Invalid or duplicate existing pending task row: " + columns[0])
+        rows[columns[0]] = (line, columns)
+    return rows
+
+
+def preserve_annotated_pending_row(existing, generated, priority, status, ident):
+    """Keep human-enriched visible rows; refuse ambiguous status/priority drift."""
+    if not existing:
+        return generated
+    original, columns = existing
+    if original == generated:
+        return generated
+    old_state = re.match(r"\*{0,2}([A-Z_]+)", columns[2])
+    # Compare annotation to the *previous* status, so ordinary status updates still work.
+    annotated = (
+        len(columns) != 5 or not old_state or
+        columns[2] != f"**{old_state.group(1)}**" or
+        "**" in columns[3] or "**" in columns[4] or
+        "[" in columns[4] or len(columns[4]) > 85
+    )
+    if not annotated:
+        return generated
+    old_priority = re.match(r"P[0-3]", columns[1])
+    new_priority = re.match(r"P[0-3]", priority)
+    if (not old_state or old_state.group(1) != status or not old_priority or
+            not new_priority or old_priority.group(0) != new_priority.group(0)):
+        raise RuntimeError("Annotated pending row differs from canonical status/priority: " + ident)
+    return original
+
+
 def render_pending_block(body):
     pending = pending_tasks(body)
+    originals = existing_pending_rows(body)
     out = [OPEN_BEGIN, "## 未完了・要追跡（自動抽出）", "",
            "> **DONEまたは理由付きDROPPEDになるまで追跡フラグが残ります。**",
            "> BLOCKED・REVIEW_PENDING・WAITING・PROPOSEDも隠しません。",
@@ -265,7 +309,9 @@ def render_pending_block(body):
         brief_owner = re.sub(r"\s+", " ", assignee).replace("|", "／")
         if len(brief_owner) > 48:
             brief_owner = brief_owner[:45] + "…"
-        out.append(f"| {ident} | {priority} | **{status}** | {brief_owner} | {brief} |")
+        generated = f"| {ident} | {priority} | **{status}** | {brief_owner} | {brief} |"
+        out.append(preserve_annotated_pending_row(
+            originals.get(ident), generated, priority, status, ident))
     out.extend(["",
                 "**再開の入口**：下のタスク表の対象ID→既存PR/Issue/BUILD_PLANの現行状態→最終実取得→次の1工程。",
                 "資料・接続が欠ける場合はNOT_RUNのまま保全。作業が途中終了したら担当・失敗箇所・次の一手を対象行へ書き戻す。",
@@ -350,6 +396,58 @@ def self_test():
     assert "未完了：2 件" in highlighted
     assert replace_pending_block(highlighted) == highlighted
     assert "ADNC-T001 |" not in highlighted.split(OPEN_END)[0]
+    # Real Issue #13 has two human-enriched display rows, one with an evidence link.
+    # Rebuild must never shorten or discard those notes simply because they are a view.
+    plain2 = "| ADNC-T002 | P0 | **BLOCKED** | AI | PR失敗後の復旧 |"
+    plain3 = "| ADNC-T003 | P1 | **REVIEW_PENDING** | AI | レビュー待ち |"
+    enriched2 = ("| ADNC-T002 | P0（詳細あり） | **BLOCKED（追加検査待ち）** | "
+                 "AI（担当） | **手編集された長い詳細を保全** | [証拠](https://github.com/example) |")
+    enriched3 = ("| ADNC-T003 | P1 | **REVIEW_PENDING（独立検証待ち）** | "
+                 "AI | **手編集された未解消条件** |")
+    annotated = highlighted.replace(plain2, enriched2).replace(plain3, enriched3)
+    assert annotated != highlighted and enriched2 in annotated and enriched3 in annotated
+    assert replace_pending_block(annotated) == annotated
+    assert enriched2 in replace_pending_block(annotated)
+    assert enriched3 in replace_pending_block(annotated)
+
+    # A newly registered task must appear without losing existing enriched rows.
+    # This guards against a renderer that preserves annotations but freezes the queue.
+    expanded = annotated.replace(
+        "| ADNC-T003 | P1 | レビュー待ち | AI | REVIEW_PENDING | source |",
+        "| ADNC-T003 | P1 | レビュー待ち | AI | REVIEW_PENDING | source |\n"
+        "| ADNC-T005 | P2 | 新規の安全な検査 | AI | IN_PROGRESS | new |",
+    )
+    assert expanded != annotated
+    expanded_view = replace_pending_block(expanded)
+    assert enriched2 in expanded_view and enriched3 in expanded_view
+    assert "| ADNC-T005 | P2 | **IN_PROGRESS** | AI | 新規の安全な検査 |" in expanded_view
+    assert "未完了：3 件" in expanded_view
+    assert replace_pending_block(expanded_view) == expanded_view
+
+    # Canonical DONE removes an active row; a new ordinary status can still be rendered.
+    finished = annotated.replace("REVIEW_PENDING | source |", "DONE（実体確認済み） | source |")
+    updated_finished = replace_pending_block(finished)
+    assert enriched2 in updated_finished and enriched3 not in updated_finished
+    assert "未完了：1 件" in updated_finished
+    ordinary_changed = highlighted.replace("REVIEW_PENDING | source |", "BLOCKED（待機） | source |")
+    assert "| ADNC-T003 | P1 | **BLOCKED** | AI | レビュー待ち |" in replace_pending_block(ordinary_changed)
+
+    # Protected rows require manual reconciliation if canonical state/priority differs.
+    for inconsistent in (
+        annotated.replace("BLOCKED（CI異常） | PR |", "IN_PROGRESS（修理中） | PR |"),
+        annotated.replace("| ADNC-T002 | P0 | PR失敗後の復旧", "| ADNC-T002 | P1 | PR失敗後の復旧"),
+    ):
+        try:
+            replace_pending_block(inconsistent)
+            raise AssertionError("Conflicting annotated task must abort")
+        except RuntimeError:
+            pass
+    duplicated = annotated.replace(enriched2 + "\n", enriched2 + "\n" + enriched2 + "\n")
+    try:
+        replace_pending_block(duplicated)
+        raise AssertionError("Duplicate visible task ID must abort")
+    except RuntimeError:
+        pass
     try:
         pending_tasks("# No task list")
         raise AssertionError("Missing task list must not be silently successful")
@@ -366,7 +464,27 @@ def self_test():
     invalid_task = dict(registered)
     invalid_task["user"] = {"login": "not-owner"}
     assert recover_registered_tasks(synthetic, [invalid_task]) == synthetic
-    print("SELF_TEST_PASS: latest-wins, idempotent, authenticated events, pending-work flags, refusal on missing list")
+    print("SELF_TEST_PASS: latest-wins, idempotent, authenticated events, pending-work flags, annotated-row retention, fail-closed drift, refusal on missing list")
+
+
+def replay_issue_readonly(issue_body):
+    """Replay the pending display from a supplied real Issue body, without network or writes.
+
+    Caller supplies a previously fetched public Issue #13 body. Never run main(),
+    never fetch comments, and never PATCH the live Issue.
+    """
+    if not isinstance(issue_body, str) or TASK_HEADER not in issue_body:
+        raise RuntimeError("Missing real Issue task table")
+    rebuilt = replace_pending_block(issue_body)
+    if rebuilt != issue_body:
+        before = existing_pending_rows(issue_body)
+        after = existing_pending_rows(rebuilt)
+        changed = [ident for ident in sorted(set(before) | set(after))
+                   if before.get(ident) != after.get(ident)]
+        print("READ_ONLY_REPLAY_DIFF:", json.dumps(changed, ensure_ascii=False))
+        return False
+    print("READ_ONLY_REPLAY_PASS:", len(pending_tasks(issue_body)), "open tasks; byte-identical")
+    return True
 
 
 def main():

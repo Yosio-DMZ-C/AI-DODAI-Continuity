@@ -1,0 +1,44 @@
+name: T015 PR60 isolated self-test
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/sync_issue13_state.py'
+      - '.github/workflows/t015-pr60-self-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  self-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python syntax check
+        run: python3 -m py_compile scripts/sync_issue13_state.py
+      - name: Existing full-source self-test (offline)
+        run: python3 scripts/sync_issue13_state.py --self-test
+      - name: Read-only replay against real Issue 13
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+          from scripts.sync_issue13_state import replay_issue_readonly
+          repo = os.environ["GITHUB_REPOSITORY"]
+          url = "https://api.github.com/repos/" + repo + "/issues/13"
+          req = urllib.request.Request(url, headers={
+              "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+              "Accept": "application/vnd.github+json",
+              "User-Agent": "adnc-t015-readonly-replay",
+          })
+          with urllib.request.urlopen(req, timeout=20) as resp:
+              body = json.load(resp)["body"]
+          if not replay_issue_readonly(body):
+              raise SystemExit("Read-only replay differs from current Issue; no writes performed")
+          PY
